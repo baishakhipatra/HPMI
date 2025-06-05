@@ -32,7 +32,7 @@
             @csrf
             <div class="form-floating form-floating-outline mb-5">
               <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus>
-              <label for="email">Email</label>
+              <label for="email">Email or Username</label>
                 @error('email-username')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -69,7 +69,7 @@
 
           <p class="text-center mb-5">
             <span>New on our platform?</span>
-            <a href="{{url('auth/register-basic')}}">
+            <a href="{{route('auth-register-basic')}}">
               <span>Create an account</span>
             </a>
           </p>

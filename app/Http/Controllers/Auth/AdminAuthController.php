@@ -43,12 +43,24 @@ class AdminAuthController extends Controller
             'password.required' => 'Please enter your password.',
         ]);
 
-        $credentials = [
-            'email' => $request->input('email-username'),
-            'password' => $request->input('password'),
-        ];
+        // $credentials = [
+        //     'email' => $request->input('email-username'),
+        //     'password' => $request->input('password'),
+        // ];
 
-        if (Auth::guard('admin')->attempt($credentials)) {
+        // if (Auth::guard('admin')->attempt($credentials)) {
+        //     return redirect()->route('admin.dashboard');
+        // }
+        $login_input = $request->input('email-username');
+        $password = $request->input('password');
+
+        // First try login assuming input is email
+        if (Auth::guard('admin')->attempt(['email' => $login_input, 'password' => $password])) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // If email login failed, try with username (name)
+        if (Auth::guard('admin')->attempt(['name' => $login_input, 'password' => $password])) {
             return redirect()->route('admin.dashboard');
         }
 

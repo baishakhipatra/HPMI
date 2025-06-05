@@ -64,7 +64,7 @@
 
           <p class="text-center mb-5">
             <span>Already have an account?</span>
-            <a href="{{url('auth/login-basic')}}">
+            <a href="{{route('auth-login-basic')}}">
               <span>Sign in instead</span>
             </a>
           </p>
