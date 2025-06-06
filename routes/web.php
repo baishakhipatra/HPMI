@@ -135,5 +135,7 @@ Route::prefix('admin')->group(function () {
     // Protected admin dashboard
     Route::middleware('admin')->group(function () {
         Route::get('/dashboard', [Analytics::class, 'index'])->name('admin.dashboard');
+        Route::get('/profile', [AdminAuthController::class, 'profile'])->name('admin.profile');
+        Route::post('/update-profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
     });
 });

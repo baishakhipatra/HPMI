@@ -49,9 +49,9 @@ $navbarDetached = ($navbarDetached ?? '');
         <ul class="navbar-nav flex-row align-items-center ms-auto">
 
           <!-- Place this tag where you want the button to render. -->
-          <li class="nav-item lh-1 me-4">
+          {{-- <li class="nav-item lh-1 me-4">
             <a class="github-button" href="{{config('variables.repository')}}" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star themeselection/materio-html-laravel-admin-template-free on GitHub">Star</a>
-          </li>
+          </li> --}}
 
           <!-- User -->
           <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -71,7 +71,7 @@ $navbarDetached = ($navbarDetached ?? '');
                     </div>
                     <div class="flex-grow-1">
                       <h6 class="mb-0 small">{{ Auth::guard('admin')->user()->name ?? 'Admin' }}</h6>
-                      <small class="text-muted">Admin</small>
+                      <small class="text-muted">{{ Auth::guard('admin')->user()->user_type ?? 'Admin' }}</small>
                     </div>
                   </div>
                 </a>
@@ -80,18 +80,18 @@ $navbarDetached = ($navbarDetached ?? '');
                 <div class="dropdown-divider"></div>
               </li>
               <li>
-                <a class="dropdown-item" href="javascript:void(0);">
+                <a class="dropdown-item" href="{{route('admin.profile')}}">
                   <i class="ri-user-3-line ri-22px me-2"></i>
                   <span class="align-middle">My Profile</span>
                 </a>
               </li>
-              <li>
+              {{-- <li>
                 <a class="dropdown-item" href="javascript:void(0);">
                   <i class='ri-settings-4-line ri-22px me-2'></i>
                   <span class="align-middle">Settings</span>
                 </a>
-              </li>
-              <li>
+              </li> --}}
+              {{-- <li>
                 <a class="dropdown-item" href="javascript:void(0);">
                   <span class="d-flex align-items-center align-middle">
                     <i class="flex-shrink-0 ri-file-text-line ri-22px me-3"></i>
@@ -99,7 +99,7 @@ $navbarDetached = ($navbarDetached ?? '');
                     <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger h-px-20 d-flex align-items-center justify-content-center">4</span>
                   </span>
                 </a>
-              </li>
+              </li> --}}
               <li>
                 <div class="dropdown-divider"></div>
               </li>

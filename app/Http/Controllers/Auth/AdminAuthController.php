@@ -15,13 +15,17 @@ class AdminAuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'username' => 'required|string|max:255',
+            'name'     => 'required|string|max:255',
+            'user_name' => 'required|string|max:255',
+            'user_type' => 'required|in:admin,teacher,employee',
             'email' => 'required|email|unique:admins,email',
             'password' => 'required|min:6',
         ]);
 
         Admin::create([
-            'name' => $request->username,
+            'name'     => $request->name,
+            'user_name' => $request->user_name,
+            'user_type' => ucwords($request->user_type),
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -51,11 +55,32 @@ class AdminAuthController extends Controller
         }
 
         // If email login failed, try with username (name)
-        if (Auth::guard('admin')->attempt(['name' => $login_input, 'password' => $password])) {
+        if (Auth::guard('admin')->attempt(['user_name' => $login_input, 'password' => $password])) {
             return redirect()->route('admin.dashboard');
         }
 
-        return back()->withErrors(['email-username' => 'Invalid credentials']);
+        return back()->withErrors(['email-user_name' => 'Invalid credentials']);
+    }
+
+    public function profile()
+    {
+        $admin = auth()->guard('admin')->user();
+        return view('admin.profile-update.profile',compact('admin'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $admin = auth()->guard('admin')->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'user_name' => 'required|string|max:255|unique:admins,user_name,' . $admin->id,
+            'email' => 'required|email|unique:admins,email,' . $admin->id,
+        ]);
+
+        $admin->update($request->only(['name','user_name','email']));
+
+        return redirect()->back()->with('success','profile updated successfully');
     }
 
     public function logout(Request $request)

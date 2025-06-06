@@ -31,8 +31,20 @@
           <form id="formAuthentication" class="mb-5" action="{{ route('admin.register.submit') }}" method="POST">
             @csrf
             <div class="form-floating form-floating-outline mb-5">
-              <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" autofocus>
-              <label for="username">Username</label>
+              <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" autofocus>
+              <label for="name">Name</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-5">
+              <input type="text" class="form-control" id="user_name" name="user_name" placeholder="Enter your username" autofocus>
+              <label for="user_name">Username</label>
+            </div>
+            <div class="form-floating form-floating-outline mb-5">
+              <select class="form-select" id="user_type" name="user_type">
+                <option value="admin" selected>Admin</option>
+                <option value="teacher">Teacher</option>
+                <option value="employee">Employee</option>
+              </select>
+              <label for="user_type">User Type</label>
             </div>
             <div class="form-floating form-floating-outline mb-5">
               <input type="text" class="form-control" id="email" name="email" placeholder="Enter your email">
