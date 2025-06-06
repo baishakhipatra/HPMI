@@ -1,17 +1,13 @@
 {
   "menu": [
     {
-      "url": "/",
+      "url": "admin/dashboard",
       "name": "Dashboards",
       "icon": "menu-icon tf-icons ri-home-smile-line",
       "slug": "dashboard",
-      "badge": [
-        "danger",
-        "5"
-      ],
       "submenu": [
         {
-          "url": "https://demos.themeselection.com/materio-bootstrap-html-laravel-admin-template/demo-1/dashboard/crm",
+          "url": "",
           "name": "CRM",
           "slug": "dashboard-crm",
           "target": "_blank",
@@ -148,6 +144,20 @@
         }
       ]
     },
+    
+    {
+      "name": "User Management",
+      "icon": "menu-icon tf-icons ri-database-2-line",
+      "slug": "laravel-example",
+      "submenu": [
+        {
+          "url": "admin/user-management/user-list",
+          "name": "User List",
+          "slug": "laravel-example-user-management"
+        }
+      ]
+    },
+    
     {
       "menuHeader": "Apps & Pages"
     },

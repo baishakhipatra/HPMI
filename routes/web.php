@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\Admin\UserListController;
 //End New Route
 
 use App\Http\Controllers\dashboard\Analytics;
@@ -133,9 +134,12 @@ Route::prefix('admin')->group(function () {
     Route::post('/forgot-password', [AdminAuthController::class, 'resetPassword'])->name('admin.reset-password');
 
     // Protected admin dashboard
-    Route::middleware('admin')->group(function () {
+    Route::middleware('admin', 'prevent-back-history')->group(function () {
         Route::get('/dashboard', [Analytics::class, 'index'])->name('admin.dashboard');
         Route::get('/profile', [AdminAuthController::class, 'profile'])->name('admin.profile');
         Route::post('/update-profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
+
+        //usermanagement/userlist
+        Route::get('/user-management/user-list', [UserListController::class, 'index'])->name('admin.userlist');
     });
 });

@@ -4,7 +4,8 @@
 
 @section('page-style')
 @vite([
-  'resources/assets/vendor/scss/pages/page-auth.scss'
+  'resources/assets/vendor/scss/pages/page-auth.scss',
+  'resources/css/app.css'
 ])
 @endsection
 
@@ -31,20 +32,41 @@
             <div class="form-floating form-floating-outline mb-4">
               <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required>
               <label for="email">Email</label>
+              @error('email')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
             </div>
 
-            <div class="form-floating form-floating-outline mb-4">
-              <input type="password" class="form-control" id="password" name="password" placeholder="New Password" required>
-              <label for="password">New Password</label>
+            <div class="form-password-toggle">
+              <div class="input-group input-group-merge">
+                <div class="form-floating form-floating-outline">
+                  <input type="password" id="password" class="form-control" name="password" placeholder="New Password" aria-describedby="password">
+                  <label for="password">New Password</label>
+                  @error('password')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
+                </div>
+                <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px toggle-password"></i></span>
+              </div>
             </div>
 
-            <div class="form-floating form-floating-outline mb-4">
-              <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" placeholder="Confirm Password" required>
-              <label for="password_confirmation">Confirm Password</label>
+            <div class="form-password-toggle mt-4">
+              <div class="input-group input-group-merge">
+                <div class="form-floating form-floating-outline">
+                  <input type="password" id="password_confirmation" class="form-control" name="password_confirmation" placeholder="Confirm Password" aria-describedby="password_confirmation">
+                  <label for="password_confirmation">Confirm Password</label>
+                  @error('password_confirmation')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
+                </div>
+                <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px toggle-password"></i></span>
+              </div>
             </div>
 
-            <button class="btn btn-primary d-grid w-100 mb-5">Reset Password</button>
-            {{-- <button class="btn btn-primary d-grid w-100 mb-5">Send Reset Link</button> --}}
+            <div class="mt-4">
+              <button class="btn btn-primary d-grid w-100 mb-5">Reset Password</button>
+              {{-- <button class="btn btn-primary d-grid w-100 mb-5">Send Reset Link</button> --}}
+            </div>
           </form>
           <div class="text-center">
             <a href="{{route('auth-login-basic')}}" class="d-flex align-items-center justify-content-center">
@@ -62,3 +84,20 @@
   </div>
 </div>
 @endsection
+<script>
+  document.querySelectorAll('.toggle-password').forEach(item => {
+    item.addEventListener('click', function () {
+      const input = document.querySelector(this.getAttribute('data-target'));
+      const icon = this.querySelector('i');
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.remove("ri-eye-off-line");
+        icon.classList.add("ri-eye-line");
+      } else {
+        input.type = "password";
+        icon.classList.remove("ri-eye-line");
+        icon.classList.add("ri-eye-off-line");
+      }
+    });
+  });
+</script>

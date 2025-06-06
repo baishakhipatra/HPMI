@@ -23,6 +23,7 @@ $container = ($container ?? 'container-xxl');
 
     @if ($isMenu)
     @include('layouts/sections/menu/verticalMenu')
+    {{-- @include('layouts.partials.sidebar') --}}
     @endif
 
 
