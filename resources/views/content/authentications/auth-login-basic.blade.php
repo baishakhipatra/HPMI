@@ -4,7 +4,8 @@
 
 @section('page-style')
 @vite([
-  'resources/assets/vendor/scss/pages/page-auth.scss'
+  'resources/assets/vendor/scss/pages/page-auth.scss',
+  'resources/css/app.css'
 ])
 @endsection
 
@@ -25,8 +26,10 @@
         <!-- /Logo -->
 
         <div class="card-body mt-1">
-          <h4 class="mb-1">Welcome to {{config('variables.templateName')}}! 👋🏻</h4>
-          <p class="mb-5">Please sign-in to your account and start the adventure</p>
+          <h4 class="mb-1" style="font-family: 'Georgia', serif; font-size: 18px; text-align: center;">
+            <strong>Welcome to {{config('variables.titleName')}}</strong>
+          </h4>
+          <p class="mb-5"></p>
 
           <form id="formAuthentication" class="mb-5" action="{{ route('admin.login.submit') }}" method="POST">
             @csrf
@@ -52,13 +55,13 @@
               </div>
             </div>
             <div class="mb-5 pb-2 d-flex justify-content-between pt-2 align-items-center">
-              <div class="form-check mb-0">
+              {{-- <div class="form-check mb-0">
                 <input class="form-check-input" type="checkbox" id="remember-me">
                 <label class="form-check-label" for="remember-me">
                   Remember Me
                 </label>
-              </div>
-              <a href="{{url('auth/forgot-password-basic')}}" class="float-end mb-1">
+              </div> --}}
+              <a href="{{ route('auth-reset-password-basic') }}" class="float-end mb-1">
                 <span>Forgot Password?</span>
               </a>
             </div>
@@ -68,7 +71,7 @@
           </form>
 
           <p class="text-center mb-5">
-            <span>New on our platform?</span>
+            <span>New on HPMI?</span>
             <a href="{{route('auth-register-basic')}}">
               <span>Create an account</span>
             </a>
