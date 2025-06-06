@@ -128,6 +128,9 @@ Route::prefix('admin')->group(function () {
     Route::post('/register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
     Route::post('/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
     Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+    
+    //for reset password
+    Route::post('/forgot-password', [AdminAuthController::class, 'resetPassword'])->name('admin.reset-password');
 
     // Protected admin dashboard
     Route::middleware('admin')->group(function () {

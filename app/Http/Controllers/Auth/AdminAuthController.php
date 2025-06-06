@@ -42,15 +42,6 @@ class AdminAuthController extends Controller
             'email-username.required' => 'Please enter your email or username.',
             'password.required' => 'Please enter your password.',
         ]);
-
-        // $credentials = [
-        //     'email' => $request->input('email-username'),
-        //     'password' => $request->input('password'),
-        // ];
-
-        // if (Auth::guard('admin')->attempt($credentials)) {
-        //     return redirect()->route('admin.dashboard');
-        // }
         $login_input = $request->input('email-username');
         $password = $request->input('password');
 
@@ -76,5 +67,18 @@ class AdminAuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('auth-login-basic');
+    }
+
+    //for reset password
+    public function resetPassword(Request $request) {
+        $request->validate([
+            'email' => 'required|email|exists:admins,email',
+            'password'  => 'required|confirmed|min:6',
+        ]);
+
+        Admin::where('email', $request->email)
+            ->update(['password'  => Hash::make($request->password)]);
+
+        return redirect()->route('auth-login-basic')->with('success', 'Password has been reset successfully!');
     }
 }

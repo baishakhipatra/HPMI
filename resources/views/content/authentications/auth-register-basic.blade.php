@@ -25,8 +25,8 @@
         </div>
         <!-- /Logo -->
         <div class="card-body mt-1">
-          <h4 class="mb-1">Adventure starts here 🚀</h4>
-          <p class="mb-5">Make your app management easy and fun!</p>
+          {{-- <h4 class="mb-1">Adventure starts here 🚀</h4>
+          <p class="mb-5">Make your app management easy and fun!</p> --}}
 
           <form id="formAuthentication" class="mb-5" action="{{ route('admin.register.submit') }}" method="POST">
             @csrf
@@ -49,13 +49,13 @@
             </div>
 
             <div class="mb-5 py-2">
-              <div class="form-check mb-0">
+              {{-- <div class="form-check mb-0">
                 <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms">
                 <label class="form-check-label" for="terms-conditions">
                   I agree to
                   <a href="javascript:void(0);">privacy policy & terms</a>
                 </label>
-              </div>
+              </div> --}}
             </div>
             <button class="btn btn-primary d-grid w-100 mb-5">
               Sign up
