@@ -140,6 +140,13 @@ Route::prefix('admin')->group(function () {
         Route::post('/update-profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
 
         //usermanagement/userlist
-        Route::get('/user-management/user-list', [UserListController::class, 'index'])->name('admin.userlist');
+        Route::prefix('user-management')->group(function() {
+            Route::get('/user-list', [UserListController::class, 'index'])->name('admin.userlist');
+            Route::get('user-list/edit/{id}', [UserListController::class, 'edit'])->name('admin.userlist.edit');
+            Route::post('user-list/update/{id}', [UserListController::class, 'update'])->name('admin.userlist.update');
+            Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.userlist.status');
+            Route::post('/delete', [UserListController::class, 'delete'])->name('admin.userlist.delete');
+        });
+        
     });
 });
