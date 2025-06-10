@@ -26,33 +26,36 @@
       </a>
     </li>
     
-    <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
-      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-        <i class="menu-icon tf-icons ri-store-line"></i>
-        <div>User Management</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {{ (request()->is('admin/user-management/user-list*')) ? 'open' : '' }}">
-          <a href="{{route('admin.userlist')}}" class="menu-link">
-            <div>User List</div>
+    {{-- @auth('admin')
+      @if(auth('admin')->user()->user_type == 'Admin') --}}
+        <li class="menu-item {{ (request()->is('admin/employees*')) ? 'open' : '' }}" style="">
+          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+            <i class="menu-icon tf-icons ri-store-line"></i>
+            <div>Employee Management</div>
           </a>
+          <ul class="menu-sub">
+            <li class="menu-item {{ (request()->is('admin/employees')) ? 'open' : '' }}">
+              <a href="{{route('admin.employee.index')}}" class="menu-link">
+                <div>Employee List</div>
+              </a>
+            </li>
+          </ul>
         </li>
-      </ul>
-    </li>
-
-    <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
-      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-        <i class="menu-icon tf-icons ri-store-line"></i>
-        <div>Student Management</div>
-      </a>
-      <ul class="menu-sub">
-        <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
-          <a href="{{route('admin.studentlist')}}" class="menu-link">
-            <div>Students List</div>
+        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+            <i class="menu-icon tf-icons ri-store-line"></i>
+            <div>Teacher Management</div>
           </a>
+          <ul class="menu-sub">
+            <li class="menu-item {{ (request()->is('admin/teacher-management/teacher-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.teacherlist')}}" class="menu-link">
+                <div>Teacher List</div>
+              </a>
+            </li>
+          </ul>
         </li>
-      </ul>
-    </li>
+      {{-- @endif
+    @endauth --}}
     <li class="menu-item">
       <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

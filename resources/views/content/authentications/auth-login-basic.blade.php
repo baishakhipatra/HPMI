@@ -35,11 +35,12 @@
             @csrf
             <div class="form-floating form-floating-outline mb-5">
               <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus>
-              <label for="email">Email or Username</label>
+              <label for="email">Email</label>
                 @error('email-username')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+            
             <div class="mb-5">
               <div class="form-password-toggle">
                 <div class="input-group input-group-merge">

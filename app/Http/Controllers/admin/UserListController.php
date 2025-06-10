@@ -13,9 +13,9 @@ class UserListController extends Controller
     public function index(Request $request) 
     {
         //dd($request->all());
-        if (Auth::guard('admin')->user()->user_type !== 'Admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
+        //     abort(403, 'Unauthorized access.');
+        // }
 
         $keyword = $request->input('keyword');
         $query = Admin::where('user_type', '!=', 'Admin');
@@ -32,6 +32,47 @@ class UserListController extends Controller
 
         return view('admin.user_management.userList', compact('admins'));
     }
+    public function create(){
+        $user_id = $this->generateTeacherId();
+        return view('admin.user_management.create',compact('user_id'));
+    }
+    private function generateTeacherId(){
+         do {
+            // Count existing Admins and increment for next ID
+            $count = Admin::count() + 1;
+
+            // Generate ID in the format TCH0001, TCH0002, etc.
+            $teacherId = 'EMP' . str_pad($count, 4, '0', STR_PAD_LEFT);
+
+            // Check uniqueness in the database
+            $exists = Admin::where('user_id', $teacherId)->exists();
+        } while ($exists);
+
+        return $teacherId;
+    }
+    public function store(Request $request) {
+        // dd($request->all());
+        $request->validate([
+            'teacher_id' => 'nullable|string',
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:teachers,email',
+            'phone' => 'required|string|max:20',
+            'date_of_birth'     => 'nullable|date',
+            'date_of_joining'   => 'nullable|date',
+            'qualifications'    => 'nullable|string',
+            'subjects_taught'   => 'nullable|string',
+            'classes_assigned'  => 'nullable|string',
+            'role' => 'required|string',
+        ]);
+
+        Admin::create($request->only([
+            'teacher_id', 'name', 'email', 'phone',
+            'date_of_birth', 'date_of_joining', 'qualifications',
+            'subjects_taught', 'classes_assigned', 'role'
+        ]));
+
+        return redirect()->route('admin.teacherlist')->with('success', 'Teacher created successfully');
+    }
 
     public function edit($id) {
         $data = Admin::findOrFail($id);
@@ -43,6 +84,7 @@ class UserListController extends Controller
             'name' => 'required|string|max:255',
             'user_name' => 'required|string|max:255',
             'user_type' => 'required',
+            'mobile' => 'required|digits:10|unique:admins,mobile,' . $id,
             'email' => 'required|email|unique:admins,email,' . $id,
         ]);
 
@@ -51,6 +93,7 @@ class UserListController extends Controller
             'name'   => $request->name,
             'user_name' => $request->user_name,
             'user_type' => $request->user_type,
+            'mobile' => $request->mobile,
             'email'  => $request->email,
         ]);
         return redirect()->route('admin.userlist')->with('success', 'User updated successfully!');
