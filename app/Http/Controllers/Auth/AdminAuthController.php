@@ -23,7 +23,7 @@ class AdminAuthController extends Controller
         ]);
 
         Admin::create([
-            'name'     => $request->name,
+            'name'     => ucwords($request->name),
             'user_name' => $request->user_name,
             'user_type' => ucwords($request->user_type),
             'email' => $request->email,
