@@ -23,6 +23,7 @@ $container = ($container ?? 'container-xxl');
 
     @if ($isMenu)
     @include('layouts/sections/menu/verticalMenu')
+    {{-- @include('layouts.partials.sidebar') --}}
     @endif
 
 
@@ -55,6 +56,23 @@ $container = ($container ?? 'container-xxl');
           @include('layouts/sections/footer/footer')
           @endif
           <!-- / Footer -->
+
+          <!-- jQuery -->
+          {{-- <script src="build/assets/jquery-3.6.0.min.js"></script> --}}
+          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+          <!-- Bootstrap Bundle (includes Popper for tooltip) -->
+          {{-- <script src="build/assets/bootstrap.bundle.min.js"></script> --}}
+          <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+          <!-- SweetAlert2 -->
+          {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
+          <script src="{{ asset('build/assets/sweetalert2@11.js') }}"></script>
+          <!-- Global custom JS -->
+          <script src="{{ asset('build/assets/custom.js') }}"></script>
+
+          <!-- Stacked scripts from individual views (optional) -->
+          @stack('scripts')
           <div class="content-backdrop fade"></div>
         </div>
         <!--/ Content wrapper -->

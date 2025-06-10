@@ -31,7 +31,7 @@ class AdminAuthController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('auth-login-basic');
         }
 
         return redirect()->route('auth-login-basic')->withErrors('Registration successful but login failed');
