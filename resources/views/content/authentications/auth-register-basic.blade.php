@@ -40,9 +40,9 @@
             </div>
             <div class="form-floating form-floating-outline mb-5">
               <select class="form-select" id="user_type" name="user_type">
-                <option value="admin" selected>Admin</option>
-                <option value="teacher">Teacher</option>
-                <option value="employee">Employee</option>
+                <option value="Admin" selected>Admin</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Employee">Employee</option>
               </select>
               <label for="user_type">User Type</label>
             </div>

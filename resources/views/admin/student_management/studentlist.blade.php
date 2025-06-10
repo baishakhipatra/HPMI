@@ -3,21 +3,21 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'User - List')
+@section('title', 'Student - List')
 
 @section('content')
 
-   @if(session('success'))
-      <div class="alert alert-success" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    @endif
+@if(session('success'))
+    <div class="alert alert-success" role="alert">
+    {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">User List</h3>
-    <a href="{{ route('auth-register-basic') }}" class="btn btn-primary btn-sm">+ Add User</a>
+    <h3 class="mb-0">Student List</h3>
+    <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
   </div>
 
   <div class="px-3 py-2">
@@ -50,54 +50,64 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>User Type</th>
+            <th>Student Name</th>
+            <th>Student ID</th>
+            <th>Date Of Birth</th>
+            <th>Gender</th>
+            <th>Admission Date</th>
+            <th>Class</th>
+            <th>Section</th>
+            <th>Roll Number</th>
             <th>Status</th>
-            <th>Actions</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
-          @foreach($admins as $item)
-            <tr>
-              <td>{{ ucfirst($item->name) }}</td>
-              <td>{{ $item->email }}</td>
-              <td>{{ ucfirst($item->user_type) }}</td>
+          @foreach($students as $item)
+            <tr> 
+              <td>{{ ucfirst($item->student_name) }}</td>
+              <td>{{ ($item->student_id) }}</td>
+              <td>{{ ($item->date_of_birth) }}</td>
+              <td>{{ $item->gender}}</td>
+              <td>{{ $item->admission_date }}</td>
+              <td>{{ $item->class }}</td>
+              <td>{{ $item->section }}</td>
+              <td>{{ $item->roll_number }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
-                      {{ $item->status ? 'checked' : ''}} onclick="statusToggle('{{route('admin.userlist.status', $item->id)}}', this)">
+                      {{ $item->status ? 'checked' : ''}} onclick="statusToggle('{{route('admin.studentstatus', $item->id)}}', this)">
                     <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
                   </div>
               </td>
-              {{-- Edit and delete --}}
               <td>
                 <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                       <i class="ri-more-2-line"></i>
                   </button>
                   <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.userlist.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
+                      <a class="dropdown-item" href="{{ route('admin.studentedit',  $item->id) }}" title="Edit" data-bs-toggle="tooltip">
                           <i class="ri-pencil-line me-1"></i> Edit
                       </a>
-                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
+                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteStudent({{$item->id}})">
                           <i class="ri-delete-bin-6-line me-1"></i> Delete
                       </a>
                   </div>
                 </div>
               </td>
- 
             </tr>
           @endforeach         
         </tbody>
       </table>
-      {{ $admins->links() }}
+      {{ $students->links() }}
     </div>
   </div>
   
 </div>
+@endsection
+
 <script>
-  function deleteUser(userId) {
+  function deleteStudent(studentId) {
     Swal.fire({
         icon: 'warning',
         title: "Are you sure you want to delete this?",
@@ -110,10 +120,10 @@
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
             $.ajax({
-                url: "{{ route('admin.userlist.delete')}}",
+                url: "{{ route('admin.studentdelete')}}",
                 type: 'POST',
                 data: {
-                    "id": userId,
+                    "id": studentId,
                     "_token": '{{ csrf_token() }}',
                 },
                 success: function (data){
@@ -129,4 +139,3 @@
     });
   }
 </script>
-@endsection

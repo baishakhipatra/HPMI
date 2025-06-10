@@ -14,14 +14,16 @@ class AdminAuthController extends Controller
 
     public function register(Request $request)
     {
+        //dd($request->all());
         $request->validate([
             'name'     => 'required|string|max:255',
             'user_name' => 'required|string|max:255',
-            'user_type' => 'required|in:admin,teacher,employee',
+            'user_type' => 'required|in:Admin,Teacher,Employee',
             'email' => 'required|email|unique:admins,email',
             'password' => 'required|min:6',
+        ],[
+            'email.unique'  => 'This email already registered. Please use a diffrent email address',
         ]);
-
         Admin::create([
             'name'     => ucwords($request->name),
             'user_name' => $request->user_name,
@@ -30,11 +32,11 @@ class AdminAuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
-            return redirect()->route('auth-login-basic');
-        }
+        // if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
+        //     return redirect()->route('auth-login-basic');
+        // }
 
-        return redirect()->route('auth-login-basic')->withErrors('Registration successful but login failed');
+        return redirect()->route('admin.userlist')->with('success', 'Registration successful');
     }
 
     public function login(Request $request)

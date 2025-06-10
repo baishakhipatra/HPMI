@@ -39,6 +39,20 @@
         </li>
       </ul>
     </li>
+
+    <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+        <i class="menu-icon tf-icons ri-store-line"></i>
+        <div>Student Management</div>
+      </a>
+      <ul class="menu-sub">
+        <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
+          <a href="{{route('admin.studentlist')}}" class="menu-link">
+            <div>Students List</div>
+          </a>
+        </li>
+      </ul>
+    </li>
     <li class="menu-item">
       <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

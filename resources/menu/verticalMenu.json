@@ -1,7 +1,7 @@
 {
   "menu": [
     {
-      "url": "/dashboard",
+      "url": "admin/dashboard",
       "name": "Dashboards",
       "icon": "menu-icon tf-icons ri-home-smile-line",
       "slug": "dashboard",
