@@ -1,4 +1,4 @@
-@extends('layouts/blankLayout')
+@extends('layouts/contentNavbarLayout')
 
 @section('title', 'Register Basic - Pages')
 
@@ -10,23 +10,23 @@
 
 
 @section('content')
-<div class="position-relative">
-  <div class="authentication-wrapper authentication-basic container-p-y">
-    <div class="authentication-inner py-6 mx-4">
+{{-- <div class="position-relative"> --}}
+  <div class="col-md-12 form-control-validation fv-plugins-icon-container">
+    <div class="form-floating form-floating-outline">
 
       <!-- Register Card -->
       <div class="card p-7">
-        <!-- Logo -->
-        <div class="app-brand justify-content-center mt-5">
-          <a href="{{url('/')}}" class="app-brand-link gap-3">
-            <span class="app-brand-logo demo">@include('_partials.macros',["height"=>20])</span>
-            <span class="app-brand-text demo text-heading fw-semibold">{{ config('variables.templateName') }}</span>
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h3 class="mb-0">User Registration</h3>
+          {{-- <a href="{{ route('auth-register-basic') }}" class="btn btn-primary btn-sm">+ Add User</a> --}}
+          <a href="{{route('admin.userlist')}}" class="btn btn-primary btn-sm" style="position: absolute; right: 50px;">
+            <i class="menu-icon tf-icons ri-arrow-left-line"></i>
+              Back
           </a>
         </div>
+
         <!-- /Logo -->
         <div class="card-body mt-1">
-          {{-- <h4 class="mb-1">Adventure starts here 🚀</h4>
-          <p class="mb-5">Make your app management easy and fun!</p> --}}
 
           <form id="formAuthentication" class="mb-5" action="{{ route('admin.register.submit') }}" method="POST">
             @csrf
@@ -40,9 +40,9 @@
             </div>
             <div class="form-floating form-floating-outline mb-5">
               <select class="form-select" id="user_type" name="user_type">
-                <option value="admin" selected>Admin</option>
-                <option value="teacher">Teacher</option>
-                <option value="employee">Employee</option>
+                <option value="Admin" selected>Admin</option>
+                <option value="Teacher">Teacher</option>
+                <option value="Employee">Employee</option>
               </select>
               <label for="user_type">User Type</label>
             </div>
@@ -59,34 +59,24 @@
                 <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
               </div>
             </div>
-
-            <div class="mb-5 py-2">
-              {{-- <div class="form-check mb-0">
-                <input class="form-check-input" type="checkbox" id="terms-conditions" name="terms">
-                <label class="form-check-label" for="terms-conditions">
-                  I agree to
-                  <a href="javascript:void(0);">privacy policy & terms</a>
-                </label>
-              </div> --}}
-            </div>
-            <button class="btn btn-primary d-grid w-100 mb-5">
+            <button class="btn btn-primary d-grid mb-5">
               Sign up
             </button>
           </form>
 
-          <p class="text-center mb-5">
+          {{-- <p class="text-center mb-5">
             <span>Already have an account?</span>
             <a href="{{route('auth-login-basic')}}">
               <span>Sign in instead</span>
             </a>
-          </p>
+          </p> --}}
         </div>
       </div>
       <!-- Register Card -->
-      <img src="{{asset('assets/img/illustrations/tree-3.png')}}" alt="auth-tree" class="authentication-image-object-left d-none d-lg-block">
-      <img src="{{asset('assets/img/illustrations/auth-basic-mask-light.png')}}" class="authentication-image d-none d-lg-block" height="172" alt="triangle-bg">
-      <img src="{{asset('assets/img/illustrations/tree.png')}}" alt="auth-tree" class="authentication-image-object-right d-none d-lg-block">
+      {{-- <img src="{{asset('assets/img/illustrations/tree-3.png')}}" alt="auth-tree" class="authentication-image-object-left d-none d-lg-block">
+      <img src="{{asset('assets/img/illustrations/auth-basic-mask-light.png')}}" class="authentication-image d-none d-lg-block" height="172" alt="triangle-bg"> --}}
+      {{-- <img src="{{asset('assets/img/illustrations/tree.png')}}" alt="auth-tree" class="authentication-image-object-right d-none d-lg-block"> --}}
     </div>
   </div>
-</div>
+{{-- </div> --}}
 @endsection

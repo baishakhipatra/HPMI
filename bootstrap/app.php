@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\AdminAuth; //Import your middleware
+use App\Http\Middleware\{AdminAuth, PreventBackHistory}; //Import your middleware
 
 return Application::configure(basePath: dirname(__DIR__))
   ->withRouting(
@@ -13,9 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
   )
   ->withMiddleware(function (Middleware $middleware) {
     // Register your route middleware alias here
-        $middleware->alias([
-            'admin' => AdminAuth::class,
-        ]);
+
+       $middleware->alias([
+        'admin' => AdminAuth::class,
+        'prevent-back-history' => PreventBackHistory::class, // Correct: use alias, not global
+      ]);
   })
   ->withExceptions(function (Exceptions $exceptions) {
     //
