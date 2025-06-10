@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\UserListController;
+use App\Http\Controllers\Admin\{UserListController, TeacherListController};
 //End New Route
 
 use App\Http\Controllers\dashboard\Analytics;
@@ -140,12 +140,25 @@ Route::prefix('admin')->group(function () {
         Route::post('/update-profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
 
         //usermanagement/userlist
-        Route::prefix('user-management')->group(function() {
-            Route::get('/user-list', [UserListController::class, 'index'])->name('admin.userlist');
-            Route::get('user-list/edit/{id}', [UserListController::class, 'edit'])->name('admin.userlist.edit');
-            Route::post('user-list/update/{id}', [UserListController::class, 'update'])->name('admin.userlist.update');
+        Route::prefix('employees/')->group(function() {
+            Route::get('/', [UserListController::class, 'index'])->name('admin.employee.index');
+            Route::get('/create', [UserListController::class, 'create'])->name('admin.employee.create');
+            Route::post('/store', [UserListController::class, 'store'])->name('admin.employee.store');
+            Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.userlist.edit');
+            Route::post('/update/{id}', [UserListController::class, 'update'])->name('admin.userlist.update');
             Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.userlist.status');
             Route::post('/delete', [UserListController::class, 'delete'])->name('admin.userlist.delete');
+        });
+
+        //teachermanagement/teacherlist
+        Route::prefix('teacher-management/teacher-list')->group(function() {
+            Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacherlist');
+            Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacherlist.create');
+            Route::post('/store', [TeacherListController::class, 'store'])->name('admin.teacherlist.store');
+            Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacherlist.edit');
+            Route::post('/update/{id}', [TeacherListController::class, 'update'])->name('admin.teacherlist.update');
+            //Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacherlist.status');
+            Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacherlist.delete');
         });
         
     });

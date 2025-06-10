@@ -16,20 +16,24 @@ class AdminAuthController extends Controller
     {
         //dd($request->all());
         $request->validate([
-            'name'     => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'user_name' => 'required|string|max:255',
             'user_type' => 'required|in:Admin,Teacher,Employee',
             'email' => 'required|email|unique:admins,email',
+            'mobile'   => 'required|digits:10|unique:admins,mobile',
             'password' => 'required|min:6',
         ],[
             'email.unique'  => 'This email already registered. Please use a diffrent email address',
+            'mobile.unique' => 'This mobile number is already registered.',
+            'mobile.digits' => 'Mobile number must be 10 digits.',
         ]);
         Admin::create([
             'name'     => $request->name,
             'user_name' => $request->user_name,
             'user_type' => ucwords($request->user_type),
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'mobile'    => $request->mobile,
+            'password'  => Hash::make($request->password),
         ]);
 
         // if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password])) {
@@ -51,17 +55,28 @@ class AdminAuthController extends Controller
         $login_input = $request->input('email-username');
         $password = $request->input('password');
 
+        //First check if email exists in the database
+        $user = Admin::where('email', $login_input)->first();
+
+        //If user doesn't exist or is soft deleted
+        if(!$user || !empty($user->deleted_at)) {
+            return back()->withErrors([
+                'email-username'    => 'The provided email does not exist in our records.',
+            ])->onlyInput('email-username'); //is equal to withInput($request->only('email-username'))
+        }
+
         // First try login assuming input is email
         if (Auth::guard('admin')->attempt(['email' => $login_input, 'password' => $password])) {
             return redirect()->route('admin.dashboard');
         }
 
-        // If email login failed, try with username (name)
-        if (Auth::guard('admin')->attempt(['user_name' => $login_input, 'password' => $password])) {
-            return redirect()->route('admin.dashboard');
-        }
+        // // If email login failed, try with username (name)
+        // if (Auth::guard('admin')->attempt(['user_name' => $login_input, 'password' => $password])) {
+        //     return redirect()->route('admin.dashboard');
+        // }
 
-        return back()->withErrors(['email-user_name' => 'Invalid credentials']);
+        return back()->withErrors(['password' => 'The provided password is incorrect.'])
+                    ->onlyInput('email-username'); //withInput($request->only('email-username'))
     }
 
     public function profile()

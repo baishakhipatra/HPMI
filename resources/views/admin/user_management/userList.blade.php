@@ -16,8 +16,8 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">User List</h3>
-    <a href="{{ route('auth-register-basic') }}" class="btn btn-primary btn-sm">+ Add User</a>
+    <h3 class="mb-0">Employee List</h3>
+    <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
   </div>
 
   <div class="px-3 py-2">
@@ -52,6 +52,7 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Mobile</th>
             <th>User Type</th>
             <th>Status</th>
             <th>Actions</th>
@@ -62,6 +63,7 @@
             <tr>
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
+              <td>{{ $item->mobile }}</td>
               <td>{{ ucfirst($item->user_type) }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
