@@ -19,4 +19,10 @@ class ClassList extends Model
     {
         return $this->hasMany(SectionList::class, 'class_list_id');
     }
+
+     // Many-to-Many relationship with class wise subjects
+    public function classWiseSubjects()
+    {
+        return $this->hasMany(ClassWiseSubject::class, 'class_id');
+    }
 }
