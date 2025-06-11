@@ -18,16 +18,14 @@ class ClassWiseSubject extends Model
     /**
      * Get the class associated with this mapping.
      */
-    public function classList(): BelongsTo
-    {
+    public function classList() {
         return $this->belongsTo(ClassList::class, 'class_id');
     }
 
     /**
      * Get the subject associated with this mapping.
      */
-    public function subject(): BelongsTo
-    {
+    public function subject() {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
 }

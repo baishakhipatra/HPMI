@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController,
-ClasswiseSubjectController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController};
 
 //End New Route
 
@@ -186,8 +185,8 @@ Route::prefix('admin')->group(function () {
                 Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete');
 
                 //classwise subject
-                Route::get('/classwise-subjects', [ClasswiseSubjectController::class, 'index'])->name('admin.classwise.subjects');
-                Route::post('/classwise-subjects/store', [ClasswiseSubjectController::class, 'store'])->name('admin.classwise.subjects.store');
+                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects');
+                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign');
 
             });
         

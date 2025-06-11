@@ -5,8 +5,7 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ClassList;
-use App\Models\SectionList;
+use App\Models\{ClassList, SectionList, ClassWiseSubject, Subject};
 use DB;
 
 class ClassListController extends Controller
@@ -224,6 +223,33 @@ class ClassListController extends Controller
             'status'    => 200,
             'message'   => 'class deleted successfully.',
         ]);
+    }
+
+    public function subjectsList($id) {
+        $classData = ClassList::findOrFail($id);
+        $classSubjects = ClassWiseSubject::with('subject')->where('class_id', $id)->paginate(10);
+        $allSubjects =  Subject::whereNotIn('id', function ($query) use ($id) {
+                    $query->select('class_id')
+                        ->from('class_wise_subjects')
+                        ->where('subject_id', $id);
+                    })->get();
+        return view('admin.class_lists.subjects-list', compact('classData', 'classSubjects', 'allSubjects'));
+    }
+
+    public function addSubjectToclass(Request $request) {
+        $checkIfExists = ClassWiseSubject::where([
+                'subject_id' => $request->subjectId,
+                'class_id' => $request->classId,
+        ])->first();
+
+        if ($checkIfExists) {
+            return redirect()->route('admin.class.subjects', $request->classId)->with('error', 'Selected subject is already added to the class.');
+        }
+        ClassWiseSubject::create([
+            'subject_id' => $request->subjectId,
+            'class_id' => $request->classId,
+        ]);
+        return redirect()->route('admin.class.subjects', $request->classId)->with('success', 'Selected subject is successfully added to the class.');
     }
     
 }
