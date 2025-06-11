@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController};
 //End New Route
 
 use App\Http\Controllers\dashboard\Analytics;
@@ -160,6 +160,15 @@ Route::prefix('admin')->group(function () {
             //Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacherlist.status');
             Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacherlist.delete');
         });
-        
+
+        Route::prefix('student-management/student-list')->group(function(){
+            Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist');
+            Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate');
+            Route::post('/store', [StudentListController::class, 'store'])->name('admin.studentstore');
+            Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
+            Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
+            Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
+            Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
+        });
     });
 });

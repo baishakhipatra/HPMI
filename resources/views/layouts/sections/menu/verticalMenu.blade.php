@@ -54,6 +54,27 @@
             </li>
           </ul>
         </li>
+
+        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+            <i class="menu-icon tf-icons ri-store-line"></i>
+            <div>Student Management</div>
+          </a>
+          <ul class="menu-sub">
+            <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.studentlist')}}" class="menu-link">
+                <div>Student List</div>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+            <i class="menu-icon tf-icons ri-store-line"></i>
+            <div>Master Module</div>
+          </a>
+        </li>
       {{-- @endif
     @endauth --}}
     <li class="menu-item">
