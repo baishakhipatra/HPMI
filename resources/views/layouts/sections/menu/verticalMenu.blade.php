@@ -74,6 +74,13 @@
             <i class="menu-icon tf-icons ri-store-line"></i>
             <div>Master Module</div>
           </a>
+          <ul class="menu-sub">
+            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.classlist')}}" class="menu-link">
+                <div>Class List</div>
+              </a>
+            </li>
+          </ul>
         </li>
       {{-- @endif
     @endauth --}}
