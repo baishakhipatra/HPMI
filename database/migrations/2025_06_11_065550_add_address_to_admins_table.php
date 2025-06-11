@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::table('admins', function (Blueprint $table) {
             //
-            $table->string('mobile', 20)->nullable()->after('email');
-            $table->unique('mobile');
+            $table->text('address')->nullable()->after('email');
         });
     }
 
@@ -25,7 +24,9 @@ return new class extends Migration
     {
         Schema::table('admins', function (Blueprint $table) {
             //
-            $table->dropColumn('mobile');
+            $table->dropColumn([
+                'address'
+            ]);
         });
     }
 };

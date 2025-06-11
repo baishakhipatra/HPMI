@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::table('admins', function (Blueprint $table) {
             //
-            $table->string('teacher_id')->unique()->nullable()->after('id');
             $table->date('date_of_birth')->nullable()->after('mobile');
             $table->date('date_of_joining')->nullable()->after('date_of_birth');
-            $table->text('qualifications')->nullable()->after('date_of_joining');
-            $table->text('subjects_taught')->nullable()->after('qualifications');
-            $table->text('classes_assigned')->nullable()->after('subjects_taught');
+            $table->string('qualifications')->nullable()->after('date_of_joining');
+            $table->string('subjects_taught')->nullable()->after('qualifications');
+            $table->string('classes_assigned')->nullable()->after('subjects_taught');
         });
     }
 

@@ -41,14 +41,14 @@
             </li>
           </ul>
         </li>
-        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+        <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
             <i class="menu-icon tf-icons ri-store-line"></i>
             <div>Teacher Management</div>
           </a>
           <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/teacher-management/teacher-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.teacherlist')}}" class="menu-link">
+            <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}">
+              <a href="{{route('admin.teacher.index')}}" class="menu-link">
                 <div>Teacher List</div>
               </a>
             </li>
@@ -69,11 +69,18 @@
           </ul>
         </li>
 
-        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+        <li class="menu-item {{ (request()->is('admin/master-module*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
             <i class="menu-icon tf-icons ri-store-line"></i>
             <div>Master Module</div>
           </a>
+          <ul class="menu-sub">
+            <li class="menu-item {{ (request()->is('admin/master-module/subject-list')) ? 'open' : '' }}">
+              <a href="{{route('admin.subjectlist.index')}}" class="menu-link">
+                <div>Subject List</div>
+              </a>
+            </li>
+          </ul>
         </li>
       {{-- @endif
     @endauth --}}

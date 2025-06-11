@@ -4,106 +4,131 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use App\Models\{Teacher, Admin};
 
 class TeacherListController extends Controller
 {
     //
-    public function index(Request $request) {
-        $query = Admin::where('user_type', 'Teacher');
-
+    public function index(Request $request) 
+    {
         $keyword = $request->input('keyword');
+        $query = Admin::where('user_type', 'Teacher');
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
                 $subQuery->where('name', 'like', '%'. $keyword . '%')
-                    ->orWhere('email', 'like', '%'. $keyword . '%')
-                    ->orWhere('teacher_id', 'like', '%'. $keyword . '%')
-                    ->orWhere('phone', 'like', '%'. $keyword . '%')
-                    ->orWhere('role', 'like', '%' . $keyword . '%');
+                            ->orWhere('email', 'like', '%'. $keyword . '%')
+                            ->orWhere('qualifications', 'like', '%' . $keyword . '%')
+                            ->orWhere('address', 'like', '%' . $keyword . '%');                           
             });
         });
+        
+        $admins = $query->latest('id')->paginate(10);
 
-        $teachers = $query->latest('id')->paginate(10);
-        return view('admin.teacher_management.teacherList', compact('teachers'));
+        return view('admin.teacher_management.index', compact('admins'));
     }
-
-    public function create() {
-        return view('admin.teacher_management.teacherListCreate');
+    public function create(){
+        $user_id = generateTeacherId();
+        return view('admin.teacher_management.create',compact('user_id'));
     }
 
     public function store(Request $request) {
+        // dd($request->all());
         $request->validate([
-            'teacher_id' => 'nullable|string',
-            'name'  => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers,email',
-            'phone' => 'required|string|max:20',
-            'date_of_birth'     => 'nullable|date',
-            'date_of_joining'   => 'nullable|date',
-            'qualifications'    => 'nullable|string',
-            'subjects_taught'   => 'nullable|string',
-            'classes_assigned'  => 'nullable|string',
-            'role' => 'required|string',
+            // 'user_id'          => 'nullable|string|unique:admins,user_id',
+            'user_id'          => 'required|string|unique:admins,user_id',
+            'user_type'        => 'required|in:Teacher,Employee,Admin',
+            'name'             => 'required|string|max:255',
+            'email'            => 'required|email|unique:admins,email',
+            'mobile'           => 'required|string|max:20',
+            'date_of_birth'    => 'nullable|date',
+            'date_of_joining'  => 'nullable|date',
+            'qualifications'   => 'nullable|string|max:255',
+            'address'          => 'nullable|string',
+            'subjects_taught'  => 'nullable|string|max:255',
+            'classes_assigned' => 'nullable|string|max:255',
+            'password'         => 'required|string|min:6',
         ]);
 
-        Admin::create($request->only([
-            'teacher_id', 'name', 'email', 'phone',
-            'date_of_birth', 'date_of_joining', 'qualifications',
-            'subjects_taught', 'classes_assigned', 'role'
-        ]));
+        Admin::create([
+            'user_id'          => $request->user_id,
+            'user_type'        => $request->user_type,
+            'name'             => $request->name,
+            'email'            => $request->email,
+            'mobile'           => $request->mobile,
+            'date_of_birth'    => $request->date_of_birth,
+            'date_of_joining'  => $request->date_of_joining,
+            'qualifications'   => $request->qualifications,
+            'address'          => $request->address,
+            'subjects_taught'  => $request->subjects_taught,
+            'classes_assigned' => $request->classes_assigned,
+            'password'         => Hash::make($request->password),
+            'user_type'        => 'Teacher',
+            'status'           => 1,
+        ]);
+        //dd('Hi');
 
-        return redirect()->route('admin.teacherlist')->with('success', 'Teacher created successfully');
+        return redirect()->route('admin.teacher.index')->with('success', 'Teacher created successfully');
     }
 
     public function edit($id) {
-        //dd($id);
         $data = Admin::findOrFail($id);
-        return view('admin.teacher_management.teacherListEdit', compact('data'));
+        return view('admin.teacher_management.edit', compact('data'));
     }
 
     public function update(Request $request, $id) {
-        
         $request->validate([
-            'teacher_id' => 'nullable|string',
-            'name'  => 'required|string|max:255',
-            'phone' => 'required|digits:10|unique:teachers,mobile,' . $id,
-            'email' => 'required|email|unique:teachers,email,' . $id,
-            'date_of_birth'     => 'nullable|date',
-            'date_of_joining'   => 'nullable|date',
-            'qualifications'    => 'nullable|string',
-            'subjects_taught'   => 'nullable|string',
-            'classes_assigned'  => 'nullable|string',
-            'role' => 'required|string',
+            'name' => 'required|string|max:255',
+            'address'   => 'nullable|string',
+            'mobile'    => 'required|digits:10|unique:admins,mobile,' . $id,
+            'email'     => 'required|email|unique:admins,email,' . $id,
         ]);
 
         $admin = Admin::findOrFail($id);
         $admin->update([
-            'teacher_id'   => $request->teacher_id,
-            'name'   => $request->name,
-            'phone'  => $request->phone,
-            'email'  => $request->email,
-            'date_of_birth'     => $request->date_of_birth,
-            'date_of_joining'   => $request->date_of_joining,
-            'qualifications'    => $request->qualifications,
-            'user_type' => $request->user_type,
-            'subjects_taught'   => $request->subjects_taught,
-            'classes_assigned'  => $request->classes_assigned,
-            'role'   => $request->role,
+            'name'             => $request->name,
+            //'user_name'        => $request->user_name,
+            'user_type'        => $request->user_type ?? $admin->user_type,
+            'mobile'           => $request->mobile,
+            'email'            => $request->email,
+            'date_of_birth'    => $request->date_of_birth,
+            'date_of_joining'  => $request->date_of_joining,
+            'qualifications'   => $request->qualifications,
+            'subjects_taught'  => $request->subjects_taught,
+            'classes_assigned' => $request->classes_assigned,
+            'address'          => $request->address,
         ]);
-        return redirect()->route('admin.teacherlist')->with('success', 'Teacher updated successfully!');
+        return redirect()->route('admin.teacher.index')->with('success', 'Teacher updated successfully!');
+    }
+
+    public function status($id)
+    {
+        $user = Admin::findOrFail($id);
+
+        // if($user->user_type == 'admin') {
+        //     return response()->json(['status' => 403, 'message' => 'Cannot change status of teacher']);
+        // }
+
+        $user->status = $user->status ? 0 : 1;
+        $user->save();
+        return response()->json([
+            'status'  => 200,
+            'message' => 'Status updated successfully'
+        ]);
     }
 
     public function delete(Request $request){
-        $teacher = Admin::find($request->id); 
+        $user = Admin::find($request->id); 
     
-        if (!$teacher) {
+        if (!$user) {
             return response()->json([
                 'status'    => 404,
-                'message'   => 'Teacher not found.',
+                'message'   => 'user not found.',
             ]);
         }
     
-        $teacher->delete(); 
+        $user->delete(); 
         return response()->json([
             'status'    => 200,
             'message'   => 'Teacher deleted successfully.',

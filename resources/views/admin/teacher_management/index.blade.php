@@ -3,7 +3,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'User - List')
+@section('title', 'Teacher - List')
 
 @section('content')
 
@@ -16,8 +16,8 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">Employee List</h3>
-    <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
+    <h3 class="mb-0">Teacher List</h3>
+    <a href="{{ route('admin.teacher.create') }}" class="btn btn-primary btn-sm">+ Add Teacher</a>
   </div>
 
   <div class="px-3 py-2">
@@ -54,6 +54,8 @@
             <th>Email</th>
             <th>Mobile</th>
             <th>User Type</th>
+            <th>DOB</th>
+            <th>Address</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -64,11 +66,13 @@
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              <td>{{ ucfirst($item->user_type) }}</td>
+              <td>{{ $item->user_type }}</td>
+              <td>{{ $item->date_of_birth }}</td>
+              <td>{{ ucfirst($item->address) }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
-                      {{ $item->status ? 'checked' : ''}} onclick="statusToggle('{{route('admin.userlist.status', $item->id)}}', this)">
+                      {{ $item->status ? 'checked' : ''}} onclick="statusToggle('{{route('admin.teacher.status', $item->id)}}', this)">
                     <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
                   </div>
               </td>
@@ -79,10 +83,10 @@
                       <i class="ri-more-2-line"></i>
                   </button>
                   <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.userlist.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
+                      <a class="dropdown-item" href="{{ route('admin.teacher.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
                           <i class="ri-pencil-line me-1"></i> Edit
                       </a>
-                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
+                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteTeacher({{$item->id}})">
                           <i class="ri-delete-bin-6-line me-1"></i> Delete
                       </a>
                   </div>
@@ -99,7 +103,7 @@
   
 </div>
 <script>
-  function deleteUser(userId) {
+  function deleteTeacher(userId) {
     Swal.fire({
         icon: 'warning',
         title: "Are you sure you want to delete this?",
@@ -112,7 +116,7 @@
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
             $.ajax({
-                url: "{{ route('admin.userlist.delete')}}",
+                url: "{{ route('admin.teacher.delete')}}",
                 type: 'POST',
                 data: {
                     "id": userId,

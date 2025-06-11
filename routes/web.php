@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, SubjectListController};
 //End New Route
 
 use App\Http\Controllers\dashboard\Analytics;
@@ -144,21 +144,21 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [UserListController::class, 'index'])->name('admin.employee.index');
             Route::get('/create', [UserListController::class, 'create'])->name('admin.employee.create');
             Route::post('/store', [UserListController::class, 'store'])->name('admin.employee.store');
-            Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.userlist.edit');
-            Route::post('/update/{id}', [UserListController::class, 'update'])->name('admin.userlist.update');
-            Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.userlist.status');
-            Route::post('/delete', [UserListController::class, 'delete'])->name('admin.userlist.delete');
+            Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.employee.edit');
+            Route::post('/update', [UserListController::class, 'update'])->name('admin.employee.update');
+            Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.employee.status');
+            Route::post('/delete', [UserListController::class, 'delete'])->name('admin.employee.delete');
         });
 
         //teachermanagement/teacherlist
-        Route::prefix('teacher-management/teacher-list')->group(function() {
-            Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacherlist');
-            Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacherlist.create');
-            Route::post('/store', [TeacherListController::class, 'store'])->name('admin.teacherlist.store');
-            Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacherlist.edit');
-            Route::post('/update/{id}', [TeacherListController::class, 'update'])->name('admin.teacherlist.update');
-            //Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacherlist.status');
-            Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacherlist.delete');
+        Route::prefix('teachers/')->group(function() {
+            Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacher.index');
+            Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacher.create');
+            Route::post('/store', [TeacherListController::class, 'store'])->name('admin.teacher.store');
+            Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacher.edit');
+            Route::post('/update', [TeacherListController::class, 'update'])->name('admin.teacher.update');
+            Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacher.status');
+            Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
         });
 
         Route::prefix('student-management/student-list')->group(function(){
@@ -170,5 +170,19 @@ Route::prefix('admin')->group(function () {
             Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
             Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
         });
+
+        //Master module
+        Route::prefix('master-module')->group(function(){
+            Route::prefix('subject-list')->group(function(){
+                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');
+                Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
+                Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');
+                //Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
+                Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
+                Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
+                Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');
+            });
+        });
+
     });
 });
