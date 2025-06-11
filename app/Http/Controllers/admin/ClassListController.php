@@ -81,6 +81,74 @@ class ClassListController extends Controller
     }
 
 
+    // public function update(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'class' => 'required|string|max:255',
+    //         'existing_sections.*' => 'nullable|string|max:255',
+    //         'section.*' => 'nullable|string|max:255',
+    //     ]);
+
+    //      $sections = [];
+
+    //     if ($request->existing_sections) {
+    //         foreach ($request->existing_sections as $existingSection) {
+    //             if (!empty($existingSection)) {
+    //                 $sections[] = strtolower(trim($existingSection));
+    //             }
+    //         }
+    //     }
+
+    //     if ($request->section) {
+    //         foreach ($request->section as $newSection) {
+    //             if (!empty($newSection)) {
+    //                 $sections[] = strtolower(trim($newSection));
+    //             }
+    //         }
+    //     }
+
+    //     // check for duplicates
+    //     if (count($sections) !== count(array_unique($sections))) {
+    //         return redirect()->back()->withErrors(['section' => 'Duplicate entry not allowed. Each section name must be unique.'])->withInput();
+    //     }
+
+    //     // update class name
+    //     $class = ClassList::findOrFail($id);
+    //     $class->class = $request->class;
+    //     $class->save();
+
+    //     // update existing sections
+    //     if ($request->existing_section_ids) {
+    //         foreach ($request->existing_section_ids as $key => $sectionId) {
+    //             $section = SectionList::find($sectionId);
+    //             if ($section) {
+    //                 $section->section = $request->existing_sections[$key];
+    //                 $section->save();
+    //             }
+    //         }
+    //     }
+
+    //     // add new sections
+    //     if ($request->section) {
+    //         foreach ($request->section as $sectionName) {
+    //             if (!empty($sectionName)) {
+    //                 SectionList::create([
+    //                     'class_list_id' => $id,
+    //                     'section' => $sectionName,
+    //                 ]);
+    //             }
+    //         }
+    //     }
+
+    //     // handle deleted sections
+    //     if ($request->deleted_section_ids) {
+    //         $deletedIds = explode(',', $request->deleted_section_ids);
+    //         SectionList::whereIn('id', $deletedIds)->delete();
+    //     }
+
+    //     return redirect()->route('admin.classlist')->with('success', 'Class and sections updated successfully.');
+    // }
+
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -89,64 +157,42 @@ class ClassListController extends Controller
             'section.*' => 'nullable|string|max:255',
         ]);
 
-         $sections = [];
+        
 
-        if ($request->existing_sections) {
-            foreach ($request->existing_sections as $existingSection) {
-                if (!empty($existingSection)) {
-                    $sections[] = strtolower(trim($existingSection));
-                }
-            }
-        }
-
-        if ($request->section) {
-            foreach ($request->section as $newSection) {
-                if (!empty($newSection)) {
-                    $sections[] = strtolower(trim($newSection));
-                }
-            }
-        }
-
-        // check for duplicates
-        if (count($sections) !== count(array_unique($sections))) {
-            return redirect()->back()->withErrors(['section' => 'Duplicate entry not allowed. Each section name must be unique.'])->withInput();
-        }
-
-        // update class name
+        
         $class = ClassList::findOrFail($id);
         $class->class = $request->class;
         $class->save();
 
-        // update existing sections
-        if ($request->existing_section_ids) {
-            foreach ($request->existing_section_ids as $key => $sectionId) {
+
+        if (!empty($request->deleted_section_ids)) {
+            $deletedIds = explode(',', $request->deleted_section_ids);
+            SectionList::whereIn('id', $deletedIds)->delete();
+        }
+
+        if (!empty($request->existing_section)) {
+            foreach ($request->existing_section as $sectionId => $sectionName) {
                 $section = SectionList::find($sectionId);
                 if ($section) {
-                    $section->section = $request->existing_sections[$key];
+                    $section->section = $sectionName;
                     $section->save();
                 }
             }
         }
 
-        // add new sections
-        if ($request->section) {
+       if (!empty($request->section)) {
             foreach ($request->section as $sectionName) {
                 if (!empty($sectionName)) {
-                    SectionList::create([
-                        'class_list_id' => $id,
-                        'section' => $sectionName,
-                    ]);
+                    $section = new SectionList();
+                    $section->class_list_id = $class->id;
+                    $section->section = $sectionName;
+                    $section->save();
                 }
             }
         }
 
-        // handle deleted sections
-        if ($request->deleted_section_ids) {
-            $deletedIds = explode(',', $request->deleted_section_ids);
-            SectionList::whereIn('id', $deletedIds)->delete();
-        }
 
-        return redirect()->route('admin.classlist')->with('success', 'Class and sections updated successfully.');
+        return redirect()->route('admin.classlist')->with('success', 'Class updated successfully');
     }
 
 
@@ -166,12 +212,12 @@ class ClassListController extends Controller
     {
         $classlist = ClassList::find($request->id); 
     
-        if (!$classlist) {
-            return response()->json([
-                'status'    => 404,
-                'message'   => 'user not found.',
-            ]);
-        }
+        // if (!$classlist) {
+        //     return response()->json([
+        //         'status'    => 404,
+        //         'message'   => 'user not found.',
+        //     ]);
+        // }
     
         $classlist->delete(); 
         return response()->json([

@@ -90,7 +90,7 @@
             <h4>Edit Class & Sections</h4>
             </div>
             <div class="card-body">
-            <form action="{{ route('admin.classstore') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ route('admin.classupdate',['id' => $update_data->id]) }}" method="post" enctype="multipart/form-data">
                 @csrf
                 <div class="form-floating form-floating-outline mb-3">
                 <input type="text" name="class" class="form-control" placeholder="Enter Class Name" value="{{$update_data->class}}">
@@ -98,7 +98,10 @@
                 @error('class') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
                 {{-- <label>Section</label> --}}
-                @foreach($update_data->sections as $key=>$section_item)
+
+                <input type="hidden" name="deleted_section_ids" id="deleted_section_ids" value="">
+
+                {{-- @foreach($update_data->sections as $key=>$section_item)
                     <div>
                         <div class="input-group mb-2">
                             <div class="form-floating form-floating-outline flex-grow-1">
@@ -110,7 +113,20 @@
                             </button>
                         </div>
                     </div>
+                @endforeach --}}
+
+                @foreach($update_data->sections as $key=>$section_item)
+                    <div class="input-group mb-2 existing-section">
+                        <div class="form-floating form-floating-outline flex-grow-1">
+                            <input type="text" name="existing_section[{{ $section_item->id }}]" class="form-control" placeholder="Enter Section" value="{{ $section_item->section }}">
+                            <label>Section</label>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger remove-existing-section ms-2" data-id="{{ $section_item->id }}">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
                 @endforeach
+
                 <div id="section-container">
                     <div class="input-group mb-2">
                         <div class="form-floating form-floating-outline flex-grow-1">
@@ -140,7 +156,7 @@
             <h4>Add Class & Sections</h4>
             </div>
             <div class="card-body">
-            <form action="{{ route('admin.classstore') }}" method="post" enctype="multipart/form-data">
+            <form action="{{ route('admin.classstore') }}" method="post">
                 @csrf
 
                 <div class="form-floating form-floating-outline mb-3">
@@ -193,20 +209,20 @@
   $(document).ready(function () {
     let deletedSectionIds = [];
 
-    $(document).on('click', '.add-section', function () {
-      let template = $('#section-template').html();
-      $('#section-container').append(template);
+    $(document).on('click', '.add-section', function() {
+        let template = $('#section-template').html();
+        $('#section-container').append(template);
     });
 
-    $(document).on('click', '.remove-section', function () {
-      $(this).closest('.input-group').remove();
+    $(document).on('click', '.remove-section', function() {
+        $(this).closest('.input-group').remove();
     });
 
     $(document).on('click', '.remove-existing-section', function () {
-      let sectionId = $(this).closest('.input-group').find('input[name="existing_section_ids[]"]').val();
-      deletedSectionIds.push(sectionId);
-      $('#deleted_section_ids').val(deletedSectionIds.join(','));
-      $(this).closest('.input-group').remove();
+        let sectionId = $(this).data('id');
+        deletedSectionIds.push(sectionId);
+        $('#deleted_section_ids').val(deletedSectionIds.join(','));
+        $(this).closest('.input-group').remove();
     });
   });
 
