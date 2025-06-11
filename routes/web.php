@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController,
+ClasswiseSubjectController};
 
 //End New Route
 
@@ -183,6 +184,11 @@ Route::prefix('admin')->group(function () {
                 Route::post('/update/{id}', [ClassListController::class, 'update'])->name('admin.classupdate');
                 Route::get('/status/{id}', [ClassListController::class, 'status'])->name('admin.classstatus');
                 Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete');
+
+                //classwise subject
+                Route::get('/classwise-subjects', [ClasswiseSubjectController::class, 'index'])->name('admin.classwise.subjects');
+                Route::post('/classwise-subjects/store', [ClasswiseSubjectController::class, 'store'])->name('admin.classwise.subjects.store');
+
             });
         
             Route::prefix('subject-list')->group(function(){
