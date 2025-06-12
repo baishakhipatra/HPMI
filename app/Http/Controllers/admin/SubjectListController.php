@@ -12,6 +12,7 @@ class SubjectListController extends Controller
     public function index(Request $request) {
         // Get search keyword from request
         $keyword = $request->input('keyword');
+        $subject_id = $request->input('edit_subject') ?? null;
 
         // Fetch subjects with optional search
         $subjects = Subject::when($keyword, function ($query, $keyword) {
@@ -24,8 +25,29 @@ class SubjectListController extends Controller
 
         $subject = new Subject();
 
+        $editableSubjectDetails = null;
+        if ($subject_id){
+            $editableSubjectDetails = Subject::findOrFail($subject_id);
+        }
+
         // Return to view with subjects
-        return view('admin.subject_list.index', compact('subjects', 'subject'));
+        return view('admin.subject_list.index', compact('subjects', 'subject', 'editableSubjectDetails'));
+    }
+
+    public function update(Request $request){
+        $validated = $request->validate([
+            'edit_sub_name' => 'required|string|max:255',
+            'edit_sub_code' => 'required|string|max:50',
+            'edit_description' => 'nullable|string',
+        ]);
+
+        Subject::where('id', $request->edit_subject_id)->update([
+            'sub_name' => $request->edit_sub_name,
+            'sub_code' => $request->edit_sub_code,
+            'description' => $request->edit_description
+        ]);
+
+        return redirect()->route('admin.subjectlist.index')->with('success', 'Subject is updated successfully.');
     }
 
     public function store(Request $request)
@@ -54,16 +76,19 @@ class SubjectListController extends Controller
     }
 
      public function delete(Request $request){
-        $user = Subject::find($request->id); 
+        $subject = Subject::find($request->id); 
     
-        if (!$user) {
+        if (!$subject) {
             return response()->json([
                 'status'    => 404,
-                'message'   => 'user not found.',
+                'message'   => 'subject not found.',
             ]);
         }
     
-        $user->delete(); 
+        $subject->delete();
+        // De-allocate subjects from associated tables
+        ClassWiseSubject::where('sub_id', $request->id)->delete();
+
         return response()->json([
             'status'    => 200,
             'message'   => 'Subject deleted successfully.',

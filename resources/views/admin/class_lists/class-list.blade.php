@@ -62,7 +62,7 @@
                       <i class="ri-more-2-line"></i>
                     </button>
                     <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.classwise.subjects', ['update_id'=> $class->id]) }}" title="Edit">
+                      <a class="dropdown-item" href="{{ route('admin.class.subjects', ['id'=> $class->id]) }}" title="Edit">
                           <i class="ri-pencil-line me-1"></i> Classwise Subject
                       </a>
                       <a class="dropdown-item" href="{{ route('admin.classlist',['update_id'=> $class->id]) }}"

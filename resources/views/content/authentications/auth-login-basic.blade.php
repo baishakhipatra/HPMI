@@ -71,12 +71,12 @@
             </div>           
           </form>
 
-          {{-- <p class="text-center mb-5">
+          <p class="text-center mb-5">
             <span>New on HPMI?</span>
             <a href="{{route('auth-register-basic')}}">
               <span>Create an account</span>
             </a>
-          </p> --}}
+          </p>
         </div>
       </div>
       <!-- /Login -->
