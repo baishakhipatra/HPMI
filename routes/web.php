@@ -191,10 +191,10 @@ Route::prefix('admin')->group(function () {
             });
         
             Route::prefix('subject-list')->group(function(){
-                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');
+                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');                Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
+                // Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
                 Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');
-                //Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
                 Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
                 Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');
