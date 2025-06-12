@@ -123,7 +123,7 @@
                         <input type="text" name="sub_name" class="form-control" placeholder="Subject Name"
                                 value="{{ old('sub_name', $subject->subject_name) }}">
                         <label>Subject Name</label>
-                        @error('subject_name') <p class="text-danger small">{{ $message }}</p> @enderror
+                        @error('sub_name') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
