@@ -40,7 +40,7 @@ class AdminAuthController extends Controller
         //     return redirect()->route('auth-login-basic');
         // }
 
-        return redirect()->route('admin.userlist')->with('success', 'Registration successful');
+        return redirect()->route('auth-login-basic')->with('success', 'Registration successful');
     }
 
     public function login(Request $request)

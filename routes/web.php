@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController,
-ClasswiseSubjectController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController};
 
 //End New Route
 
@@ -170,7 +169,9 @@ Route::prefix('admin')->group(function () {
             Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
             Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
             Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
+            Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
             Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
+            Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
         });
 
 
@@ -186,16 +187,16 @@ Route::prefix('admin')->group(function () {
                 Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete');
 
                 //classwise subject
-                Route::get('/classwise-subjects', [ClasswiseSubjectController::class, 'index'])->name('admin.classwise.subjects');
-                Route::post('/classwise-subjects/store', [ClasswiseSubjectController::class, 'store'])->name('admin.classwise.subjects.store');
+                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects');
+                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign');
 
             });
         
             Route::prefix('subject-list')->group(function(){
-                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');
+                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');                Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
+                // Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
                 Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');
-                //Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
                 Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
                 Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');

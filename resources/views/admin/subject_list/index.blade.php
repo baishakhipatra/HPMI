@@ -78,7 +78,14 @@
                                             <i class="ri-more-2-line"></i>
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a class="dropdown-item" data-bs-toggle="modal" data-target="#editModal" data-id="{{$subject->id}}">
+                                            @php
+                                                $edit_link = route('admin.subjectlist.index') . '?';
+                                                if(request()->input('keyword')) {
+                                                    $edit_link .= 'keyword=' . request()->input('keyword') . '&';
+                                                }
+                                                $edit_link .= 'edit_subject=' . $subject->id;
+                                            @endphp
+                                            <a class="dropdown-item" href="{{$edit_link}}">
                                                 <i class="ri-pencil-line me-1"></i> Edit
                                             </a>
                                             <a class="dropdown-item" href="javascript:void(0);" onclick="deleteSubject({{ $subject->id }})">
@@ -102,52 +109,116 @@
 
         {{-- Subject Create Form --}}
         <div class="col-md-4">
+            @if(!$editableSubjectDetails)
             <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Add Subject</h5>
-            </div>
-            <div class="card-body">
-                <form action="{{ route('admin.subjectlist.store') }}" method="POST">
-                @csrf
+                <div class="card-header">
+                    <h5 class="mb-0">Add Subject</h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ route('admin.subjectlist.store') }}" method="POST">
+                    @csrf
 
-                <div class="mb-3">
-                    <div class="form-floating form-floating-outline">
-                    <input type="text" name="sub_name" class="form-control" placeholder="Subject Name"
-                            value="{{ old('sub_name', $subject->subject_name) }}">
-                    <label>Subject Name</label>
-                    @error('subject_name') <p class="text-danger small">{{ $message }}</p> @enderror
+                    <div class="mb-3">
+                        <div class="form-floating form-floating-outline">
+                        <input type="text" name="sub_name" class="form-control" placeholder="Subject Name"
+                                value="{{ old('sub_name', $subject->subject_name) }}">
+                        <label>Subject Name</label>
+                        @error('sub_name') <p class="text-danger small">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-floating form-floating-outline">
+                        <input type="text" name="sub_code" class="form-control" placeholder="Subject Code"
+                                value="{{ old('sub_code') }}">
+                        <label>Subject Code</label>
+                        @error('sub_code') <p class="text-danger small">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-floating form-floating-outline">
+                        <textarea name="description" class="form-control" placeholder="Description" style="height: 100px">{{ old('description') }}</textarea>
+                        <label>Description</label>
+                        @error('description') <p class="text-danger small">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary d-block ">
+                        Create
+                    </button>
+                    </form>
+                </div>
+            </div>
+            
+            @else
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Edit Subject</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="edit_suject_form" action="{{ route('admin.subjectlist.update') }}" method="POST">
+                            @csrf
+
+                            <input type="hidden" name="edit_subject_id" value="{{ $editableSubjectDetails->id }}" />
+
+                            <div class="mb-3">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" name="edit_sub_name" id="edit_sub_name" class="form-control" placeholder="Subject Name"
+                                            value="{{ $editableSubjectDetails->sub_name }}">
+                                    <label>Subject Name</label>
+                                    <p class="text-danger small" id="error_edit_sub_name"></p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-floating form-floating-outline">
+                                    <input type="text" name="edit_sub_code" id="edit_sub_code" class="form-control" placeholder="Subject Code"
+                                            value="{{ $editableSubjectDetails->sub_code }}">
+                                    <label>Subject Code</label>
+                                    <p class="text-danger small" id="error_edit_sub_code"></p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-floating form-floating-outline">
+                                <textarea name="edit_description" id="edit_description" class="form-control" placeholder="Description" style="height: 100px">
+                                {{ $editableSubjectDetails->description }}
+                                </textarea>
+                                <label>Description</label>
+                                <p class="text-danger small" id="error_edit_sub_description"></p>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary d-block" onClick="updateSubjectForm()">Update</button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <div class="form-floating form-floating-outline">
-                    <input type="text" name="sub_code" class="form-control" placeholder="Subject Code"
-                            value="{{ old('sub_code') }}">
-                    <label>Subject Code</label>
-                    @error('sub_code') <p class="text-danger small">{{ $message }}</p> @enderror
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-floating form-floating-outline">
-                    <textarea name="description" class="form-control" placeholder="Description" style="height: 100px">{{ old('description') }}</textarea>
-                    <label>Description</label>
-                    @error('description') <p class="text-danger small">{{ $message }}</p> @enderror
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary d-block ">
-                    Create
-                </button>
-                </form>
-            </div>
-            </div>
+            @endif
         </div>
     </div>
 
 @endsection
 
 <script>
+    function updateSubjectForm() {
+        $(".text-danger").text('');
+        var is_error = false;
+
+        if ($.trim($("#edit_sub_name").val()) == '') {
+            $("#error_edit_sub_name").text('Subject name is required');
+            is_error = true;
+        } else if ($.trim($("#edit_sub_code").val()) == '') {
+            $("#error_edit_sub_code").text('Subject code is required');
+            is_error = true;
+        }
+
+        if (is_error) {
+            return false;
+        } else {
+            $("#edit_suject_form").submit();
+        }
+    }
   function deleteSubject(userId) {
     Swal.fire({
         icon: 'warning',

@@ -5,8 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\ClassList;
-use App\Models\SectionList;
+use Illuminate\Validation\Rule;
+use App\Models\{ClassList, SectionList, ClassWiseSubject, Subject};
 use DB;
 
 class ClassListController extends Controller
@@ -34,7 +34,14 @@ class ClassListController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'class' => 'required|string|max:255|unique:class_lists,class',
+            'class' => [
+                'required',
+                'string',
+                'max:255',
+                     Rule::unique('class_lists')->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
             'section.*' => 'required|string|max:255',
         ]);
 
@@ -81,73 +88,6 @@ class ClassListController extends Controller
     }
 
 
-    // public function update(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'class' => 'required|string|max:255',
-    //         'existing_sections.*' => 'nullable|string|max:255',
-    //         'section.*' => 'nullable|string|max:255',
-    //     ]);
-
-    //      $sections = [];
-
-    //     if ($request->existing_sections) {
-    //         foreach ($request->existing_sections as $existingSection) {
-    //             if (!empty($existingSection)) {
-    //                 $sections[] = strtolower(trim($existingSection));
-    //             }
-    //         }
-    //     }
-
-    //     if ($request->section) {
-    //         foreach ($request->section as $newSection) {
-    //             if (!empty($newSection)) {
-    //                 $sections[] = strtolower(trim($newSection));
-    //             }
-    //         }
-    //     }
-
-    //     // check for duplicates
-    //     if (count($sections) !== count(array_unique($sections))) {
-    //         return redirect()->back()->withErrors(['section' => 'Duplicate entry not allowed. Each section name must be unique.'])->withInput();
-    //     }
-
-    //     // update class name
-    //     $class = ClassList::findOrFail($id);
-    //     $class->class = $request->class;
-    //     $class->save();
-
-    //     // update existing sections
-    //     if ($request->existing_section_ids) {
-    //         foreach ($request->existing_section_ids as $key => $sectionId) {
-    //             $section = SectionList::find($sectionId);
-    //             if ($section) {
-    //                 $section->section = $request->existing_sections[$key];
-    //                 $section->save();
-    //             }
-    //         }
-    //     }
-
-    //     // add new sections
-    //     if ($request->section) {
-    //         foreach ($request->section as $sectionName) {
-    //             if (!empty($sectionName)) {
-    //                 SectionList::create([
-    //                     'class_list_id' => $id,
-    //                     'section' => $sectionName,
-    //                 ]);
-    //             }
-    //         }
-    //     }
-
-    //     // handle deleted sections
-    //     if ($request->deleted_section_ids) {
-    //         $deletedIds = explode(',', $request->deleted_section_ids);
-    //         SectionList::whereIn('id', $deletedIds)->delete();
-    //     }
-
-    //     return redirect()->route('admin.classlist')->with('success', 'Class and sections updated successfully.');
-    // }
 
     public function update(Request $request, $id)
     {
@@ -157,9 +97,7 @@ class ClassListController extends Controller
             'section.*' => 'nullable|string|max:255',
         ]);
 
-        
 
-        
         $class = ClassList::findOrFail($id);
         $class->class = $request->class;
         $class->save();
@@ -170,19 +108,38 @@ class ClassListController extends Controller
             SectionList::whereIn('id', $deletedIds)->delete();
         }
 
+        //dd($request->deleted_section_ids);
+
+
+        $sectionNames = [];
+
         if (!empty($request->existing_section)) {
             foreach ($request->existing_section as $sectionId => $sectionName) {
-                $section = SectionList::find($sectionId);
-                if ($section) {
-                    $section->section = $sectionName;
-                    $section->save();
+                $sectionName = trim($sectionName);
+                if (!empty($sectionName)) {
+                    if (in_array(strtolower($sectionName), $sectionNames)) {
+                        return back()->withErrors(['Duplicate entry not allowed, please enter another section: ' . $sectionName])->withInput();
+                    }
+                    $sectionNames[] = strtolower($sectionName);
+
+                    $section = SectionList::find($sectionId);
+                    if ($section) {
+                        $section->section = $sectionName;
+                        $section->save();
+                    }
                 }
             }
         }
 
-       if (!empty($request->section)) {
+        if (!empty($request->section)) {
             foreach ($request->section as $sectionName) {
+                $sectionName = trim($sectionName);
                 if (!empty($sectionName)) {
+                    if (in_array(strtolower($sectionName), $sectionNames)) {
+                        return back()->withErrors(['Duplicate entry not allowed, please enter another section: ' . $sectionName])->withInput();
+                    }
+                    $sectionNames[] = strtolower($sectionName);
+
                     $section = new SectionList();
                     $section->class_list_id = $class->id;
                     $section->section = $sectionName;
@@ -194,6 +151,7 @@ class ClassListController extends Controller
 
         return redirect()->route('admin.classlist')->with('success', 'Class updated successfully');
     }
+
 
 
     public function status($id)
@@ -224,6 +182,33 @@ class ClassListController extends Controller
             'status'    => 200,
             'message'   => 'class deleted successfully.',
         ]);
+    }
+
+    public function subjectsList($id) {
+        $classData = ClassList::findOrFail($id);
+        $classSubjects = ClassWiseSubject::with('subject')->where('class_id', $id)->paginate(10);
+        $allSubjects =  Subject::whereNotIn('id', function ($query) use ($id) {
+                    $query->select('class_id')
+                        ->from('class_wise_subjects')
+                        ->where('subject_id', $id);
+                    })->get();
+        return view('admin.class_lists.subjects-list', compact('classData', 'classSubjects', 'allSubjects'));
+    }
+
+    public function addSubjectToclass(Request $request) {
+        $checkIfExists = ClassWiseSubject::where([
+                'subject_id' => $request->subjectId,
+                'class_id' => $request->classId,
+        ])->first();
+
+        if ($checkIfExists) {
+            return redirect()->route('admin.class.subjects', $request->classId)->with('error', 'Selected subject is already added to the class.');
+        }
+        ClassWiseSubject::create([
+            'subject_id' => $request->subjectId,
+            'class_id' => $request->classId,
+        ]);
+        return redirect()->route('admin.class.subjects', $request->classId)->with('success', 'Selected subject is successfully added to the class.');
     }
     
 }

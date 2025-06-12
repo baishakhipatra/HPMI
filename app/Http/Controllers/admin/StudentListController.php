@@ -6,15 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Student;
+use App\Models\AcademicSession;
+use App\Models\ClassList;
+use App\Models\SectionList;
+use App\Models\StudentAdmission;
 
 class StudentListController extends Controller
 {
     public function index(Request $request) 
     {
         //dd($request->all());
-        if (Auth::guard('admin')->user()->user_type !== 'Admin') {
-            abort(403, 'Unauthorized access.');
-        }
+        // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
+        //     abort(403, 'Unauthorized access.');
+        // }
 
         $keyword = $request->input('keyword');
         $query = Student::query();
@@ -32,38 +36,82 @@ class StudentListController extends Controller
     }
 
     public function create(){
-        return view('admin.student_management.create_student');
+        $sessions = AcademicSession::get();
+        $classrooms = ClassList::where('status',1)->orderBy('class','ASC')->get();
+        return view('admin.student_management.create_student',compact('sessions','classrooms'));
     }
+    public function getSections(Request $request)
+    {
+        $classId = $request->classId;
+        $SectionList = SectionList::where('class_list_id',$classId)->orderBy('section', 'ASC')->get();
+       return response()->json([
+        'success' => true,
+        'sections' => $SectionList
+    ]);
+    }
+
 
     public function store(Request $request)
     {
         $request->validate([
             'student_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
             'gender' => 'required|in:Male,Female,Other',
+            'date_of_birth' => 'required|date|before_or_equal:today',
+            'phone_number' =>  ['required', 'regex:/^[0-9]{10}$/'],
             'parent_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
-            'phone_number' => 'required|string|min:10|max:10|regex:/^[0-9]{10}$/|unique:students,phone_number',
-            'address' => 'required|string|max:255', 
-            'admission_date' => 'required|date|after_or_equal:date_of_birth',
-            'class' => 'required|string|max:50',
-            'section' => 'required|string|max:50',
+            'email'=> 'required|string',
+            'address' => 'required|string',
+            'session_id' => 'required|exists:academic_sessions,id',
+            'class_id' => 'required|exists:class_lists,id',
+            'section_id' => 'required',
             'roll_number' => 'required|integer',
-            ], [
-            'phone_number.regex' => 'The phone number must be exactly 10 digits.',
-            'phone_number.min' => 'The phone number must be exactly 10 digits.',
-            'phone_number.max' => 'The phone number must be exactly 10 digits.',
-            'admission_date.after_or_equal' => 'The admission date must be after or equal to date of birth.'
+            'admission_date' => 'required|date',
         ]);
 
-        $studentId = 'STD' . str_pad(Student::max('id') + 1, 4, '0', STR_PAD_LEFT);
-        $data = $request->all();
-        $data['student_id'] = $studentId;
+        try {
+            $student = Student::where('student_name', $request->student_name)
+                ->where('date_of_birth', $request->date_of_birth)
+                ->first();
 
-        Student::create($data);
+            if (!$student) {
+                $student = new Student();
+                $student->student_id = Student::generateStudentUid();
+                $student->student_name = $request->student_name;
+                $student->gender = $request->gender;
+                $student->date_of_birth = $request->date_of_birth;
+                $student->phone_number = $request->phone_number;
+                $student->parent_name = $request->parent_name;
+                $student->email = $request->email;
+                $student->address = $request->address;
+                $student->save();
+            }
+            $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
+                ->where('session_id', $request->session_id)
+                ->exists();
 
-        return redirect()->route('admin.studentlist')->with('success', 'Student added successfully!');
+            if ($alreadyAdmitted) {
+                return back()->with('error', 'This student is already admitted in the selected session.');
+            }
+
+            StudentAdmission::create([
+                'student_id' => $student->id,
+                'session_id' => $request->session_id,
+                'class_id' => $request->class_id,
+                'section' => $request->section_id,
+                'roll_number' => $request->roll_number,
+                'admission_date' => $request->admission_date,
+            ]);
+
+
+            
+            return redirect()->back()->with('success', 'Student admission successful!');
+
+        } catch (\Exception $e) {
+            \Log::error('Student Admission Error: '.$e->getMessage());
+            return back()->with('error', 'Something went wrong while processing admission.');
+        }
     }
+
 
     public function edit($id)
     {
@@ -122,5 +170,11 @@ class StudentListController extends Controller
             'status'    => 200,
             'message'   => 'user deleted successfully.',
         ]);
+    }
+
+    public function admissionHistory($id)
+    {
+        $student = Student::findOrFail($id);
+        return view('admin.student_management.admission_history',compact('student'));
     }
 }
