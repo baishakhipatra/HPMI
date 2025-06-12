@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Models\{Teacher, Admin};
+use Illuminate\Validation\Rule;
+use App\Models\{Admin, ClassList, ClassWiseSubject, Subject};
 
 class TeacherListController extends Controller
 {
@@ -13,7 +14,7 @@ class TeacherListController extends Controller
     public function index(Request $request) 
     {
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Teacher');
+        $query = Admin::where('user_type', 'Teacher')->with(['class', 'subject']);
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
@@ -41,7 +42,14 @@ class TeacherListController extends Controller
             'user_type'        => 'required|in:Teacher,Employee,Admin',
             'name'             => 'required|string|max:255',
             'email'            => 'required|email|unique:admins,email',
-            'mobile'           => 'required|string|max:20',
+            //'mobile'           => 'required|digits:10|unique:admins,mobile',
+            'mobile' => [
+            'required',
+            'digits:10',
+                Rule::unique('admins')->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
             'date_of_birth'    => 'nullable|date',
             'date_of_joining'  => 'nullable|date',
             'qualifications'   => 'nullable|string|max:255',
@@ -133,5 +141,14 @@ class TeacherListController extends Controller
             'status'    => 200,
             'message'   => 'Teacher deleted successfully.',
         ]);
+    }
+
+    public function getSubjectsByClass(Request $request) {
+        $subjects = ClassWiseSubject::with('subject')
+            ->where('class_id', $request->class_id)
+            ->get()
+            ->pluck('subject');
+
+        return response()->json($subjects);
     }
 }

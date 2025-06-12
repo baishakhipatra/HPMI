@@ -16,4 +16,14 @@ class Admin extends Authenticatable
     'date_of_birth', 'date_of_joining','qualifications', 'subjects_taught', 'classes_assigned', 'password'];
 
     protected $hidden = ['password'];
+
+    public function class()
+    {
+        return $this->belongsTo(ClassList::class, 'classes_assigned');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class, 'subjects_taught');
+    }
 }

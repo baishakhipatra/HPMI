@@ -50,14 +50,16 @@
       <table class="table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Mobile</th>
-            <th>User Type</th>
-            <th>DOB</th>
-            <th>Address</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th width="10%">Name</th>
+            <th width="5%">Email</th>
+            <th width="5%">Mobile</th>
+            <th width="5%">Teacher ID</th>
+            <th width="10%">DOB</th>
+            <th width="5%">Address</th>  
+            <th width="5%">Classes Assigned</th>
+            <th width="10%">Subjects Taught</th>
+            <th width="5%">Status</th>
+            <th width="10%">Actions</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
@@ -66,9 +68,11 @@
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              <td>{{ $item->user_type }}</td>
+              <td>{{ $item->user_id }}</td>
               <td>{{ $item->date_of_birth }}</td>
               <td>{{ ucfirst($item->address) }}</td>
+              <td>{{ ucfirst($item->class->class ?? '-') }}</td>
+              <td>{{ ucfirst($item->subject->sub_name ?? '-') }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"

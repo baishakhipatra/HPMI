@@ -97,7 +97,10 @@
           @endforeach         
         </tbody>
       </table>
-      {{ $admins->links() }}
+      {{-- Pagination Links --}}
+      <div class="pagination-container">
+          {{$admins->links()}}
+      </div>
     </div>
   </div>
   

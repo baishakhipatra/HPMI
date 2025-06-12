@@ -62,9 +62,9 @@
                         <tbody class="table-border-bottom-0">
                             @forelse($subjects as $subject)
                                 <tr>
-                                    <td>{{ $subject->sub_name }}</td>
+                                    <td>{{ ucwords($subject->sub_name) }}</td>
                                     <td>{{ $subject->sub_code }}</td>
-                                    <td>{{ $subject->description }}</td>
+                                    <td>{{ ucfirst($subject->description) }}</td>
                                     <td>
                                         <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                                             <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$subject->id}}"
@@ -189,8 +189,17 @@
                                 <p class="text-danger small" id="error_edit_sub_description"></p>
                                 </div>
                             </div>
-
-                            <button type="button" class="btn btn-primary d-block" onClick="updateSubjectForm()">Update</button>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <a href="{{ route('admin.subjectlist.index') }}" class="btn btn-danger">
+                                        <i class="ri-arrow-left-line"></i> Back
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-primary d-block" onClick="updateSubjectForm()">Update</button>
+                                </div>
+                            </div>
+                            
                         </form>
                     </div>
                 </div>

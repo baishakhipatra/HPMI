@@ -97,7 +97,6 @@ class ClassListController extends Controller
             'section.*' => 'nullable|string|max:255',
         ]);
 
-
         $class = ClassList::findOrFail($id);
         $class->class = $request->class;
         $class->save();
@@ -186,12 +185,22 @@ class ClassListController extends Controller
 
     public function subjectsList($id) {
         $classData = ClassList::findOrFail($id);
-        $classSubjects = ClassWiseSubject::with('subject')->where('class_id', $id)->paginate(10);
-        $allSubjects =  Subject::whereNotIn('id', function ($query) use ($id) {
-                    $query->select('class_id')
-                        ->from('class_wise_subjects')
-                        ->where('subject_id', $id);
-                    })->get();
+        $keyword = request()->input('keyword');
+        $classSubjects = ClassWiseSubject::with('subject')
+                ->where('class_id', $id)
+                ->whereHas('subject', function ($query) use ($keyword) {
+                    if(!empty($keyword)) {
+                        $query->where('sub_name', 'like', '%'. $keyword . '%');
+                    }
+                })->paginate(10);
+        
+        $assignedSubjectIds = ClassWiseSubject::where('class_id', $id)->pluck('subject_id');
+        // $allSubjects =  Subject::whereNotIn('id', function ($query) use ($id) {
+        //             $query->select('class_id')
+        //                 ->from('class_wise_subjects')
+        //                 ->where('subject_id', $id);
+        //             })->get();
+        $allSubjects = Subject::whereNotIn('id', $assignedSubjectIds)->get();
         return view('admin.class_lists.subjects-list', compact('classData', 'classSubjects', 'allSubjects'));
     }
 
@@ -209,6 +218,23 @@ class ClassListController extends Controller
             'class_id' => $request->classId,
         ]);
         return redirect()->route('admin.class.subjects', $request->classId)->with('success', 'Selected subject is successfully added to the class.');
+    }
+    
+    public function deleteSubjectToclass(Request $request) {
+        $user = ClassWiseSubject::find($request->id); 
+    
+        if (!$user) {
+            return response()->json([
+                'status'    => 404,
+                'message'   => 'Classwise subject not found.',
+            ]);
+        }
+    
+        $user->delete(); 
+        return response()->json([
+            'status'    => 200,
+            'message'   => 'Classwise subject deleted successfully.',
+        ]);
     }
     
 }

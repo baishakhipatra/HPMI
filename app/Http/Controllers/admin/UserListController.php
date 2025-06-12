@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use App\Models\Admin;
 
 class UserListController extends Controller
@@ -46,7 +47,14 @@ class UserListController extends Controller
             'user_id'          => 'required|string|unique:admins,user_id',
             'name'             => 'required|string|max:255',
             'email'            => 'required|email|unique:admins,email',
-            'mobile'           => 'required|string|max:20',
+            //'mobile'           => 'required|digits:10|unique:admins,mobile',
+            'mobile' => [
+            'required',
+            'digits:10',
+                Rule::unique('admins')->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
             'date_of_birth'    => 'nullable|date',
             'date_of_joining'  => 'nullable|date',
             'qualifications'   => 'nullable|string|max:255',

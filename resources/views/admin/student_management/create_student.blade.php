@@ -15,8 +15,8 @@
 
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">New Student Admission</h3>
-    <a href="{{ route('admin.studentlist') }}" class="btn btn-primary btn-sm">Back</a>
+    <h3 class="mb-0">Create Student</h3>
+    <a href="{{ route('admin.studentlist') }}" class="btn btn-danger">Back</a>
   </div>
 
   <div class="card-body">
