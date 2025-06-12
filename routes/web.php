@@ -160,6 +160,9 @@ Route::prefix('admin')->group(function () {
             Route::post('/update', [TeacherListController::class, 'update'])->name('admin.teacher.update');
             Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacher.status');
             Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
+
+            //get class and subject
+            Route::get('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
         });
 
         Route::prefix('student-management/student-list')->group(function(){
@@ -187,11 +190,11 @@ Route::prefix('admin')->group(function () {
                 //classwise subject
                 Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects');
                 Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign');
-
+                Route::post('/subjects/delete', [ClassListController::class, 'deleteSubjectToclass'])->name('admin.class.subjects.delete');
             });
         
             Route::prefix('subject-list')->group(function(){
-                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');                Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
+                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');               
                 // Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
                 Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');

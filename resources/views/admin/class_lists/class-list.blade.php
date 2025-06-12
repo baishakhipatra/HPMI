@@ -63,7 +63,7 @@
                     </button>
                     <div class="dropdown-menu">
                       <a class="dropdown-item" href="{{ route('admin.class.subjects', ['id'=> $class->id]) }}" title="Edit">
-                          <i class="ri-pencil-line me-1"></i> Classwise Subject
+                          <i class="ri-pencil-line me-1"></i> Subject
                       </a>
                       <a class="dropdown-item" href="{{ route('admin.classlist',['update_id'=> $class->id]) }}"
                         title="Edit">
@@ -242,7 +242,7 @@
     }).then((result) => {
       if (result.isConfirmed) {
         $.ajax({
-          url: "{{ route('admin.classdelete')}}",
+          url: "{{ route('admin.classdelete') }}",
           type: 'POST',
           data: {
             "id": classId,

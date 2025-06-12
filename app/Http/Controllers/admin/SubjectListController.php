@@ -75,7 +75,7 @@ class SubjectListController extends Controller
         ]);
     }
 
-     public function delete(Request $request){
+    public function delete(Request $request){
         $subject = Subject::find($request->id); 
     
         if (!$subject) {
@@ -87,7 +87,7 @@ class SubjectListController extends Controller
     
         $subject->delete();
         // De-allocate subjects from associated tables
-        ClassWiseSubject::where('sub_id', $request->id)->delete();
+        ClassWiseSubject::where('subject_id', $request->id)->delete();
 
         return response()->json([
             'status'    => 200,
