@@ -16,4 +16,9 @@ class subject extends Model
       'sub_name', 'sub_code', 'description', 'deleted_at'
     ];
 
+     // Many-to-Many relationship with class wise subjects
+    public function classWiseSubjects()
+    {
+        return $this->hasMany(ClassWiseSubject::class, 'subject_id');
+    }
 }
