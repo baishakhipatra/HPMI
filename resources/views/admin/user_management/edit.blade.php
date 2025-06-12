@@ -14,14 +14,14 @@
           <!-- Card Header -->
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">Edit Employee</h5>
-            <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-primary">
+            <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
             </a>
           </div>
 
           <!-- Card Body -->
           <div class="card-body">
-            <form action="{{ route('admin.employee.update', $data->id) }}" method="POST">
+            <form action="{{ route('admin.employee.update') }}" method="POST">
               @csrf
               @method('POST') {{-- Or change to PUT/PATCH if your route uses it --}}
 
@@ -100,6 +100,7 @@
                 </div>
               </div>
 
+              <input type="hidden" name="id" value="{{$data->id}}">
               <button type="submit" class="btn btn-primary d-block">
                 Update
               </button>

@@ -13,27 +13,62 @@ use App\Models\StudentAdmission;
 
 class StudentListController extends Controller
 {
+    // public function index(Request $request) 
+    // {
+    //     //dd($request->all());
+    //     // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
+    //     //     abort(403, 'Unauthorized access.');
+    //     // }
+
+    //     $keyword = $request->input('keyword');
+
+    //     $query = Student::with('session');
+
+    //     $query->when($keyword, function ($q) use ($keyword) {
+    //         $q->where(function($subQuery) use ($keyword) {
+    //             $subQuery->where('student_name', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('student_id', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('gender', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('parent_name', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('email', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('phone_number', 'like', '%'. $keyword . '%')
+    //                     ->orWhere('address', 'like', '%'. $keyword . '%');
+    //         })
+    //         ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+    //             $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+    //         });
+    //     });
+
+    //     $students = $query->latest('id')->paginate(10);
+
+    //     return view('admin.student_management.studentlist', compact('students'));
+    // }
     public function index(Request $request) 
     {
-        //dd($request->all());
-        // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
-        //     abort(403, 'Unauthorized access.');
-        // }
-
         $keyword = $request->input('keyword');
-        $query = Student::query();
+
+        $query = Student::with('session');
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
                 $subQuery->where('student_name', 'like', '%'. $keyword . '%')
-                            ->orWhere('student_id', 'like', '%'. $keyword . '%');
+                        ->orWhere('student_id', 'like', '%'. $keyword . '%')
+                        ->orWhere('gender', 'like', '%'. $keyword . '%')
+                        ->orWhere('parent_name', 'like', '%'. $keyword . '%')
+                        ->orWhere('email', 'like', '%'. $keyword . '%')
+                        ->orWhere('phone_number', 'like', '%'. $keyword . '%')
+                        ->orWhere('address', 'like', '%'. $keyword . '%');
+            })
+            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
             });
         });
-        
+
         $students = $query->latest('id')->paginate(10);
 
         return view('admin.student_management.studentlist', compact('students'));
     }
+
 
     public function create(){
         $sessions = AcademicSession::get();
@@ -61,7 +96,8 @@ class StudentListController extends Controller
             'parent_name' => 'required|string|max:255',
             'email'=> 'required|string',
             'address' => 'required|string',
-            'session_id' => 'required|exists:academic_sessions,id',
+            //'session_id' => 'required|exists:academic_sessions,id',
+            'session_id'   => 'required|exists:academic_sessions,id',
             'class_id' => 'required|exists:class_lists,id',
             'section_id' => 'required',
             'roll_number' => 'required|integer',
@@ -82,6 +118,7 @@ class StudentListController extends Controller
                 $student->phone_number = $request->phone_number;
                 $student->parent_name = $request->parent_name;
                 $student->email = $request->email;
+                $student->academic_session_id = $request->session_id;
                 $student->address = $request->address;
                 $student->save();
             }
@@ -101,9 +138,7 @@ class StudentListController extends Controller
                 'roll_number' => $request->roll_number,
                 'admission_date' => $request->admission_date,
             ]);
-
-
-            
+           
             return redirect()->back()->with('success', 'Student admission successful!');
 
         } catch (\Exception $e) {
@@ -177,4 +212,141 @@ class StudentListController extends Controller
         $student = Student::findOrFail($id);
         return view('admin.student_management.admission_history',compact('student'));
     }
+
+    // public function export(Request $request) {
+    //      $start_date = $request->start_date ?? '';
+    //     $end_date = $request->end_date ?? '';
+    //     $keyword = $request->keyword ?? '';
+    //     $query = Student::query();
+
+    //     $query->when($start_date && $end_date, function($query) use ($start_date, $end_date) {
+    //         $query->where('created_at', '>=', $start_date)
+    //               ->where('created_at', '<=', $end_date);
+    //     });
+
+
+    //     $query->when($keyword, function($query) use ($keyword) {
+    //         $query->where('name', 'like', '%'.$keyword.'%')
+    //             ->orWhere('dob', 'like', '%'.$keyword.'%')
+    //             ->orWhere('class', 'like', '%'.$keyword.'%')
+    //             ->orWhere('mobile', 'like', '%'.$keyword.'%')
+    //             ->orWhere('email', 'like', '%'.$keyword.'%')
+    //             ->orWhere('utm_source', 'like', '%'.$keyword.'%')
+    //             ->orWhere('utm_medium', 'like', '%'.$keyword.'%')
+    //             ->orWhere('utm_campaign', 'like', '%'.$keyword.'%')
+    //             ->orWhere('utm_term', 'like', '%'.$keyword.'%')
+    //             ->orWhere('utm_content', 'like', '%'.$keyword.'%')
+    //             ->orWhere('pincode', 'like', '%'.$keyword.'%');
+    //     });
+        
+    //     $data = $query->latest('id')->get();
+    //      if (count($data) > 0) {
+    //         $delimiter = ",";
+    //         $filename = "admission_application-".date('Y-m-d').".csv";
+    //         // Create a file pointer
+    //         $f = fopen('php://memory', 'w');
+
+    //         // Set column headers
+    //         $fields = array('Student Name','Parent Name','Email','Mobile','DOB','Class','Pin Code','Source','Medium','Campaign','Term','Content','Date');
+    //         fputcsv($f, $fields, $delimiter);
+
+    //         $count = 1;
+    //         foreach($data as $key=> $row) {
+    //                 $mobile = (!empty($row['country_code']) ? $row['country_code'] . ' ' : '') . $row['mobile'];
+    //                 $lineData = array(
+    //                     $row['name'] ? $row['name'] : '',
+    //                     $row['parent_name'] ? $row['parent_name'] : '',
+    //                     $row['email'] ? $row['email'] : '',
+    //                     $mobile,
+    //                     !empty($row['dob']) ? date('d-m-Y', strtotime($row['dob'])) : '',
+    //                     $row['class'] ? $row['class'] : '',
+    //                     $row['pincode'] ? $row['pincode'] : '',
+    //                     $row['utm_source'] ? $row['utm_source'] : '',
+    //                     $row['utm_medium'] ? $row['utm_medium'] : '',
+    //                     $row['utm_campaign'] ? $row['utm_campaign'] : '',
+    //                     $row['utm_term'] ? $row['utm_term'] : '',
+    //                     $row['utm_content'] ? $row['utm_content'] : '',
+    //                     date("d-m-Y h:i a",strtotime($row['created_at'])) ? date("d-m-Y h:i a",strtotime($row['created_at'])) : ''
+    //                 );
+    //                 fputcsv($f, $lineData, $delimiter);
+
+    //                 $count++;
+    //         }
+                
+
+    //         // Move back to beginning of file
+    //         fseek($f, 0);
+
+    //         // Set headers to download file rather than displayed
+    //         header('Content-Type: text/csv');
+    //         header('Content-Disposition: attachment; filename="' . $filename . '";');
+
+    //         //output all remaining data on a file pointer
+    //         fpassthru($f);
+    //     }
+    // }
+
+    public function export(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $query = Student::query();
+
+        // Search by keyword in multiple fields
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('student_name', 'like', '%' . $keyword . '%')
+                ->orWhere('student_id', 'like', '%' . $keyword . '%')
+                ->orWhere('gender', 'like', '%' . $keyword . '%')
+                ->orWhere('parent_name', 'like', '%' . $keyword . '%')
+                ->orWhere('email', 'like', '%' . $keyword . '%')
+                ->orWhere('phone_number', 'like', '%' . $keyword . '%')
+                ->orWhere('address', 'like', '%' . $keyword . '%');               
+             })
+            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+            });
+        }
+
+        $students = $query->latest()->get();
+
+        if ($students->count() > 0) {
+            $delimiter = ",";
+            $filename = "students_export_" . date('Y-m-d') . ".csv";
+
+            $f = fopen('php://memory', 'w');
+
+            // CSV column headers
+            $headers = ['Student Name', 'Student ID', 'Gender', 'Parent Name', 'Email', 'Phone Number', 'Address', 'Date of Birth', 'Academic Session', 'Created Date'];
+            fputcsv($f, $headers, $delimiter);
+
+            foreach ($students as $student) {
+                $lineData = [
+                    $student->student_name,
+                    $student->student_id,
+                    $student->gender,
+                    $student->parent_name,
+                    $student->email,
+                    $student->phone_number,
+                    $student->address,
+                    //$student->academic_session_id,
+                    optional($student->date_of_birth)->format('d-m-Y'),
+                    optional($student->session)->session_name, 
+                    optional($student->created_at)->format('d-m-Y h:i A'),
+                ];
+                fputcsv($f, $lineData, $delimiter);
+            }
+
+            // Rewind and output
+            fseek($f, 0);
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '";');
+            fpassthru($f);
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'No records found to export.');
+        }
+    }
+
+
 }

@@ -175,6 +175,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
             Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
             Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
+            Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
         });
 
 
