@@ -5,11 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Student;
-use App\Models\AcademicSession;
-use App\Models\ClassList;
-use App\Models\SectionList;
-use App\Models\StudentAdmission;
+use Illuminate\Validation\Rule;
+use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, };
 
 class StudentListController extends Controller
 {
@@ -47,7 +44,7 @@ class StudentListController extends Controller
     {
         $keyword = $request->input('keyword');
 
-        $query = Student::with('session');
+        $query = Student::with('admission.session');
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
@@ -58,10 +55,10 @@ class StudentListController extends Controller
                         ->orWhere('email', 'like', '%'. $keyword . '%')
                         ->orWhere('phone_number', 'like', '%'. $keyword . '%')
                         ->orWhere('address', 'like', '%'. $keyword . '%');
-            })
-            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
             });
+            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+            // });
         });
 
         $students = $query->latest('id')->paginate(10);
@@ -75,16 +72,6 @@ class StudentListController extends Controller
         $classrooms = ClassList::where('status',1)->orderBy('class','ASC')->get();
         return view('admin.student_management.create_student',compact('sessions','classrooms'));
     }
-    public function getSections(Request $request)
-    {
-        $classId = $request->classId;
-        $SectionList = SectionList::where('class_list_id',$classId)->orderBy('section', 'ASC')->get();
-       return response()->json([
-        'success' => true,
-        'sections' => $SectionList
-    ]);
-    }
-
 
     public function store(Request $request)
     {
@@ -96,11 +83,18 @@ class StudentListController extends Controller
             'parent_name' => 'required|string|max:255',
             'email'=> 'required|string',
             'address' => 'required|string',
-            //'session_id' => 'required|exists:academic_sessions,id',
             'session_id'   => 'required|exists:academic_sessions,id',
             'class_id' => 'required|exists:class_lists,id',
             'section_id' => 'required',
-            'roll_number' => 'required|integer',
+            //'roll_number' => 'required|integer',
+            'roll_number'   => [
+                'required',
+                'integer',
+                Rule::unique('student_admissions')->where( function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
             'admission_date' => 'required|date',
         ]);
 
@@ -118,7 +112,7 @@ class StudentListController extends Controller
                 $student->phone_number = $request->phone_number;
                 $student->parent_name = $request->parent_name;
                 $student->email = $request->email;
-                $student->academic_session_id = $request->session_id;
+                //$student->session_id = $request->session_id;
                 $student->address = $request->address;
                 $student->save();
             }
@@ -130,7 +124,7 @@ class StudentListController extends Controller
                 return back()->with('error', 'This student is already admitted in the selected session.');
             }
 
-            StudentAdmission::create([
+            $admission = StudentAdmission::create([
                 'student_id' => $student->id,
                 'session_id' => $request->session_id,
                 'class_id' => $request->class_id,
@@ -139,10 +133,15 @@ class StudentListController extends Controller
                 'admission_date' => $request->admission_date,
             ]);
 
+            //Update student with admission ID
+            $student->student_admission_id = $admission->id;
+            $student->save();
+
             return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
 
         } catch (\Exception $e) {
             \Log::error('Student Admission Error: '.$e->getMessage());
+            //dd($e->getMessage());
             return back()->with('error', 'Something went wrong while processing admission.');
         }
     }
@@ -167,7 +166,15 @@ class StudentListController extends Controller
             'admission_date' => 'required|date',
             'class' => 'required|string|max:50',
             'section' => 'required|string|max:50',
-            'roll_number' => 'required|integer',
+            //'roll_number' => 'required|integer',
+            'roll_number'  => [
+                'required',
+                'integer',
+                Rule::unique('student_admissions')->where( function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
         ]);
 
         $student = Student::findOrFail($id);
@@ -188,6 +195,17 @@ class StudentListController extends Controller
             'message' => 'Status updated successfully'
         ]);
     }
+
+    public function getSections(Request $request)
+    {
+        $classId = $request->classId;
+        $SectionList = SectionList::where('class_list_id',$classId)->orderBy('section', 'ASC')->get();
+        return response()->json([
+            'success' => true,
+            'sections' => $SectionList
+        ]);
+    }
+
 
     public function delete(Request $request)
     {
@@ -261,7 +279,15 @@ class StudentListController extends Controller
             'session_id' => 'required',
             'class_id'  => 'required',
             'section_id'  => 'required',
-            'roll_number' => 'required',
+            //'roll_number' => 'required',
+            'roll_number' => [
+                'required',
+                'integer',
+                Role::unique('student_admissions')->where(function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
             'admission_date' => 'required|date',
         ]);
 
@@ -275,79 +301,6 @@ class StudentListController extends Controller
         ]);
         return redirect()->route('admin.student.admissionhistory', $student->id)->with('success', 'Re-admission Done Successfully');
     }
-
-    // public function export(Request $request) {
-    //      $start_date = $request->start_date ?? '';
-    //     $end_date = $request->end_date ?? '';
-    //     $keyword = $request->keyword ?? '';
-    //     $query = Student::query();
-
-    //     $query->when($start_date && $end_date, function($query) use ($start_date, $end_date) {
-    //         $query->where('created_at', '>=', $start_date)
-    //               ->where('created_at', '<=', $end_date);
-    //     });
-
-
-    //     $query->when($keyword, function($query) use ($keyword) {
-    //         $query->where('name', 'like', '%'.$keyword.'%')
-    //             ->orWhere('dob', 'like', '%'.$keyword.'%')
-    //             ->orWhere('class', 'like', '%'.$keyword.'%')
-    //             ->orWhere('mobile', 'like', '%'.$keyword.'%')
-    //             ->orWhere('email', 'like', '%'.$keyword.'%')
-    //             ->orWhere('utm_source', 'like', '%'.$keyword.'%')
-    //             ->orWhere('utm_medium', 'like', '%'.$keyword.'%')
-    //             ->orWhere('utm_campaign', 'like', '%'.$keyword.'%')
-    //             ->orWhere('utm_term', 'like', '%'.$keyword.'%')
-    //             ->orWhere('utm_content', 'like', '%'.$keyword.'%')
-    //             ->orWhere('pincode', 'like', '%'.$keyword.'%');
-    //     });
-        
-    //     $data = $query->latest('id')->get();
-    //      if (count($data) > 0) {
-    //         $delimiter = ",";
-    //         $filename = "admission_application-".date('Y-m-d').".csv";
-    //         // Create a file pointer
-    //         $f = fopen('php://memory', 'w');
-
-    //         // Set column headers
-    //         $fields = array('Student Name','Parent Name','Email','Mobile','DOB','Class','Pin Code','Source','Medium','Campaign','Term','Content','Date');
-    //         fputcsv($f, $fields, $delimiter);
-
-    //         $count = 1;
-    //         foreach($data as $key=> $row) {
-    //                 $mobile = (!empty($row['country_code']) ? $row['country_code'] . ' ' : '') . $row['mobile'];
-    //                 $lineData = array(
-    //                     $row['name'] ? $row['name'] : '',
-    //                     $row['parent_name'] ? $row['parent_name'] : '',
-    //                     $row['email'] ? $row['email'] : '',
-    //                     $mobile,
-    //                     !empty($row['dob']) ? date('d-m-Y', strtotime($row['dob'])) : '',
-    //                     $row['class'] ? $row['class'] : '',
-    //                     $row['pincode'] ? $row['pincode'] : '',
-    //                     $row['utm_source'] ? $row['utm_source'] : '',
-    //                     $row['utm_medium'] ? $row['utm_medium'] : '',
-    //                     $row['utm_campaign'] ? $row['utm_campaign'] : '',
-    //                     $row['utm_term'] ? $row['utm_term'] : '',
-    //                     $row['utm_content'] ? $row['utm_content'] : '',
-    //                     date("d-m-Y h:i a",strtotime($row['created_at'])) ? date("d-m-Y h:i a",strtotime($row['created_at'])) : ''
-    //                 );
-    //                 fputcsv($f, $lineData, $delimiter);
-
-    //                 $count++;
-    //         }
-                
-
-    //         // Move back to beginning of file
-    //         fseek($f, 0);
-
-    //         // Set headers to download file rather than displayed
-    //         header('Content-Type: text/csv');
-    //         header('Content-Disposition: attachment; filename="' . $filename . '";');
-
-    //         //output all remaining data on a file pointer
-    //         fpassthru($f);
-    //     }
-    // }
 
     public function export(Request $request)
     {
@@ -365,10 +318,10 @@ class StudentListController extends Controller
                 ->orWhere('email', 'like', '%' . $keyword . '%')
                 ->orWhere('phone_number', 'like', '%' . $keyword . '%')
                 ->orWhere('address', 'like', '%' . $keyword . '%');               
-             })
-            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
-            });
+             });
+            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+            // });
         }
 
         $students = $query->latest()->get();

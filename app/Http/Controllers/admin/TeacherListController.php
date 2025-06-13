@@ -35,21 +35,21 @@ class TeacherListController extends Controller
     }
 
     public function store(Request $request) {
-        // dd($request->all());
+        //dd($request->all());
         $request->validate([
             // 'user_id'          => 'nullable|string|unique:admins,user_id',
             'user_id'          => 'required|string|unique:admins,user_id',
             'user_type'        => 'required|in:Teacher,Employee,Admin',
             'name'             => 'required|string|max:255',
             'email'            => 'required|email|unique:admins,email',
-            //'mobile'           => 'required|digits:10|unique:admins,mobile',
-            'mobile' => [
-            'required',
-            'digits:10',
-                Rule::unique('admins')->where(function ($query) {
-                    return $query->whereNull('deleted_at');
-                }),
-            ],
+            'mobile'           => 'required|digits:10|unique:admins,mobile',
+            // 'mobile' => [
+            // 'required',
+            // 'digits:10',
+            //     Rule::unique('mobile')->where(function ($query) {
+            //         return $query->whereNull('deleted_at');
+            //     }),
+            // ],
             'date_of_birth'    => 'nullable|date',
             'date_of_joining'  => 'nullable|date',
             'qualifications'   => 'nullable|string|max:255',
@@ -58,7 +58,7 @@ class TeacherListController extends Controller
             'classes_assigned' => 'nullable|string|max:255',
             'password'         => 'required|string|min:6',
         ]);
-
+         //dd($request->all());
         Admin::create([
             'user_id'          => $request->user_id,
             'user_type'        => $request->user_type,
@@ -72,10 +72,10 @@ class TeacherListController extends Controller
             'subjects_taught'  => $request->subjects_taught,
             'classes_assigned' => $request->classes_assigned,
             'password'         => Hash::make($request->password),
-            'user_type'        => 'Teacher',
+            'user_type'        => $request->user_type,
             'status'           => 1,
         ]);
-        //dd('Hi');
+        //dd($request->subjects_taught);
 
         return redirect()->route('admin.teacher.index')->with('success', 'Teacher created successfully');
     }
@@ -87,7 +87,7 @@ class TeacherListController extends Controller
 
     public function update(Request $request) {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'      => 'required|string|max:255',
             'address'   => 'nullable|string',
             'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
             'email'     => 'required|email|unique:admins,email,' . $request->id,
@@ -143,12 +143,43 @@ class TeacherListController extends Controller
         ]);
     }
 
-    public function getSubjectsByClass(Request $request) {
-        $subjects = ClassWiseSubject::with('subject')
-            ->where('class_id', $request->class_id)
-            ->get()
-            ->pluck('subject');
+    
+   public function getSubjectsByClass(Request $request)
+    {
+        $classId = $request->class_id;
 
-        return response()->json($subjects);
+        // Get all class_id and subject_id pairs that are already assigned
+        $assignedPairs = Admin::whereNotNull('classes_assigned')
+            ->whereNotNull('subjects_taught')
+            ->get()
+            ->map(function ($admin) {
+                return [
+                    'class_id' => $admin->classes_assigned,
+                    'subject_id' => $admin->subjects_taught,
+                ];
+            });
+
+        // Get subjects assigned to this class
+        $classWiseSubjects = ClassWiseSubject::with('subject')
+            ->where('class_id', $classId)
+            ->get()
+            ->pluck('subject')
+            ->filter(function ($subject) use ($classId, $assignedPairs) {
+                if (!$subject) return false;
+
+                // Check if this class-subject pair is already assigned
+                foreach ($assignedPairs as $pair) {
+                    if ($pair['class_id'] == $classId && $pair['subject_id'] == $subject->id) {
+                        return false; // Already assigned
+                    }
+                }
+
+                return true;
+            })
+            ->values();
+
+        return response()->json($classWiseSubjects);
     }
+
+
 }
