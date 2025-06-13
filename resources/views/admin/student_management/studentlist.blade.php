@@ -65,7 +65,7 @@
         <tbody class="table-border-bottom-0">
           @foreach($students as $item)
             <tr> 
-              <td>{{ ucfirst($item->student_name) }}</td>
+              <td>{{ ucwords($item->student_name) }}</td>
               <td>{{ ($item->student_id) }}</td>
               <td>{{ ($item->date_of_birth) }}</td>
               <td>{{ $item->gender}}</td>
