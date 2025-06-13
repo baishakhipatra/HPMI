@@ -13,7 +13,7 @@
         <div class="card">
           <!-- Card Header -->
           <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="mb-0">Edit Student</h5>
+            <h4 class="mb-0">Edit Student</h4>
             <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-primary">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
             </a>
@@ -25,138 +25,131 @@
               @csrf
               @method('POST')
 
-              {{-- <div class="col-md-6">
-                <label for="student_name">Full Name <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="student_name" id="student_name" placeholder="Enter full name"
-                  value="{{ old('student_name', $student->student_name) }}">
-                @error('student_name') <small class="text-danger">{{ $message }}</small> @enderror
-              </div>
-
-              <div class="col-md-6">
-                <label for="date_of_birth">Date Of Birth<span class="text-danger">*</span></label>
-                <input type="date" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="Enter full name"
-                  value="{{ old('date_of_birth', $student->date_of_birth) }}">
-                @error('date_of_birth') <small class="text-danger">{{ $message }}</small> @enderror
-              </div> --}}
               <div class="row g-3">
-                <!-- Student Name -->
-                <div class="col-md-6">
-                    <label for="student_name" class="form-label">Student Name*</label>
+               
+                <div class="form-floating form-floating-outline col-md-6">
                     <input type="text" class="form-control" 
                             id="student_name" name="student_name" 
-                            value="{{ old('student_name', $student->student_name) }}" required>
+                            value="{{ old('student_name', $student->student_name) }}">
+                    <label for="student_name">Student Name</label>
                     @error('student_name')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Date of Birth -->
-                <div class="col-md-6">
-                    <label for="date_of_birth" class="form-label">Date of Birth*</label>
+               
+                <div class="form-floating form-floating-outline col-md-6">
+                   
                     <input type="date" class="form-control" 
                             id="date_of_birth" name="date_of_birth" 
-                            value="{{ old('date_of_birth', $student->date_of_birth) }}" required>
+                            value="{{ old('date_of_birth', $student->date_of_birth) }}">
+                    <label for="date_of_birth">Date of Birth</label>
                     @error('date_of_birth')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Gender -->
-                <div class="col-md-4">
-                    <label for="gender" class="form-label">Gender*</label>
-                    <select class="form-select" name="gender" required>
+     
+                <div class="form-floating form-floating-outline col-md-4">
+                    <select class="form-select" name="gender">
                         <option value="">Select Gender</option>
                         <option value="Male" {{ old('gender', $student->gender) == 'Male' ? 'selected' : '' }}>Male</option>
                         <option value="Female" {{ old('gender', $student->gender) == 'Female' ? 'selected' : '' }}>Female</option>
                         <option value="Other" {{ old('gender', $student->gender) == 'Other' ? 'selected' : '' }}>Other</option>
                     </select>
+                    <label for="gender">Gender*</label>
                     @error('gender')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Parent Name -->
-                <div class="col-md-8">
-                    <label for="parent_name" class="form-label">Parent/Guardian Name*</label>
-                    <input type="text" class="form-control" 
-                            id="parent_name" name="parent_name" 
-                            value="{{ old('parent_name', $student->parent_name) }}" required>
-                    @error('parent_name')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
+          
+                <div class="form-floating form-floating-outline col-md-8">
+                  <input type="text" class="form-control" 
+                          id="parent_name" name="parent_name" 
+                          value="{{ old('parent_name', $student->parent_name) }}">
+                  <label for="parent_name">Parent/Guardian Name</label>
+                  @error('parent_name')
+                      <small class="text-danger">{{ $message }}</small>
+                  @enderror
                 </div>
 
-                <!-- Email -->
-                <div class="col-md-6">
-                    <label for="email" class="form-label">Email</label>
+             
+                <div class="form-floating form-floating-outline col-md-6">
+                    
                     <input type="email" class="form-control" 
                             id="email" name="email" 
                             value="{{ old('email', $student->email) }}">
+                    <label for="email">Email</label>
                     @error('email')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Phone Number -->
-                <div class="col-md-6">
-                    <label for="phone_number" class="form-label">Phone Number</label>
+           
+                <div class="form-floating form-floating-outline col-md-6">
                     <input type="text" class="form-control" 
                             id="phone_number" name="phone_number" 
                             value="{{ old('phone_number', $student->phone_number) }}">
+                    <label for="phone_number">Phone Number</label>
                     @error('phone_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Address -->
-                <div class="col-12">
-                    <label for="address" class="form-label">Address</label>
+             
+                <div class="form-floating form-floating-outline col-12">
                     <textarea class="form-control" 
                                 id="address" name="address" rows="3">{{ old('address', $student->address) }}</textarea>
+                    <label for="address">Address</label>
                     @error('address')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Admission Date -->
-                <div class="col-md-4">
-                    <label for="admission_date" class="form-label">Admission Date*</label>
+                <h4>Admission Details</h4>
+                <div class="form-floating form-floating-outline col-md-4">
                     <input type="date" class="form-control" 
                             id="admission_date" name="admission_date" 
-                            value="{{ old('admission_date', $student->admission_date) }}" required>
+                            value="{{ old('admission_date', $student->admission_date) }}">
+                    <label for="admission_date">Admission Date</label>
                     @error('admission_date')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
 
-                <!-- Class -->
-                <div class="col-md-4">
-                    <label for="class" class="form-label">Class*</label>
-                    <input type="text" class="form-control" 
-                            id="class" name="class" 
-                            value="{{ old('class', $student->class) }}" required>
+              
+                <div class="form-floating form-floating-outline col-md-4">
+                    <select name="class_id" class="form-select" id="class_id">
+                        <option value="">Select Class</option>
+                        @foreach ($classrooms as $classroom)
+                            <option value="{{ $classroom->id }}" 
+                                {{ old('class_id', $admission->class_list_id) == $classroom->id ? 'selected' : '' }}>
+                                {{ $classroom->class }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <label for="class_id">Class*</label>
                     @error('class')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
-
+       
                 <!-- Section -->
-                <div class="col-md-4">
-                    <label for="section" class="form-label">Section*</label>
-                    <input type="text" class="form-control" 
-                            id="section" name="section" 
-                            value="{{ old('section', $student->section) }}" required>
-                    @error('section')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
+                <div class="form-floating form-floating-outline col-md-4">
+                    <select name="section_id" class="form-select" id="section_id">
+                        <option value="">Select Section</option>
+                    </select>
+                    <label for="section_id">Section<span class="text-danger">*</span></label>
+                    @error('section_id')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>
 
-                <!-- Roll Number -->
-                <div class="col-md-4">
-                    <label for="roll_number" class="form-label">Roll Number*</label>
+
+                <div class="form-floating form-floating-outline col-md-4">
                     <input type="number" class="form-control" 
                             id="roll_number" name="roll_number" 
-                            value="{{ old('roll_number', $student->roll_number) }}" required>
+                            value="{{ old('roll_number', $student->roll_number) }}">
+                    <label for="roll_number">Roll Number</label>
                     @error('roll_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
@@ -164,8 +157,12 @@
 
 
               <input type="hidden" name="id" value="{{ $student->id }}">
-
-              <button type="submit" class="btn btn-primary">Update</button>
+              
+              <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4 py-2">
+                  <i class="fas fa-user-plus me-2"></i> Update
+                </button>
+              </div>
             </form>
           </div>
 
@@ -177,6 +174,41 @@
 </section>
 
 @endsection
-@section('scripts')
+<script>
+  $(document).ready(function() {
+      function loadSections(classId, selectedSection = null) {
+          $('#section_id').html('<option value="">Loading...</option>');
 
-@endsection
+          if (classId) {
+              $.ajax({
+                  url: "{{ route('admin.student.get-sections') }}",
+                  type: 'GET',
+                  dataType: 'json',
+                  data: { classId: classId },
+                  success: function(response) {
+                      $('#section_id').empty().append('<option value="">Select Section</option>');
+                      $.each(response.sections, function(key, section) {
+                          let selected = (section.section == selectedSection) ? 'selected' : '';
+                          $('#section_id').append('<option value="'+section.section+'" '+selected+'>'+section.section+'</option>');
+                      });
+                  }
+              });
+          } else {
+              $('#section_id').html('<option value="">Select Section</option>');
+          }
+      }
+
+      $('#class_id').on('change', function() {
+          let classId = $(this).val();
+          loadSections(classId);
+      });
+
+      let existingClassId = "{{ old('class_id', $admission->class_id ?? '') }}";
+      let existingSection = "{{ old('section_id', $admission->section ?? '') }}";
+
+      if(existingClassId){
+          loadSections(existingClassId, existingSection);
+      }
+  });
+
+</script>

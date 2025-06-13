@@ -15,7 +15,7 @@
 
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">Re-Admission</h3>
+    <h3 class="mb-0">New Class Admission</h3>
     <a href="{{ route('admin.student.admissionhistory', $student->id) }}" class="btn btn-danger">Back</a>
   </div>
 
@@ -64,7 +64,7 @@
             <label for="address">Address</label>
           </div>
 
-            <h4>Re-admission Details</h4>
+          <h4>Admission Details</h4>
           <div class="form-floating col-md-4">
             <select name="session_id" class="form-select" id="session_id" required>
               <option value="">Select Session</option>
@@ -114,7 +114,7 @@
 
           <div class="col-12 mt-4">
             <button type="submit" class="btn btn-primary px-4 py-2">
-              <i class="fas fa-user-plus me-2"></i> Submit Re-Admission
+              <i class="fas fa-user-plus me-2"></i> Submit New Class Admission
             </button>
           </div>
 
@@ -140,7 +140,7 @@
             success: function(response) {
                 if(response.success){
                     console.log(response.sections);
-                    // You can loop here to populate dropdown, etc
+
                     $('#section_id').empty();
                     $('#section_id').append('<option value="">Select Section</option>');
                     $.each(response.sections, function(key, section) {
