@@ -102,7 +102,7 @@
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
                   
-                    {{-- @php
+                    @php
                         $classLists = \App\Models\ClassList::all();
                     @endphp
                     <div class="row mb-3">
@@ -142,43 +142,13 @@
                               </select>    
                             </div>
                         </div>
-                    </div> --}}
-
-                    {{-- Class and Subject Dropdowns --}}
-       @php
-    $classLists = \App\Models\ClassList::all();
-@endphp
-
-<div class="row mb-3">
-    <div class="col-md-4">
-        <div class="form-floating form-floating-outline">
-            <select name="classes_assigned" id="classDropdown" class="form-control">
-                <option value="">-- Select Class --</option>
-                @foreach($classLists as $class)
-                    <option value="{{ $class->id }}"
-                        {{ old('classes_assigned', $data->classes_assigned) == $class->id ? 'selected' : '' }}>
-                        {{ $class->class }}
-                    </option>
-                @endforeach
-            </select>
-            <label>Class Assigned</label>
-            @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="form-floating form-floating-outline">
-            <select name="subjects_taught" id="subjectDropdown" class="form-control">
-                <option value="{{ $data->subjects_taught }}" selected>
-                    {{ \App\Models\Subject::find($data->subjects_taught)->sub_name ?? '-- Select Subject --' }}
-                </option>
-            </select>
-            <label>Subject Taught</label>
-            @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
-        </div>
-    </div>
-</div>
-
+                    </div>
+                    <input type="hidden" name="id" value="{{$data->id}}">
+                    <div class="text-end">
+                      <button type="submit" class="btn btn-primary px-4 py-2">Update</button>
+                    </div>
+                </form>
+            </div>
 
           <!-- End Card Body -->
 
