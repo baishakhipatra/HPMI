@@ -102,9 +102,7 @@ class StudentListController extends Controller
                 'admission_date' => $request->admission_date,
             ]);
 
-
-            
-            return redirect()->back()->with('success', 'Student admission successful!');
+            return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
 
         } catch (\Exception $e) {
             \Log::error('Student Admission Error: '.$e->getMessage());
@@ -175,6 +173,69 @@ class StudentListController extends Controller
     public function admissionHistory($id)
     {
         $student = Student::findOrFail($id);
-        return view('admin.student_management.admission_history',compact('student'));
+        $sessions = AcademicSession::all();
+        $classes = ClassList::all();
+        $admissionHistories = StudentAdmission::with(['student','class','session'])
+                            ->where('student_id', $id)
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+        return view('admin.student_management.admission_history',compact('student','admissionHistories','sessions','classes'));
+    }
+
+    public function admissionhistoryUpdate(Request $request)
+    {
+        $request->validate([
+            'id' => 'nullable',
+            'session_id' => 'nullable',
+            'class_id' => 'nullable',
+            'section' => 'nullable',
+            'roll_number' => 'nullable',
+            'admission_date' => 'nullable|date',
+        ]);
+
+        $history = StudentAdmission::findOrFail($request->id);
+
+        $history->update([
+            'session_id' => $request->session_id,
+            'class_id' => $request->class_id,
+            'section' => $request->section,
+            'roll_number' => $request->roll_number,
+            'admission_date' => $request->admission_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Admission history updated successfully.');
+    }
+
+
+    public function reAdmissionForm($id)
+    {
+        $student = Student::findOrFail($id);
+        $classes = ClassList::all();
+        $sessions = AcademicSession::all();
+
+        return view('admin.student_management.re-admission', compact('student','classes','sessions'));
+    }
+
+    public function reAdmissionStore(Request $request, $id)
+    {
+        $student = Student::findOrFail($id);
+        //dd($request->all());
+        $request->validate([
+            'session_id' => 'required',
+            'class_id'  => 'required',
+            'section_id'  => 'required',
+            'roll_number' => 'required',
+            'admission_date' => 'required|date',
+        ]);
+
+        StudentAdmission::create([
+            'student_id' => $student->id,
+            'session_id' => $request->session_id,
+            'class_id'  => $request->class_id,
+            'section' => $request->section_id,
+            'roll_number' => $request->roll_number,
+            'admission_date' => $request->admission_date,
+        ]);
+        return redirect()->route('admin.student.admissionhistory', $student->id)->with('success', 'Re-admission Done Successfully');
     }
 }

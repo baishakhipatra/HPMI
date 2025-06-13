@@ -175,6 +175,9 @@ Route::prefix('admin')->group(function () {
             Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
             Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
             Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
+            Route::post('/admission-history/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
+            Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
+            Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
         });
 
 

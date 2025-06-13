@@ -77,7 +77,7 @@
             <label for="address">Address<span class="text-danger">*</span></label>
             @error('address')<small class="text-danger">{{ $message }}</small>@enderror
           </div>
-
+          <h4>Admission Details</h4>
           <!-- Session -->
           <div class="form-floating col-md-4">
             <select name="session_id" class="form-select" id="session_id">

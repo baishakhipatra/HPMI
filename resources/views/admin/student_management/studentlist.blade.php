@@ -70,8 +70,8 @@
               <td>{{ ($item->date_of_birth) }}</td>
               <td>{{ $item->gender}}</td>
               <td>{{ $item->admission_date }}</td>
-              <td>{{ $item->class }}</td>
-              <td>{{ $item->section }}</td>
+              <td>{{ $item->class_id }}</td>
+              <td>{{ $item->section_id }}</td>
               <td>{{ $item->roll_number }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
