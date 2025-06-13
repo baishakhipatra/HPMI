@@ -69,7 +69,7 @@
               <td>{{ ($item->student_id) }}</td>
               <td>{{ ($item->date_of_birth) }}</td>
               <td>{{ $item->gender}}</td>
-              <td>{{ $item->session?->session_name ?? 'N/A' }}</td>
+              <td>{{ $item->admission?->session?->session_name ?? 'N/A' }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"

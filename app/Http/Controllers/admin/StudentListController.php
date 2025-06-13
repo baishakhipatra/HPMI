@@ -5,11 +5,8 @@ namespace App\Http\Controllers\admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Student;
-use App\Models\AcademicSession;
-use App\Models\ClassList;
-use App\Models\SectionList;
-use App\Models\StudentAdmission;
+use Illuminate\Validation\Rule;
+use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, };
 
 class StudentListController extends Controller
 {
@@ -47,7 +44,7 @@ class StudentListController extends Controller
     {
         $keyword = $request->input('keyword');
 
-        $query = Student::with('session');
+        $query = Student::with('admission.session');
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
@@ -58,10 +55,10 @@ class StudentListController extends Controller
                         ->orWhere('email', 'like', '%'. $keyword . '%')
                         ->orWhere('phone_number', 'like', '%'. $keyword . '%')
                         ->orWhere('address', 'like', '%'. $keyword . '%');
-            })
-            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
             });
+            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+            // });
         });
 
         $students = $query->latest('id')->paginate(10);
@@ -79,10 +76,10 @@ class StudentListController extends Controller
     {
         $classId = $request->classId;
         $SectionList = SectionList::where('class_list_id',$classId)->orderBy('section', 'ASC')->get();
-        return response()->json([
-            'success' => true,
-            'sections' => $SectionList
-        ]);
+       return response()->json([
+        'success' => true,
+        'sections' => $SectionList
+    ]);
     }
 
 
@@ -96,11 +93,18 @@ class StudentListController extends Controller
             'parent_name' => 'required|string|max:255',
             'email'=> 'required|string',
             'address' => 'required|string',
-            //'session_id' => 'required|exists:academic_sessions,id',
             'session_id'   => 'required|exists:academic_sessions,id',
             'class_id' => 'required|exists:class_lists,id',
             'section_id' => 'required',
-            'roll_number' => 'required|integer',
+            //'roll_number' => 'required|integer',
+            'roll_number'   => [
+                'required',
+                'integer',
+                Rule::unique('student_admissions')->where( function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
             'admission_date' => 'required|date',
         ]);
 
@@ -118,7 +122,7 @@ class StudentListController extends Controller
                 $student->phone_number = $request->phone_number;
                 $student->parent_name = $request->parent_name;
                 $student->email = $request->email;
-                $student->academic_session_id = $request->session_id;
+                //$student->session_id = $request->session_id;
                 $student->address = $request->address;
                 $student->save();
             }
@@ -130,7 +134,7 @@ class StudentListController extends Controller
                 return back()->with('error', 'This student is already admitted in the selected session.');
             }
 
-            StudentAdmission::create([
+            $admission = StudentAdmission::create([
                 'student_id' => $student->id,
                 'session_id' => $request->session_id,
                 'class_id' => $request->class_id,
@@ -139,10 +143,15 @@ class StudentListController extends Controller
                 'admission_date' => $request->admission_date,
             ]);
 
+            //Update student with admission ID
+            $student->student_admission_id = $admission->id;
+            $student->save();
+
             return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
 
         } catch (\Exception $e) {
             \Log::error('Student Admission Error: '.$e->getMessage());
+            //dd($e->getMessage());
             return back()->with('error', 'Something went wrong while processing admission.');
         }
     }
@@ -216,7 +225,15 @@ class StudentListController extends Controller
             'admission_date' => 'required|date',
             'class_id' => 'required|exists:class_lists,id',
             'section_id' => 'required|string',
-            'roll_number' => 'required|integer',
+            //'roll_number' => 'required|integer',
+            'roll_number'  => [
+                'required',
+                'integer',
+                Rule::unique('student_admissions')->where( function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
         ]);
 
         try {
@@ -271,6 +288,8 @@ class StudentListController extends Controller
             'message' => 'Status updated successfully'
         ]);
     }
+
+
 
     public function delete(Request $request)
     {
@@ -387,7 +406,15 @@ class StudentListController extends Controller
             'session_id' => 'required',
             'class_id'  => 'required',
             'section_id'  => 'required',
-            'roll_number' => 'required',
+            //'roll_number' => 'required',
+            'roll_number' => [
+                'required',
+                'integer',
+                Role::unique('student_admissions')->where(function ($query) use ($request) {
+                    return $query->where('class_id', $request->class_id)
+                                ->where('section', $request->section_id);
+                }),
+            ],
             'admission_date' => 'required|date',
         ]);
 
@@ -429,10 +456,10 @@ class StudentListController extends Controller
                 ->orWhere('email', 'like', '%' . $keyword . '%')
                 ->orWhere('phone_number', 'like', '%' . $keyword . '%')
                 ->orWhere('address', 'like', '%' . $keyword . '%');               
-            })
-            ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-                $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
-            });
+             });
+            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
+            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
+            // });
         }
 
         $students = $query->latest()->get();

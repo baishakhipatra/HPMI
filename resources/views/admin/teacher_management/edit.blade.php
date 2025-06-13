@@ -102,7 +102,7 @@
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
                   
-                    @php
+                    {{-- @php
                         $classLists = \App\Models\ClassList::all();
                     @endphp
                     <div class="row mb-3">
@@ -127,7 +127,11 @@
                                 <option value="">--Select Subject--</option>
                                 @if($data->classes_assigned)
                                   @php
-                                    $subjects = \App\Models\ClassWiseSubject::with('subject')->where('class_id', $data->classes_assigned)->get()->pluck('subject');
+                                    $subjects = \App\Models\ClassWiseSubject::with('subject')
+                                    ->where('class_id', $data->classes_assigned)
+                                    ->get()
+                                    ->pluck('subject')
+                                    ->filter();
                                   @endphp
                                   @foreach($subjects as $subject)
                                     <option value="{{ $subject->id }}" {{ old('subjects_taught', $data->subjects_taught) == $subject->id ? 'selected' : ''}}>
@@ -138,11 +142,43 @@
                               </select>    
                             </div>
                         </div>
-                    </div>
-                    <input type="hidden" name="id" value="{{$data->id}}">
-                    <button type="submit" class="btn btn-primary d-block">Update</button>
-                </form>
-            </div>
+                    </div> --}}
+
+                    {{-- Class and Subject Dropdowns --}}
+       @php
+    $classLists = \App\Models\ClassList::all();
+@endphp
+
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="form-floating form-floating-outline">
+            <select name="classes_assigned" id="classDropdown" class="form-control">
+                <option value="">-- Select Class --</option>
+                @foreach($classLists as $class)
+                    <option value="{{ $class->id }}"
+                        {{ old('classes_assigned', $data->classes_assigned) == $class->id ? 'selected' : '' }}>
+                        {{ $class->class }}
+                    </option>
+                @endforeach
+            </select>
+            <label>Class Assigned</label>
+            @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-floating form-floating-outline">
+            <select name="subjects_taught" id="subjectDropdown" class="form-control">
+                <option value="{{ $data->subjects_taught }}" selected>
+                    {{ \App\Models\Subject::find($data->subjects_taught)->sub_name ?? '-- Select Subject --' }}
+                </option>
+            </select>
+            <label>Subject Taught</label>
+            @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
+        </div>
+    </div>
+</div>
+
 
           <!-- End Card Body -->
 

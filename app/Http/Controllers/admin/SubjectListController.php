@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Subject;
 
 class SubjectListController extends Controller
@@ -55,6 +56,12 @@ class SubjectListController extends Controller
         $validated = $request->validate([
             'sub_name' => 'required|string|max:255',
             'sub_code' => 'required|string|max:50|unique:subjects,sub_code',
+            // 'sub_code' => [
+            //     'required',
+            //     'string',
+            //     'max:50',
+            //     Rule::unique('subjects', 'sub_code')->whereNull('deleted_at'),
+            // ],
             'description' => 'nullable|string',
         ]);
 
@@ -76,6 +83,7 @@ class SubjectListController extends Controller
     }
 
     public function delete(Request $request){
+        //dd($request->all());
         $subject = Subject::find($request->id); 
     
         if (!$subject) {

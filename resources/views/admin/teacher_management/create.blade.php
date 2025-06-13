@@ -148,25 +148,29 @@
 @endsection
 
 <script>
-  $(document).ready(function () {
-    $('#classDropdown').on('change', function () {
-      var classId = $(this).val();
-      $('#subjectDropdown').html('<option value="">Loading...</option>');
-      if (classId) {
-        $.ajax({
-          url: "{{ route('admin.getSubjectsByClass') }}",
-          type: "GET",
-          data: { class_id: classId },
-          success: function (data) {
-            $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-            $.each(data, function (key, subject) {
-              $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
+    $(document).ready(function () {
+        $('#classDropdown').on('change', function () {
+            var classId = $(this).val();
+            $('#subjectDropdown').html('<option value="">Loading...</option>');
+            if (classId) {
+            $.ajax({
+                url: "{{ route('admin.getSubjectsByClass') }}",
+                type: "GET",
+                data: { class_id: classId },
+                success: function (data) {
+                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+                if (data.length > 0) {
+                    $.each(data, function (key, subject) {
+                    $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
+                    });
+                } else {
+                    $('#subjectDropdown').html('<option value="">No subjects available</option>');
+                }
+                },
             });
-          },
+            } else {
+            $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+            }
         });
-      } else {
-        $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-      }
     });
-  });
 </script>

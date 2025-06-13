@@ -1,5 +1,8 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Add your toastFire function if it's custom -->
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -88,7 +91,7 @@
                                             <a class="dropdown-item" href="{{$edit_link}}">
                                                 <i class="ri-pencil-line me-1"></i> Edit
                                             </a>
-                                            <a class="dropdown-item" href="javascript:void(0);" onclick="deleteSubject({{ $subject->id }})">
+                                            <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteSubject({{ $subject->id }})">
                                                 <i class="ri-delete-bin-6-line me-1"></i> Delete
                                             </a>
                                         </div>
@@ -228,36 +231,38 @@
             $("#edit_suject_form").submit();
         }
     }
-  function deleteSubject(userId) {
-    Swal.fire({
-        icon: 'warning',
-        title: "Are you sure you want to delete this?",
-        text: "You won't be able to revert this!",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Delete",
-    }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "{{ route('admin.subjectlist.delete')}}",
-                type: 'POST',
-                data: {
-                    "id": userId,
-                    "_token": '{{ csrf_token() }}',
-                },
-                success: function (data){
-                    if (data.status != 200) {
-                        toastFire('error', data.message);
-                    } else {
-                        toastFire('success', data.message);
-                        location.reload();
+
+    //delete subject
+    function deleteSubject(userId) {
+        Swal.fire({
+            icon: 'warning',
+            title: "Are you sure you want to delete this?",
+            text: "You won't be able to revert this!",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Delete",
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ route('admin.subjectlist.delete')}}",
+                    type: 'POST',
+                    data: {
+                        "id": userId,
+                        "_token": '{{ csrf_token() }}',
+                    },
+                    success: function (data){
+                        if (data.status != 200) {
+                            toastFire('error', data.message);
+                        } else {
+                            toastFire('success', data.message);
+                            location.reload();
+                        }
                     }
-                }
-            });
-        }
-    });
-  }
+                });
+            }
+        });
+    }
 
 </script>

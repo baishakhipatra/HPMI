@@ -3,10 +3,10 @@
   <!-- ! Hide app brand if navbar-full -->
   <div class="app-brand demo">
     <a href="{{url('/')}}" class="app-brand-link">
-      {{-- <span class="app-brand-logo demo me-1">
- @include('_partials.macros',["height"=>20])
- </span> --}}
-      <img src="{{asset('assets/img/new-logo.png')}}" alt="" style="width: 80px; height: auto;">
+      {{--<span class="app-brand-logo demo me-1">
+            @include('_partials.macros',["height"=>20])
+            </span> --}}
+      {{-- <img src="{{asset('assets/img/new-logo.png')}}" alt="" style="width: 80px; height: auto;"> --}}
       <span class="app-brand-text demo menu-text fw-semibold ms-2">HPMI</span>
     </a>
 
@@ -30,7 +30,7 @@
       @if(auth('admin')->user()->user_type == 'Admin') --}}
         <li class="menu-item {{ (request()->is('admin/employees*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-store-line"></i>
+            <i class="menu-icon tf-icons ri-briefcase-line"></i>
             <div>Employee Management</div>
           </a>
           <ul class="menu-sub">
@@ -43,7 +43,7 @@
         </li>
         <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-store-line"></i>
+            <i class="menu-icon tf-icons ri-presentation-fill"></i>
             <div>Teacher Management</div>
           </a>
           <ul class="menu-sub">
@@ -57,7 +57,7 @@
 
         <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-store-line"></i>
+            <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
             <div>Student Management</div>
           </a>
           <ul class="menu-sub">
@@ -71,7 +71,7 @@
 
         <li class="menu-item {{ (request()->is('admin/master-module*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-store-line"></i>
+            <i class="menu-icon tf-icons ri-database-2-line"></i>
             <div>Master Module</div>
           </a>
           <ul class="menu-sub">

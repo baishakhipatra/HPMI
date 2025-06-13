@@ -14,7 +14,7 @@ class Student extends Model
 
     protected $fillable = [
         'student_id',
-        'academic_session_id',
+        'student_admission_id',
         'student_name',
         'date_of_birth',
         'gender',
@@ -48,9 +48,9 @@ class Student extends Model
         return $this->belongsTo(ClassList::class, 'class_id');
     }
 
-    /*relationship with academic_sessions */
-    public function session()
+    /*relationship with student_admissions */
+    public function admission()
     {
-        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
+        return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
     }
 }
