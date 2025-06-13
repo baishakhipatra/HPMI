@@ -178,6 +178,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/admission-history/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
             Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
             Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
+            Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
         });
 
 

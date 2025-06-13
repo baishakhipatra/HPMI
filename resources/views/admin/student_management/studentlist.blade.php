@@ -37,6 +37,9 @@
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
+                  <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Export Data">
+                      Export
+                  </a>
                 </div>
               </div>
             </div>
@@ -54,10 +57,7 @@
             <th>Student ID</th>
             <th>Date Of Birth</th>
             <th>Gender</th>
-            <th>Admission Date</th>
-            <th>Class</th>
-            <th>Section</th>
-            <th>Roll Number</th>
+            <th>Session</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
@@ -69,10 +69,7 @@
               <td>{{ ($item->student_id) }}</td>
               <td>{{ ($item->date_of_birth) }}</td>
               <td>{{ $item->gender}}</td>
-              <td>{{ $item->admission_date }}</td>
-              <td>{{ $item->class_id }}</td>
-              <td>{{ $item->section_id }}</td>
-              <td>{{ $item->roll_number }}</td>
+              <td>{{ $item->session?->session_name ?? 'N/A' }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
@@ -84,7 +81,7 @@
                 <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                       <i class="ri-more-2-line"></i>
-                  </button>
+                  </button >
                   <div class="dropdown-menu">
                       <a class="dropdown-item" href="{{ route('admin.studentedit',  $item->id) }}" title="Edit" data-bs-toggle="tooltip">
                           <i class="ri-pencil-line me-1"></i> Edit

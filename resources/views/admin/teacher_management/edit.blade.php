@@ -14,14 +14,14 @@
           <!-- Card Header -->
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">Edit Teacher</h5>
-            <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-primary">
+            <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
             </a>
           </div>
 
           <!-- Card Body -->
             <div class="card-body">
-                <form action="{{ route('admin.teacher.update', $data->id) }}" method="POST">
+                <form action="{{ route('admin.teacher.update') }}" method="POST">
                     @csrf
                     @method('POST') {{-- Update to PUT if needed --}}
 
@@ -101,23 +101,45 @@
                     </div>
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
+                  
+                    @php
+                        $classLists = \App\Models\ClassList::all();
+                    @endphp
                     <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="form-floating form-floating-outline">
-                        <input type="text" name="subjects_taught" class="form-control" placeholder="Subject Taught" value="{{ old('subjects_taught', $data->subjects_taught) }}">
-                        <label>Subject Taught</label>
-                        @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
+                        <div class="col-md-4">
+                            <div class="form-floating form-floating-outline">
+                                <select name="classes_assigned" id="classDropdown" class="form-control">
+                                    <option value="">-- Select Class --</option>
+                                    @foreach($classLists as $class)
+                                      <option value="{{ $class->id}}" {{ old('class_assigned', $data->classes_assigned) == $class->id ? 'selected' : ''}}>
+                                        {{$class->class}}
+                                      </option>
+                                    @endforeach
+                                </select>
+                                <label>Class Assigned</label>
+                                @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-floating-outline">
-                        <input type="text" name="classes_assigned" class="form-control" placeholder="Class Assigned" value="{{ old('classes_assigned', $data->classes_assigned) }}">
-                        <label>Class Assigned</label>
-                        @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-                    </div>
 
+                        <div class="col-md-4">
+                            <div class="form-floating form-floating-outline">
+                              <select name="subjects_taught" id="subjectDropdown" class="form-control">
+                                <option value="">--Select Subject--</option>
+                                @if($data->classes_assigned)
+                                  @php
+                                    $subjects = \App\Models\ClassWiseSubject::with('subject')->where('class_id', $data->classes_assigned)->get()->pluck('subject');
+                                  @endphp
+                                  @foreach($subjects as $subject)
+                                    <option value="{{ $subject->id }}" {{ old('subjects_taught', $data->subjects_taught) == $subject->id ? 'selected' : ''}}>
+                                      {{ $subject->sub_name}}
+                                    </option>
+                                  @endforeach
+                                @endif  
+                              </select>    
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id" value="{{$data->id}}">
                     <button type="submit" class="btn btn-primary d-block">Update</button>
                 </form>
             </div>
@@ -132,6 +154,26 @@
 </section>
 
 @endsection
-@section('scripts')
-
-@endsection
+<script>
+  $(document).ready(function () {
+    $('#classDropdown').on('change', function () {
+      var classId = $(this).val();
+      $('#subjectDropdown').html('<option value="">Loading...</option>');
+      if (classId) {
+        $.ajax({
+          url: "{{ route('admin.getSubjectsByClass') }}",
+          type: "GET",
+          data: { class_id: classId },
+          success: function (data) {
+            $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+            $.each(data, function (key, subject) {
+              $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
+            });
+          },
+        });
+      } else {
+        $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+      }
+    });
+  });
+</script>

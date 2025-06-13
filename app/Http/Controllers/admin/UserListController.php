@@ -87,15 +87,15 @@ class UserListController extends Controller
         return view('admin.user_management.edit', compact('data'));
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request) {
         $request->validate([
             'name' => 'required|string|max:255',
             'address'   => 'nullable|string',
-            'mobile'    => 'required|digits:10|unique:admins,mobile,' . $id,
-            'email'     => 'required|email|unique:admins,email,' . $id,
+            'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
+            'email'     => 'required|email|unique:admins,email,' . $request->id,
         ]);
 
-        $admin = Admin::findOrFail($id);
+        $admin = Admin::findOrFail($request->id);
         $admin->update([
             'name'             => $request->name,
             //'user_name'        => $request->user_name,

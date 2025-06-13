@@ -14,6 +14,7 @@ class Student extends Model
 
     protected $fillable = [
         'student_id',
+        'academic_session_id',
         'student_name',
         'date_of_birth',
         'gender',
@@ -40,5 +41,16 @@ class Student extends Model
         } while (self::where('student_id', $studentId)->exists());
 
         return $studentId;
+    }
+
+    /*relationship with class_lists */
+    public function class() {
+        return $this->belongsTo(ClassList::class, 'class_id');
+    }
+
+    /*relationship with academic_sessions */
+    public function session()
+    {
+        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
     }
 }

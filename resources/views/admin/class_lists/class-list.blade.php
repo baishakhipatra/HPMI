@@ -64,7 +64,7 @@
                     </button>
                     <div class="dropdown-menu">
                       <a class="dropdown-item" href="{{ route('admin.class.subjects', ['id'=> $class->id]) }}" title="Edit">
-                          <i class="ri-pencil-line me-1"></i> Subject
+                          <i class="ri-book-2-line"></i> Subject
                       </a>
                       <a class="dropdown-item" href="{{ route('admin.classlist',['update_id'=> $class->id]) }}"
                         title="Edit">
