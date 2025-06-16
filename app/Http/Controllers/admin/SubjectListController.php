@@ -5,7 +5,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\Subject;
+use App\Models\{Subject, ClassWiseSubject};
 
 class SubjectListController extends Controller
 {
