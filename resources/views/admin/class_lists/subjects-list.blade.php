@@ -180,35 +180,36 @@
 }
 
     function deleteClassToSub(userId) {
-    Swal.fire({
-        icon: 'warning',
-        title: "Are you sure you want to delete this?",
-        text: "You won't be able to revert this!",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Delete",
-    }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "{{ route('admin.class.subjects.delete')}}",
-                type: 'POST',
-                data: {
-                    "id": userId,
-                    "_token": '{{ csrf_token() }}',
-                },
-                success: function (data){
-                    if (data.status != 200) {
-                        toastFire('error', data.message);
-                    } else {
-                        toastFire('success', data.message);
-                        location.reload();
+        //toastFire('success', 'test message');
+        Swal.fire({
+            icon: 'warning',
+            title: "Are you sure you want to delete this?",
+            text: "You won't be able to revert this!",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Delete",
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ route('admin.class.subjects.delete')}}",
+                    type: 'POST',
+                    data: {
+                        "id": userId,
+                        "_token": '{{ csrf_token() }}',
+                    },
+                    success: function (data){
+                        if (data.status != 200) {
+                            toastFire('error', data.message);
+                        } else {
+                            toastFire('success', data.message);
+                            location.reload();
+                        }
                     }
-                }
-            });
-        }
-    });
-  }
+                });
+            }
+        });
+    }
 
 </script>

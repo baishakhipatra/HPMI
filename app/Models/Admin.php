@@ -26,4 +26,14 @@ class Admin extends Authenticatable
     {
         return $this->belongsTo(Subject::class, 'subjects_taught');
     }
+
+    public function teacherClasses()
+    {
+        return $this->hasMany(TeacherClass::class, 'teacher_id');
+    }
+
+    public function teacherSubjects()
+    {
+        return $this->hasMany(TeacherSubject::class, 'teacher_id');
+    }
 }

@@ -1,6 +1,9 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<!-- Select2 JS -->
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Create - Teacher')
@@ -88,15 +91,11 @@
             </div>
         </div>
 
-        {{-- Class and Subject Dropdowns --}}
-        @php
-            $classLists = \App\Models\ClassList::all();
-        @endphp
         <div class="row mb-3">
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
-                    <select name="classes_assigned" id="classDropdown" class="form-control">
-                        <option value="">-- Select Class --</option>
+                    <select name="classes_assigned[]" id="classDropdown" class="form-control" multiple>
+                        {{-- <option value="">-- Select Class --</option> --}}
                         @foreach($classLists as $class)
                             <option value="{{ $class->id }}">{{ $class->class }}</option>
                         @endforeach
@@ -108,7 +107,7 @@
 
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
-                    <select name="subjects_taught" id="subjectDropdown" class="form-control">
+                    <select name="subjects_taught[]" id="subjectDropdown" class="form-control" multiple>
                         <option value="">-- Select Subject --</option>
                     </select>
                     <label>Subject Taught</label>
@@ -134,13 +133,10 @@
         </div>
 
         {{-- Submit --}}
-        <div class="row">
-            <div class="col-md-4">
-                <button type="submit" class="btn btn-primary d-block w-100">
-                    Create
-                </button>
-            </div>
+        <div class="text-end">
+            <button type="submit" class="btn btn-primary px-4 py-2">Create</button>
         </div>
+         
     </form>
   </div>
 
@@ -149,28 +145,41 @@
 
 <script>
     $(document).ready(function () {
-        $('#classDropdown').on('change', function () {
-            var classId = $(this).val();
-            $('#subjectDropdown').html('<option value="">Loading...</option>');
-            if (classId) {
-            $.ajax({
-                url: "{{ route('admin.getSubjectsByClass') }}",
-                type: "GET",
-                data: { class_id: classId },
-                success: function (data) {
-                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-                if (data.length > 0) {
-                    $.each(data, function (key, subject) {
-                    $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
-                    });
-                } else {
-                    $('#subjectDropdown').html('<option value="">No subjects available</option>');
-                }
-                },
-            });
-            } else {
-            $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+
+      $('#classDropdown').on('change', function () {
+
+        var classIds = $(this).val(); // get multiple selected values
+        $('#subjectDropdown').html('<option value="">Loading...</option>');
+        if (classIds.length > 0) {
+          $.ajax({
+            url: "{{ route('admin.getSubjectsByClass') }}",
+            type: "POST",
+            data: {
+              _token: '{{ csrf_token() }}',
+              'class_ids[]': classIds
+            },
+            traditional: true, // to send array properly in GET
+            success: function (response) {
+              if (response.data.length > 0) {
+                 $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+                $.each(response.data, function (key, item) {
+                  if (item.subject && item.class_list) {
+                    var subjectName = item.subject.sub_name;
+                    var className = item.class_list.class;
+                    var label = 'Class ' + className + ' - ' + subjectName;
+
+                    $('#subjectDropdown').append('<option value="' + item.subject.id + '">' + label + '</option>');
+                  }
+                });
+              } else {
+                $('#subjectDropdown').html('<option value="">No subjects available</option>');
+              }
             }
-        });
+
+          });
+        } else {
+          $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+        }
+      });
     });
 </script>

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Admin;
 
 class UserListController extends Controller
@@ -42,7 +43,7 @@ class UserListController extends Controller
 
     public function store(Request $request) {
         // dd($request->all());
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             // 'user_id'          => 'nullable|string|unique:admins,user_id',
             'user_id'          => 'required|string|unique:admins,user_id',
             'name'             => 'required|string|max:255',
@@ -63,6 +64,20 @@ class UserListController extends Controller
             'password'         => 'required|string|min:6',
         ]);
 
+        //custom validation that dob should not exceed doj
+        $validator->after(function ($validator) use ($request) {
+            if( $request->date_of_birth && $request->date_of_joining) {
+                if($request->date_of_birth >= $request->date_of_joining) {
+                    $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
+                }
+            }
+        });
+
+        //If validation fails
+        if($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         Admin::create([
             'user_id'          => $request->user_id,
             'name'             => $request->name,
@@ -81,6 +96,7 @@ class UserListController extends Controller
 
         return redirect()->route('admin.employee.index')->with('success', 'Employee created successfully');
     }
+
 
     public function edit($id) {
         $data = Admin::findOrFail($id);

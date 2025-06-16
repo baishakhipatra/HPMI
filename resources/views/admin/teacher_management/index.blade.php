@@ -56,8 +56,8 @@
             <th width="5%">Teacher ID</th>
             <th width="10%">DOB</th>
             <th width="5%">Address</th>  
-            <th width="5%">Classes Assigned</th>
-            <th width="10%">Subjects Taught</th>
+            <th width="5%">Classes</th>
+            <th width="10%">Subjects</th>
             <th width="5%">Status</th>
             <th width="10%">Actions</th>
           </tr>
@@ -71,8 +71,31 @@
               <td>{{ $item->user_id }}</td>
               <td>{{ $item->date_of_birth }}</td>
               <td>{{ ucfirst($item->address) }}</td>
-              <td>{{ ucfirst($item->class->class ?? '-') }}</td>
-              <td>{{ ucfirst($item->subject->sub_name ?? '-') }}</td>
+              {{-- <td>{{ ucfirst($item->class->class ?? '-') }}</td> --}}
+              {{-- <td>{{ ucfirst($item->subject->sub_name ?? '-') }}</td> --}}
+              <td>
+                @if($item->teacherClasses->count())
+                  <ul class="list-unstyled mb-0">
+                      @foreach($item->teacherClasses as $class)
+                          <li>{{ $class->classList->class ?? '-' }}</li>
+                      @endforeach
+                  </ul>
+                @else
+                    -
+                @endif
+              </td>
+             
+              <td>
+                @if($item->teacherSubjects->count())
+                    <ul class="list-unstyled mb-0">
+                        @foreach($item->teacherSubjects as $subject)
+                            <li>{{ ucwords($subject->subject->sub_name ?? '-') }}</li>
+                        @endforeach
+                    </ul>
+                @else
+                    -
+                @endif
+              </td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
