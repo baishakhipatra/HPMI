@@ -67,8 +67,8 @@ class UserListController extends Controller
         //custom validation that dob should not exceed doj
         $validator->after(function ($validator) use ($request) {
             if( $request->date_of_birth && $request->date_of_joining) {
-                if($request->date_of_birth >= $request->date_of_joining) {
-                    $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
+                if($request->date_of_birth > $request->date_of_joining) {
+                    $validator->errors()->add('date_of_birth', 'Date of Birth cannot be later than Date of Joining.');
                 }
             }
         });
@@ -104,12 +104,31 @@ class UserListController extends Controller
     }
 
     public function update(Request $request) {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'address'   => 'nullable|string',
-            'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
+            'mobile'             => [
+                'required',
+                'digits:10',
+                Rule::unique('admins')->ignore($request->id)->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
             'email'     => 'required|email|unique:admins,email,' . $request->id,
         ]);
+
+        // Custom DOB check
+        $validator->after(function ($validator) use ($request) {
+            if ($request->date_of_birth && $request->date_of_joining) {
+                if ($request->date_of_birth >= $request->date_of_joining) {
+                    $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
+                }
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $admin = Admin::findOrFail($request->id);
         $admin->update([

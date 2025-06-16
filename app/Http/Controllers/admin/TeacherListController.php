@@ -38,7 +38,7 @@ class TeacherListController extends Controller
     }
 
     public function store(Request $request) {
-        //dd($request->all());
+        dd($request->all());
         $validator = Validator::make($request->all(), [
             'user_id'            => 'required|string|unique:admins,user_id',
             'user_type'          => 'required|in:Teacher,Employee,Admin',
@@ -102,6 +102,17 @@ class TeacherListController extends Controller
         }
 
         // Save subject associations
+        // if(is_array($request->class_assigned) && is_array($request->subject_taught)){
+        //     foreach($request->class_assigned as $classId){
+        //         foreach ($request->subjects_taught as $subjectId) {
+        //              TeacherSubject::create([
+        //             'teacher_id' => $teacher->id,
+        //             'class_id'   => $classId,
+        //             'subject_id' => $subjectId,
+        //         ]);
+        //         }
+        //     }
+        // }
         if (is_array($request->subjects_taught)) {
             foreach ($request->subjects_taught as $subjectId) {
                 TeacherSubject::create([
@@ -112,6 +123,12 @@ class TeacherListController extends Controller
         }
 
         return redirect()->route('admin.teacher.index')->with('success', 'Teacher created successfully');
+    }
+
+    //for show details
+    public function show($id) {
+        $teacher = Admin::findOrFail($id);
+        return view('admin.teacher_management.show', compact('teacher'));
     }
 
 

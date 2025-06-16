@@ -157,6 +157,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacher.index');
             Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacher.create');
             Route::post('/store', [TeacherListController::class, 'store'])->name('admin.teacher.store');
+            Route::get('/show/{id}', [TeacherListController::class, 'show'])->name('admin.teacher.show');
             Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacher.edit');
             Route::post('/update', [TeacherListController::class, 'update'])->name('admin.teacher.update');
             Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacher.status');

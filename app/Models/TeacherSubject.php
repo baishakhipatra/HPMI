@@ -12,6 +12,7 @@ class TeacherSubject extends Model
     protected $fillable = [
         'teacher_id',
         'subject_id',
+        'class_id'
     ];
 
     /**
@@ -19,5 +20,9 @@ class TeacherSubject extends Model
      */
     public function subject() {
         return $this->belongsTo(subject::class, 'subject_id');
+    }
+
+    public function classList() {
+        return $this->belongsTo(ClassList::class, 'class_id');
     }
 }
