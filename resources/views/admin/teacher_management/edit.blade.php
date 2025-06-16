@@ -1,3 +1,8 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 @extends('layouts/contentNavbarLayout')
 
@@ -102,18 +107,16 @@
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
                   
-                    @php
-                        $classLists = \App\Models\ClassList::all();
-                    @endphp
+                    {{-- Pass $classLists and $selectedClassIds, $selectedSubjectIds from controller --}}
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-floating form-floating-outline">
-                                <select name="classes_assigned" id="classDropdown" class="form-control">
-                                    <option value="">-- Select Class --</option>
+                                <select name="classes_assigned[]" id="classDropdown" class="form-control" multiple>
                                     @foreach($classLists as $class)
-                                      <option value="{{ $class->id}}" {{ old('class_assigned', $data->classes_assigned) == $class->id ? 'selected' : ''}}>
-                                        {{$class->class}}
-                                      </option>
+                                        <option value="{{ $class->id }}" 
+                                            {{ in_array($class->id, old('classes_assigned', $selectedClassIds)) ? 'selected' : '' }}>
+                                            {{ $class->class }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <label>Class Assigned</label>
@@ -123,27 +126,17 @@
 
                         <div class="col-md-4">
                             <div class="form-floating form-floating-outline">
-                              <select name="subjects_taught" id="subjectDropdown" class="form-control">
-                                <option value="">--Select Subject--</option>
-                                @if($data->classes_assigned)
-                                  @php
-                                    $subjects = \App\Models\ClassWiseSubject::with('subject')
-                                    ->where('class_id', $data->classes_assigned)
-                                    ->get()
-                                    ->pluck('subject')
-                                    ->filter();
-                                  @endphp
-                                  @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subjects_taught', $data->subjects_taught) == $subject->id ? 'selected' : ''}}>
-                                      {{ $subject->sub_name}}
-                                    </option>
-                                  @endforeach
-                                @endif  
-                              </select>    
+                                <select name="subjects_taught[]" id="subjectDropdown" class="form-control" multiple>
+                                    {{-- Will be populated dynamically --}}
+                                </select>
+                                <label>Subjects Taught</label>
+                                @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="id" value="{{$data->id}}">
+
+                    <input type="hidden" name="id" value="{{ $data->id }}">
+
                     <div class="text-end">
                       <button type="submit" class="btn btn-primary px-4 py-2">Update</button>
                     </div>
@@ -160,7 +153,7 @@
 </section>
 
 @endsection
-<script>
+{{-- <script>
   $(document).ready(function () {
     $('#classDropdown').on('change', function () {
       var classId = $(this).val();
@@ -182,4 +175,53 @@
       }
     });
   });
+</script> --}}
+<script>
+    $(document).ready(function () {
+        let selectedSubjects = @json(old('subjects_taught', $selectedSubjectIds));
+
+        function fetchSubjects(classIds) {
+            $('#subjectDropdown').html('<option value="">Loading...</option>');
+            $.ajax({
+                url: "{{ route('admin.getSubjectsByClass') }}",
+                type: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    'class_ids[]': classIds
+                },
+                traditional: true,
+                success: function (response) {
+                    $('#subjectDropdown').html('');
+                    if (response.data.length > 0) {
+                        $.each(response.data, function (key, item) {
+                            if (item.subject && item.class_list) {
+                                var label = 'Class ' + item.class_list.class + ' - ' + item.subject.sub_name;
+                                var selected = selectedSubjects.includes(item.subject.id) ? 'selected' : '';
+                                $('#subjectDropdown').append('<option value="' + item.subject.id + '" ' + selected + '>' + label + '</option>');
+                            }
+                        });
+                    } else {
+                        $('#subjectDropdown').html('<option value="">No subjects available</option>');
+                    }
+                }
+            });
+        }
+
+        // Initial load for pre-selected classes
+        const preSelectedClasses = $('#classDropdown').val();
+        if (preSelectedClasses && preSelectedClasses.length > 0) {
+            fetchSubjects(preSelectedClasses);
+        }
+
+        // On change
+        $('#classDropdown').on('change', function () {
+            let classIds = $(this).val();
+            selectedSubjects = []; // reset selected subjects on change
+            if (classIds.length > 0) {
+                fetchSubjects(classIds);
+            } else {
+                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+            }
+        });
+    });
 </script>

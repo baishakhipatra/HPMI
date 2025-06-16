@@ -2,13 +2,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Select2 CSS -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- jQuery (required) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-
+<!-- Select2 JS -->
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Create - Teacher')
@@ -96,10 +91,6 @@
             </div>
         </div>
 
-        {{-- Class and Subject Dropdowns --}}
-        {{-- @php
-            $classLists = \App\Models\ClassList::all();
-        @endphp --}}
         <div class="row mb-3">
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
@@ -116,7 +107,7 @@
 
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
-                    <select name="subjects_taught" id="subjectDropdown" class="form-control">
+                    <select name="subjects_taught[]" id="subjectDropdown" class="form-control" multiple>
                         <option value="">-- Select Subject --</option>
                     </select>
                     <label>Subject Taught</label>
@@ -152,63 +143,43 @@
 </div>
 @endsection
 
-{{-- <script>
-    $(document).ready(function () {
-        $('#classDropdown').on('change', function () {
-            var classIds = $(this).val();
-            $('#subjectDropdown').html('<option value="">Loading...</option>');
-            if (classIds) {
-            $.ajax({
-                url: "{{ route('admin.getSubjectsByClass') }}",
-                type: "GET",
-                data: { class_id: classIds },
-                success: function (data) {
-                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-                if (data.length > 0) {
-                    $.each(data, function (key, subject) {
-                        $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
-                    });
-                } else {
-                    $('#subjectDropdown').html('<option value="">No subjects available</option>');
-                }
-                },
-            });
-            } else {
-                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-            }
-        });
-    });
-</script> --}}
 <script>
     $(document).ready(function () {
-        
-        $('#classDropdown').on('change', function () {
-       
-            var classIds = $(this).val(); // get multiple selected values
-            $('#subjectDropdown').html('<option value="">Loading...</option>');
-            if (classIds.length > 0) {
-                $.ajax({
-                    url: "{{ route('admin.getSubjectsByClass') }}",
-                    type: "POST",
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        class_ids: classIds.join('|||'),
-                    },
-                    traditional: true, // to send array properly in GET
-                    success: function (data) {
-                        $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-                        if (data.length > 0) {
-                            $.each(data, function (key, item) {
-                                $('#subjectDropdown').append('<option value="' + item.id + '">' + item.label + '</option>');
-                            });
-                        } else {
-                            $('#subjectDropdown').html('<option value="">No subjects available</option>');
-                        }
-                    },
+
+      $('#classDropdown').on('change', function () {
+
+        var classIds = $(this).val(); // get multiple selected values
+        $('#subjectDropdown').html('<option value="">Loading...</option>');
+        if (classIds.length > 0) {
+          $.ajax({
+            url: "{{ route('admin.getSubjectsByClass') }}",
+            type: "POST",
+            data: {
+              _token: '{{ csrf_token() }}',
+              'class_ids[]': classIds
+            },
+            traditional: true, // to send array properly in GET
+            success: function (response) {
+              if (response.data.length > 0) {
+                 $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+                $.each(response.data, function (key, item) {
+                  if (item.subject && item.class_list) {
+                    var subjectName = item.subject.sub_name;
+                    var className = item.class_list.class;
+                    var label = 'Class ' + className + ' - ' + subjectName;
+
+                    $('#subjectDropdown').append('<option value="' + item.subject.id + '">' + label + '</option>');
+                  }
                 });
-            } else {
-                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+              } else {
+                $('#subjectDropdown').html('<option value="">No subjects available</option>');
+              }
             }
-        });
+
+          });
+        } else {
+          $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+        }
+      });
     });
 </script>

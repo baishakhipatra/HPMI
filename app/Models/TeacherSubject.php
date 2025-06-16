@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class TeacherSubject extends Model
+{
+    //
+    protected $table = 'teacher_subjects';
+
+    protected $fillable = [
+        'teacher_id',
+        'subject_id',
+    ];
+
+    /**
+     * Get the class associated with this mapping.
+     */
+    public function subject() {
+        return $this->belongsTo(subject::class, 'subject_id');
+    }
+}

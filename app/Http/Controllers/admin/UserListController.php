@@ -67,8 +67,8 @@ class UserListController extends Controller
         //custom validation that dob should not exceed doj
         $validator->after(function ($validator) use ($request) {
             if( $request->date_of_birth && $request->date_of_joining) {
-                if($request->date_of_birth > $request->date_of_joining) {
-                    $validator->errors()->add('date_of_birth', 'Date of Birth cannot be later than Date of Joining.');
+                if($request->date_of_birth >= $request->date_of_joining) {
+                    $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
                 }
             }
         });
