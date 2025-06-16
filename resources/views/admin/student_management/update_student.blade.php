@@ -1,4 +1,5 @@
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'User - List')
@@ -109,22 +110,21 @@
 
                 <h4>Admission Details</h4>
                 <div class="form-floating form-floating-outline col-md-4">
-                    <input type="date" class="form-control" 
-                            id="admission_date" name="admission_date" 
-                            value="{{ old('admission_date', $student->admission_date) }}">
-                    <label for="admission_date">Admission Date</label>
-                    @error('admission_date')
-                        <small class="text-danger">{{ $message }}</small>
-                    @enderror
+                  <select name="session_id" class="form-select" id="session_id">
+                    <option value="" disabled>Select Session</option>
+                    @foreach ($sessions as $session)
+                      <option value="{{ $session->id }}" {{ old('session_id', optional($student->admission)->session_id ?? null) == $session->id ? 'selected' : '' }}>{{ $session->session_name }}</option>
+                    @endforeach
+                  </select>
+                  <label for="session_id">Session<span class="text-danger">*</span></label>
+                  @error('session_id')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>
-
-              
                 <div class="form-floating form-floating-outline col-md-4">
                     <select name="class_id" class="form-select" id="class_id">
-                        <option value="">Select Class</option>
+                        <option value="" disabled>Select Class</option>
                         @foreach ($classrooms as $classroom)
                             <option value="{{ $classroom->id }}" 
-                                {{ old('class_id', $admission->class_list_id) == $classroom->id ? 'selected' : '' }}>
+                                {{ old('class_id', optional($student->admission)->class_id ?? null) == $classroom->id ? 'selected' : '' }}>
                                 {{ $classroom->class }}
                             </option>
                         @endforeach
@@ -138,19 +138,31 @@
                 <!-- Section -->
                 <div class="form-floating form-floating-outline col-md-4">
                     <select name="section_id" class="form-select" id="section_id">
-                        <option value="">Select Section</option>
+                          <option value="" disabled>Select Section</option>
+                          @if(optional($student->admission)->section)
+                          <option value="{{optional($student->admission)->section}}" selected>{{optional($student->admission)->section}}</option>
+                          @endif
                     </select>
                     <label for="section_id">Section<span class="text-danger">*</span></label>
                     @error('section_id')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>
 
 
-                <div class="form-floating form-floating-outline col-md-4">
+                <div class="form-floating form-floating-outline col-md-2">
                     <input type="number" class="form-control" 
                             id="roll_number" name="roll_number" 
-                            value="{{ old('roll_number', $student->roll_number) }}">
+                            value="{{ old('roll_number', optional($student->admission)->roll_number) }}">
                     <label for="roll_number">Roll Number</label>
                     @error('roll_number')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
+                <div class="form-floating form-floating-outline col-md-2">
+                    <input type="date" class="form-control" 
+                            id="admission_date" name="admission_date" 
+                            value="{{ old('admission_date', optional($student->admission)->admission_date ?? null) }}">
+                    <label for="admission_date">Admission Date</label>
+                    @error('admission_date')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>

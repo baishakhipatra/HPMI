@@ -112,7 +112,7 @@
           </div>
 
 
-          <div class="col-12 mt-4">
+          <div class="text-end">
             <button type="submit" class="btn btn-primary px-4 py-2">
               <i class="fas fa-user-plus me-2"></i> Submit New Class Admission
             </button>
@@ -158,8 +158,4 @@
     });
   });
 </script>
-{{-- public function getSections($class_id)
-{
-    $sections = SectionList::where('class_list_id', $class_id)->get(['id', 'section']);
-    return response()->json($sections);
-} --}}
+

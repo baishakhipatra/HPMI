@@ -159,10 +159,10 @@ class StudentListController extends Controller
 
     public function edit($id)
     {
-        $student = Student::findOrFail($id);
-        $admission = StudentAdmission::where('student_id', $id)->first();
+        $student = Student::with('admission')->findOrFail($id);
+        $sessions = AcademicSession::all();
         $classrooms = ClassList::where('status',1)->orderBy('class','ASC')->get();
-        return view('admin.student_management.update_student', compact('student','classrooms','admission'));
+        return view('admin.student_management.update_student', compact('student','classrooms','sessions'));
     }
 
     // public function update(Request $request,$id)
@@ -229,8 +229,8 @@ class StudentListController extends Controller
             'roll_number'  => [
                 'required',
                 'integer',
-                Rule::unique('student_admissions')->where( function ($query) use ($request) {
-                    return $query->where('class_id', $request->class_id)
+                Rule::unique('student_admissions')->where( function ($query) use ($request,$id) {
+                    return $query->where('student_id','!=', $id)->where('class_id', $request->class_id)
                                 ->where('section', $request->section_id);
                 }),
             ],
@@ -261,6 +261,7 @@ class StudentListController extends Controller
             } else {
                 StudentAdmission::create([
                     'student_id' => $id,
+                    'session_id' => $request->session_id,
                     'class_id' => $request->class_id,
                     'section' => $request->section_id,
                     'roll_number' => $request->roll_number,
