@@ -411,7 +411,7 @@ class StudentListController extends Controller
             'roll_number' => [
                 'required',
                 'integer',
-                Role::unique('student_admissions')->where(function ($query) use ($request) {
+                Rule::unique('student_admissions')->where(function ($query) use ($request) {
                     return $query->where('class_id', $request->class_id)
                                 ->where('section', $request->section_id);
                 }),

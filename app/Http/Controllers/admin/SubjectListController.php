@@ -62,6 +62,7 @@ class SubjectListController extends Controller
             //     'max:50',
             //     Rule::unique('subjects', 'sub_code')->whereNull('deleted_at'),
             // ],
+            Rule::unique('itinerary_galleries', 'title')->ignore($request->id),
             'description' => 'nullable|string',
         ]);
 
