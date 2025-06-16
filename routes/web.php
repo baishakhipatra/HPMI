@@ -162,7 +162,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
 
             //get class and subject
-            Route::get('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
+            Route::post('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
         });
 
         Route::prefix('student-management/student-list')->group(function(){
