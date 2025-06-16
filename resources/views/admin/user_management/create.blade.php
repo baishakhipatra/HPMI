@@ -110,7 +110,10 @@
         </div>
       </div>
 
-      <button type="submit" class="btn btn-primary d-block">Create</button>
+      <div class="text-end">
+        <button type="submit" class="btn btn-primary px-4 py-2">Create</button>
+      </div>
+      
     </form>
   </div>
 

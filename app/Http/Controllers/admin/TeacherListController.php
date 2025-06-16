@@ -31,7 +31,8 @@ class TeacherListController extends Controller
     }
     public function create(){
         $user_id = generateTeacherId();
-        return view('admin.teacher_management.create',compact('user_id'));
+        $classLists = ClassList::all();
+        return view('admin.teacher_management.create',compact('user_id', 'classLists'));
     }
 
     public function store(Request $request) {
@@ -146,9 +147,10 @@ class TeacherListController extends Controller
     
    public function getSubjectsByClass(Request $request)
     {
-        $classId = $request->class_id;
+        $classIdsInput = $request->input('class_ids'); // array of selected class IDs
+        $classIds= explode('|||', $classIdsInput);
 
-        // Get all class_id and subject_id pairs that are already assigned
+        // Fetch all assigned class-subject pairs
         $assignedPairs = Admin::whereNotNull('classes_assigned')
             ->whereNotNull('subjects_taught')
             ->get()
@@ -159,26 +161,36 @@ class TeacherListController extends Controller
                 ];
             });
 
-        // Get subjects assigned to this class
-        $classWiseSubjects = ClassWiseSubject::with('subject')
-            ->where('class_id', $classId)
-            ->get()
-            ->pluck('subject')
-            ->filter(function ($subject) use ($classId, $assignedPairs) {
-                if (!$subject) return false;
+        // Fetch class-wise subjects for all selected classes
+        $classWiseSubjects = \App\Models\ClassWiseSubject::with('subject', 'classList')
+            ->whereIn('class_id', $classIds)
+            ->get();
 
-                // Check if this class-subject pair is already assigned
-                foreach ($assignedPairs as $pair) {
-                    if ($pair['class_id'] == $classId && $pair['subject_id'] == $subject->id) {
-                        return false; // Already assigned
-                    }
-                }
+        $response = [];
 
-                return true;
-            })
-            ->values();
+        foreach ($classWiseSubjects as $entry) {
+            $classId = $entry->class_id;
+            $subject = $entry->subject;
+            $class = $entry->classList;
 
-        return response()->json($classWiseSubjects);
+            if (!$subject || !$class) {
+                continue;
+            }
+
+            // Check if subject is already assigned to class
+            $isAssigned = $assignedPairs->contains(function ($pair) use ($classId, $subject) {
+                return $pair['class_id'] == $classId && $pair['subject_id'] == $subject->id;
+            });
+
+            if (!$isAssigned) {
+                $response[] = [
+                    'id' => $subject->id,
+                    'label' => $class->class . ' - ' . $subject->sub_name,
+                ];
+            }
+        }
+
+        return response()->json($response);
     }
 
 

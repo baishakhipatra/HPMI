@@ -11,7 +11,7 @@ class StudentAdmission extends Model
     protected $fillable = [
          'student_id', 'session_id', 'class_id', 'section', 'roll_number', 'admission_date'
     ];
-    public function student()
+public function student()
 {
     return $this->belongsTo(Student::class);
 }
@@ -29,4 +29,10 @@ public function section()
 {
     return $this->belongsTo(SectionList::class);
 }
+
+public function academicsession()
+{
+    return $this->belongsTo(AcademicSession::class, 'session_id');
+}
+
 }

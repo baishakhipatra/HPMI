@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
-use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,SubjectListController};
+use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
+                                SubjectListController ,StudentMarkListController};
 
 //End New Route
 
@@ -162,23 +163,30 @@ Route::prefix('admin')->group(function () {
             Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
 
             //get class and subject
-            Route::get('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
+            Route::post('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
         });
 
-        Route::prefix('student-management/student-list')->group(function(){
-            Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist');
-            Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate');
-            Route::post('/store', [StudentListController::class, 'store'])->name('admin.studentstore');
-            Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
-            Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
-            Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
-            Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
-            Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
-            Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
-            Route::post('/admission-history/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
-            Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
-            Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
-            Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+        Route::prefix('student-management')->group(function(){
+            Route::prefix('student-list')->group(function(){
+                Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist');
+                Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate');
+                Route::post('/store', [StudentListController::class, 'store'])->name('admin.studentstore');
+                Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
+                Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
+                Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
+                Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
+                Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
+                Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
+                Route::post('/admission-history/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
+                Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
+                Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
+                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+            });
+
+            Route::prefix('studentmark-list')->group(function(){
+                Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
+            });
+            
         });
 
 
