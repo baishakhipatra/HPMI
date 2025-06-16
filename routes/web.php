@@ -185,6 +185,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('studentmark-list')->group(function(){
                 Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
+                Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
             });
             
         });

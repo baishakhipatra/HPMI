@@ -21,7 +21,7 @@
                 Export
             </a>
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
-                Add Marks
+               + Add Marks
             </button>
         </div>
     </div>
@@ -30,8 +30,9 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
+                    <i class="ri-graduation-cap-line" style="font-size: 40px; color: #4e73df;"></i>
                     <h5 class="card-title">Total Records</h5>
-                    <h2></h2>
+                    <h4>150</h4>
                 </div>
             </div>
         </div>
@@ -39,8 +40,9 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
+                    <i class="ri-percent-line" style="font-size: 40px; color: #1cc88a;"></i>
                     <h5 class="card-title">Average Percentage</h5>
-                    <h2></h2>
+                    <h4>85%</h4>
                 </div>
             </div>
         </div>
@@ -120,100 +122,171 @@
                     </tr>
                     @endif --}}
                 </tbody>
-
-                <!-- Add Marks Modal -->
+                
                 <div class="modal fade" id="addMarksModal" tabindex="-1" aria-labelledby="addMarksModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
 
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <form action="" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                        <div class="row g-3">
-
-                        <div class="form-floating form-floating-outline col-md-4">
-                            <select name="session_id" id="session_id" class="form-select" required>
-                                <option value="">Select Session</option>
-                                @foreach($sessions as $item)
-                                    <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="session_id" class="form-label">Session</label>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
+                        <form action="" method="POST">
+                            @csrf
+                            <div class="modal-body">
+                            <div class="row g-3">
 
-                    
-                        <div class="form-floating form-floating-outline col-md-4">
-                            <select name="student_id" id="student_id" class="form-select" required>
-                                <option value="">Select student</option>
-                                @foreach($students as $student)
-                                <option value="{{ $student->id }}">{{ $student->student_name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="student_id" class="form-label">Student</label>
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="session_id" id="session_id" class="form-select">
+                                    <option value="">Select Session</option>
+                                    @foreach($sessions as $item)
+                                        <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="session_id" class="form-label">Session</label>
+                            </div>
 
-                    
-                        <div class="form-floating form-floating-outline col-md-4">
-                            <select name="class_id" id="class_id" class="form-select" required>
-                                <option value="">Select class</option>
-                                @foreach($classes as $class)
-                                <option value="{{ $class->id }}">{{ $class->class }} - {{ $class->sections->pluck('section')->implode(', ') }}</option>
-                                @endforeach
-                            </select>
-                              <label for="class_id" class="form-label">Class</label>
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="student_id" id="student_id" class="form-select" required>
+                                    <option value="">Select Student</option>
+                                </select>
+                                <label for="student_id" class="form-label">Student</label>
+                            </div>
+                 
+                            {{-- <div class="form-floating form-floating-outline col-md-4">
+                                <select name="class_id" id="class_id" class="form-select">
+                                    <option value="">Select Class</option>
+                                    @foreach($classes as $class)
+                                    <option value="{{ $class->id }}">{{ $class->class }} - {{ $class->sections->pluck('section')->implode(', ') }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="class_id" class="form-label">Class</label>
+                            </div> --}}
 
-                         
-                        <div class="form-floating form-floating-outline col-md-4">
-                            <select name="subject_id" id="subject_id" class="form-select" required>
-                                <option value="">Select subject</option>
-                                @foreach($subjects as $subject)
-                                <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                                @endforeach
-                            </select>
-                            <label for="subject_id" class="form-label">Subject</label>
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="class_id" id="class_id" class="form-select" required>
+                                    <option value="">Select Class</option>
+                                </select>
+                                <label for="class_id" class="form-label">Class</label>
+                            </div>
 
-                         
-                        {{-- <div class="form-floating form-floating-outline col-md-3">
-                        <label for="term_one_stu_marks" class="form-label">Term 1 (out of 100)</label>
-                        <input type="number" name="term_one_stu_marks" class="form-control" placeholder="Enter marks">
-                        </div>
+                            
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="subject_id" id="subject_id" class="form-select" >
+                                    <option value="">Select Subject</option>
+                                    @foreach($subjects as $subject)
+                                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="subject_id" class="form-label">Subject</label>
+                            </div>
 
-                    
-                        <div class="form-floating form-floating-outline col-md-3">
-                        <label for="mid_term_stu_marks" class="form-label">Midterm (out of 100)</label>
-                        <input type="number" name="mid_term_stu_marks" class="form-control" placeholder="Enter marks">
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="term_one_out_off" id="term_one_out_off" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="50-55">50-55</option>
+                                    <option value="55-60">55-60</option>
+                                    <option value="60-65">60-65</option>
+                                    <option value="65-70">65-70</option>
+                                    <option value="70-75">70-75</option>
+                                    <option value="75-80">75-80</option>
+                                    <option value="80-85">80-85</option>
+                                    <option value="85-90">85-90</option>
+                                    <option value="90-95">90-95</option>
+                                    <option value="95-100">95-100</option>
+                                </select>
+                                <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
+                            </div>
+
+                            
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <input type="number" name="term_one_stu_marks" id="term_one_stu_marks" class="form-control" placeholder="Enter marks" >
+                                <label for="term_one_stu_marks">Term 1 Student Marks</label>
+                            </div>
 
                         
-                        <div class="form-floating form-floating-outline col-md-3">
-                        <label for="term_two_stu_marks" class="form-label">Term 2 (out of 100)</label>
-                        <input type="number" name="term_two_stu_marks" class="form-control" placeholder="Enter marks">
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="term_two_out_off" id="term_two_out_off" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="50-55">50-55</option>
+                                    <option value="55-60">55-60</option>
+                                    <option value="60-65">60-65</option>
+                                    <option value="65-70">65-70</option>
+                                    <option value="70-75">70-75</option>
+                                    <option value="75-80">75-80</option>
+                                    <option value="80-85">80-85</option>
+                                    <option value="85-90">85-90</option>
+                                    <option value="90-95">90-95</option>
+                                    <option value="95-100">95-100</option>
+                                </select>
+                                <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
+                            </div>
 
-                        <div class="form-floating form-floating-outline col-md-3">
-                        <label for="final_exam_stu_marks" class="form-label">Final Exam (out of 100)</label>
-                        <input type="number" name="final_exam_stu_marks" class="form-control" placeholder="Enter marks">
-                        </div> --}}
+                    
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <input type="number" name="term_two_stu_marks" id="term_two_stu_marks" class="form-control" placeholder="Enter marks">
+                                <label for="term_two_stu_marks">Term 2 Student Marks</label>
+                            </div>
 
-                        </div>
-                        </div>
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" >
+                                    <option value="">Select</option>
+                                    <option value="50-55">50-55</option>
+                                    <option value="55-60">55-60</option>
+                                    <option value="60-65">60-65</option>
+                                    <option value="65-70">65-70</option>
+                                    <option value="70-75">70-75</option>
+                                    <option value="75-80">75-80</option>
+                                    <option value="80-85">80-85</option>
+                                    <option value="85-90">85-90</option>
+                                    <option value="90-95">90-95</option>
+                                    <option value="95-100">95-100</option>
+                                </select>
+                                <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
+                            </div>
 
-                        <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save Marks</button>
-                        </div>
+                        
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks" class="form-control" placeholder="Enter marks" >
+                                <label for="mid_term_stu_marks">Mid Term Student Marks</label>
+                            </div>
 
-                    </form>
+                            
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
+                                    <option value="">Select</option>
+                                    <option value="50-55">50-55</option>
+                                    <option value="55-60">55-60</option>
+                                    <option value="60-65">60-65</option>
+                                    <option value="65-70">65-70</option>
+                                    <option value="70-75">70-75</option>
+                                    <option value="75-80">75-80</option>
+                                    <option value="80-85">80-85</option>
+                                    <option value="85-90">85-90</option>
+                                    <option value="90-95">90-95</option>
+                                    <option value="95-100">95-100</option>
+                                </select>
+                                <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
+                            </div>
+
+                        
+                            <div class="form-floating form-floating-outline col-md-4">
+                                <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks" class="form-control" placeholder="Enter marks" >
+                                <label for="final_exam_stu_marks">Final Exam Student Marks</label>
+                            </div>
+
+                            </div>
+                            </div>
+
+                            <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Save Marks</button>
+                            </div>
+
+                        </form>
+                        </div>
                     </div>
-                </div>
                 </div>
 
             </table>
@@ -223,3 +296,42 @@
 </div>
 
 @endsection
+<script>
+    $(document).ready(function() {
+        $('#session_id').on('change', function() {
+            var sessionId = $(this).val();
+            $('#student_id').html('<option value="">Loading...</option>');
+            $('#class_id').html('<option value="">Loading...</option>');
+
+            if (sessionId) {
+                $.ajax({
+                    url: "{{ route('admin.get-students-by-session') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { sessionId: sessionId },
+                    success: function(response) {
+                        if(response.success){
+                            $('#student_id').empty();
+                            $('#student_id').append('<option value="">Select Student</option>');
+                            $.each(response.students, function(key, student) {
+                                $('#student_id').append('<option value="'+student.id+'">'+student.name+'</option>');
+                            });
+
+                            $('#class_id').empty().append('<option value="">Select Class</option>');
+                            $.each(response.classes, function(key, classItem) {
+                                $('#class_id').append('<option value="'+classItem.id+'">'+classItem.name+'</option>');
+                            });
+                        }
+                        console.log(response);
+                    },
+                    error: function(xhr) {
+                        console.error(xhr);
+                    }
+                });
+            } else {
+                $('#student_id').html('<option value="">Select Student</option>');
+                $('#class_id').html('<option value="">Select Class</option>');
+            }
+        });
+    });
+</script>
