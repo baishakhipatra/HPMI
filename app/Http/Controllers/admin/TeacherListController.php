@@ -117,33 +117,109 @@ class TeacherListController extends Controller
 
     public function edit($id) {
         $data = Admin::findOrFail($id);
-        return view('admin.teacher_management.edit', compact('data'));
+        $classLists = ClassList::all();
+
+        $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
+        $selectedSubjectIds = TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')->toArray();
+        $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
+        return view('admin.teacher_management.edit', compact('data', 'selectedSubjectIds', 'selectedClassIds', 'classLists'));
     }
 
-    public function update(Request $request) {
-        $request->validate([
-            'name'      => 'required|string|max:255',
-            'address'   => 'nullable|string',
-            'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
-            'email'     => 'required|email|unique:admins,email,' . $request->id,
+    // public function update(Request $request) {
+    //     $request->validate([
+    //         'name'      => 'required|string|max:255',
+    //         'address'   => 'nullable|string',
+    //         'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
+    //         'email'     => 'required|email|unique:admins,email,' . $request->id,
+    //     ]);
+
+    //     $admin = Admin::findOrFail($request->id);
+    //     $admin->update([
+    //         'name'             => $request->name,
+    //         //'user_name'        => $request->user_name,
+    //         'user_type'        => $request->user_type ?? $admin->user_type,
+    //         'mobile'           => $request->mobile,
+    //         'email'            => $request->email,
+    //         'date_of_birth'    => $request->date_of_birth,
+    //         'date_of_joining'  => $request->date_of_joining,
+    //         'qualifications'   => $request->qualifications,
+    //         'subjects_taught'  => $request->subjects_taught,
+    //         'classes_assigned' => $request->classes_assigned,
+    //         'address'          => $request->address,
+    //     ]);
+    //     return redirect()->route('admin.teacher.index')->with('success', 'Teacher updated successfully!');
+    // }
+    public function update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name'               => 'required|string|max:255',
+            'email'              => 'required|email|unique:admins,email,' . $request->id,
+            'mobile'             => [
+                'required',
+                'digits:10',
+                Rule::unique('admins')->ignore($request->id)->where(function ($query) {
+                    return $query->whereNull('deleted_at');
+                }),
+            ],
+            'date_of_birth'      => 'nullable|date',
+            'date_of_joining'    => 'nullable|date',
+            'qualifications'     => 'nullable|string|max:255',
+            'address'            => 'nullable|string',
+            'subjects_taught'    => 'nullable|array',
+            'subjects_taught.*'  => 'nullable|exists:subjects,id',
+            'classes_assigned'   => 'nullable|array',
+            'classes_assigned.*' => 'nullable|exists:class_lists,id',
         ]);
+
+        // Custom DOB check
+        $validator->after(function ($validator) use ($request) {
+            if ($request->date_of_birth && $request->date_of_joining) {
+                if ($request->date_of_birth >= $request->date_of_joining) {
+                    $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
+                }
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
 
         $admin = Admin::findOrFail($request->id);
         $admin->update([
             'name'             => $request->name,
-            //'user_name'        => $request->user_name,
-            'user_type'        => $request->user_type ?? $admin->user_type,
-            'mobile'           => $request->mobile,
             'email'            => $request->email,
+            'mobile'           => $request->mobile,
             'date_of_birth'    => $request->date_of_birth,
             'date_of_joining'  => $request->date_of_joining,
             'qualifications'   => $request->qualifications,
-            'subjects_taught'  => $request->subjects_taught,
-            'classes_assigned' => $request->classes_assigned,
             'address'          => $request->address,
         ]);
-        return redirect()->route('admin.teacher.index')->with('success', 'Teacher updated successfully!');
+
+        // Update Class Relations
+        TeacherClass::where('teacher_id', $admin->id)->delete();
+        if (is_array($request->classes_assigned)) {
+            foreach ($request->classes_assigned as $classId) {
+                TeacherClass::create([
+                    'teacher_id' => $admin->id,
+                    'class_id'   => $classId,
+                ]);
+            }
+        }
+
+        // Update Subject Relations
+        TeacherSubject::where('teacher_id', $admin->id)->delete();
+        if (is_array($request->subjects_taught)) {
+            foreach ($request->subjects_taught as $subjectId) {
+                TeacherSubject::create([
+                    'teacher_id' => $admin->id,
+                    'subject_id' => $subjectId,
+                ]);
+            }
+        }
+
+        return redirect()->route('admin.teacher.index')->with('success', 'Teacher updated successfully');
     }
+
 
     public function status($id)
     {
