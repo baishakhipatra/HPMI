@@ -12,11 +12,11 @@ use App\Models\{Admin, ClassList, ClassWiseSubject, Subject, TeacherSubject, Tea
 
 class TeacherListController extends Controller
 {
-    //
     public function index(Request $request) 
     {
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Teacher')->with(['teacherClasses.ClassList', 'teacherSubjects.subject']);
+        $query = Admin::where('user_type', 'Teacher')
+                ->with(['teacherSubjects']);
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
@@ -38,7 +38,6 @@ class TeacherListController extends Controller
     }
 
     public function store(Request $request) {
-        dd($request->all());
         $validator = Validator::make($request->all(), [
             'user_id'            => 'required|string|unique:admins,user_id',
             'user_type'          => 'required|in:Teacher,Employee,Admin',
@@ -92,32 +91,18 @@ class TeacherListController extends Controller
         ]);
 
         //  Save class associations
-        if (is_array($request->classes_assigned)) {
-            foreach ($request->classes_assigned as $classId) {
+        if (count($request->subjects_taught) > 0) {
+
+            foreach ($request->subjects_taught as $classWiseSubjectId) {
+                $getsubject = ClassWiseSubject::select(['class_id', 'subject_id'])->where('id', $classWiseSubjectId)->first();
                 TeacherClass::create([
                     'teacher_id' => $teacher->id,
-                    'class_id'   => $classId,
+                    'class_id'   => $getsubject->class_id,
                 ]);
-            }
-        }
-
-        // Save subject associations
-        // if(is_array($request->class_assigned) && is_array($request->subject_taught)){
-        //     foreach($request->class_assigned as $classId){
-        //         foreach ($request->subjects_taught as $subjectId) {
-        //              TeacherSubject::create([
-        //             'teacher_id' => $teacher->id,
-        //             'class_id'   => $classId,
-        //             'subject_id' => $subjectId,
-        //         ]);
-        //         }
-        //     }
-        // }
-        if (is_array($request->subjects_taught)) {
-            foreach ($request->subjects_taught as $subjectId) {
                 TeacherSubject::create([
                     'teacher_id' => $teacher->id,
-                    'subject_id' => $subjectId,
+                    'subject_id' => $getsubject->subject_id,
+                    'class_id'   => $getsubject->class_id,
                 ]);
             }
         }
@@ -142,30 +127,6 @@ class TeacherListController extends Controller
         return view('admin.teacher_management.edit', compact('data', 'selectedSubjectIds', 'selectedClassIds', 'classLists'));
     }
 
-    // public function update(Request $request) {
-    //     $request->validate([
-    //         'name'      => 'required|string|max:255',
-    //         'address'   => 'nullable|string',
-    //         'mobile'    => 'required|digits:10|unique:admins,mobile,' . $request->id,
-    //         'email'     => 'required|email|unique:admins,email,' . $request->id,
-    //     ]);
-
-    //     $admin = Admin::findOrFail($request->id);
-    //     $admin->update([
-    //         'name'             => $request->name,
-    //         //'user_name'        => $request->user_name,
-    //         'user_type'        => $request->user_type ?? $admin->user_type,
-    //         'mobile'           => $request->mobile,
-    //         'email'            => $request->email,
-    //         'date_of_birth'    => $request->date_of_birth,
-    //         'date_of_joining'  => $request->date_of_joining,
-    //         'qualifications'   => $request->qualifications,
-    //         'subjects_taught'  => $request->subjects_taught,
-    //         'classes_assigned' => $request->classes_assigned,
-    //         'address'          => $request->address,
-    //     ]);
-    //     return redirect()->route('admin.teacher.index')->with('success', 'Teacher updated successfully!');
-    // }
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -213,23 +174,20 @@ class TeacherListController extends Controller
         ]);
 
         // Update Class Relations
-        TeacherClass::where('teacher_id', $admin->id)->delete();
-        if (is_array($request->classes_assigned)) {
-            foreach ($request->classes_assigned as $classId) {
+          if (count($request->subjects_taught) > 0) {
+            TeacherClass::where('teacher_id', $admin->id)->delete();
+            TeacherSubject::where('teacher_id', $admin->id)->delete();
+
+            foreach ($request->subjects_taught as $classWiseSubjectId) {
+                $getsubject = ClassWiseSubject::select(['class_id', 'subject_id'])->where('id', $classWiseSubjectId)->first();
                 TeacherClass::create([
                     'teacher_id' => $admin->id,
-                    'class_id'   => $classId,
+                    'class_id'   => $getsubject->class_id,
                 ]);
-            }
-        }
-
-        // Update Subject Relations
-        TeacherSubject::where('teacher_id', $admin->id)->delete();
-        if (is_array($request->subjects_taught)) {
-            foreach ($request->subjects_taught as $subjectId) {
                 TeacherSubject::create([
                     'teacher_id' => $admin->id,
-                    'subject_id' => $subjectId,
+                    'subject_id' => $getsubject->subject_id,
+                    'class_id'   => $getsubject->class_id,
                 ]);
             }
         }
@@ -241,10 +199,6 @@ class TeacherListController extends Controller
     public function status($id)
     {
         $user = Admin::findOrFail($id);
-
-        // if($user->user_type == 'admin') {
-        //     return response()->json(['status' => 403, 'message' => 'Cannot change status of teacher']);
-        // }
 
         $user->status = $user->status ? 0 : 1;
         $user->save();
@@ -280,7 +234,6 @@ class TeacherListController extends Controller
             $classWiseSubjects = ClassWiseSubject::with(['subject', 'classList'])
                 ->whereIn('class_id', $classIds)
                 ->get();
-            // dd($classWiseSubjects);
             // Filter out entries where subject is null
             $validSubjects = $classWiseSubjects->filter(function ($item) {
                 return !is_null($item->subject);

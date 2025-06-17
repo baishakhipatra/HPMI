@@ -50,34 +50,40 @@
       <table class="table">
         <thead>
           <tr>
-            <th width="10%">Name</th>
-            <th width="5%">Email</th>
-            <th width="5%">Mobile</th>
-            {{-- <th width="5%">Teacher ID</th>
-            <th width="10%">DOB</th>
-            <th width="5%">Address</th>   --}}
-            <th width="5%">Classes</th>
-            <th width="10%">Subjects</th>
+            <th width="20%">Name</th>
+            <th width="10%">Email</th>
+            <th width="10%">Mobile</th>
+            <th width="15%">Classes</th>
+            <th width="40%">Subjects</th>
             <th width="5%">Status</th>
             <th width="10%">Actions</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
           @foreach($admins as $item)
+            @php
+              $classes = [];
+              $subjects = [];
+              foreach ($item->teacherSubjects as $teacherSubject) {
+                $clasName = $teacherSubject->classList->class;
+                $subjectName = $teacherSubject->subjectList->sub_name;
+
+                if (!in_array($clasName, $classes)) {
+                  $classes[] = $clasName;
+                }
+                $subjects[] = 'Class ' . $clasName . ' - ' . ucfirst($subjectName);
+              }
+              // dd($subjects);
+            @endphp
             <tr>
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              {{-- <td>{{ $item->user_id }}</td> --}}
-              {{-- <td>{{ $item->date_of_birth }}</td> --}}
-              {{-- <td>{{ ucfirst($item->address) }}</td> --}}
-              {{-- <td>{{ ucfirst($item->class->class ?? '-') }}</td> --}}
-              {{-- <td>{{ ucfirst($item->subject->sub_name ?? '-') }}</td> --}}
               <td>
-                @if($item->teacherClasses->count())
+                @if(count($classes) > 0)
                   <ul class="mb-0">
-                      @foreach($item->teacherClasses as $class)
-                          <li>{{ $class->classList->class ?? '-' }}</li>
+                      @foreach($classes as $eachClassItem)
+                        <li>{{ $eachClassItem ?? '-' }}</li>
                       @endforeach
                   </ul>
                 @else
@@ -86,11 +92,11 @@
               </td>
              
               <td>
-                @if($item->teacherSubjects->count())
+                @if(count($subjects) > 0)
                     <ul class="mb-0">
-                        @foreach($item->teacherSubjects as $subject)
+                        @foreach($subjects as $eachSubjectItem)
                             <li>
-                                {{ $subject->classList->class ?? '-' }} - {{ ucwords($subject->subject->sub_name ?? '-') }}
+                                {{ $eachSubjectItem }}
                             </li>
                         @endforeach
                     </ul>

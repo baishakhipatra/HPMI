@@ -168,7 +168,7 @@
                     var className = item.class_list.class;
                     var label = 'Class ' + className + ' - ' + subjectName;
 
-                    $('#subjectDropdown').append('<option value="' + item.subject.id + '">' + label + '</option>');
+                    $('#subjectDropdown').append('<option value="' + item.id + '">' + label + '</option>');
                   }
                 });
               } else {

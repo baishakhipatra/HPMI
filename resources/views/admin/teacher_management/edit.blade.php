@@ -196,8 +196,8 @@
                         $.each(response.data, function (key, item) {
                             if (item.subject && item.class_list) {
                                 var label = 'Class ' + item.class_list.class + ' - ' + item.subject.sub_name;
-                                var selected = selectedSubjects.includes(item.subject.id) ? 'selected' : '';
-                                $('#subjectDropdown').append('<option value="' + item.subject.id + '" ' + selected + '>' + label + '</option>');
+                                var selected = selectedSubjects.includes(item.id) ? 'selected' : '';
+                                $('#subjectDropdown').append('<option value="' + item.id + '" ' + selected + '>' + label + '</option>');
                             }
                         });
                     } else {
