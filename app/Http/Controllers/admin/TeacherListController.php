@@ -62,8 +62,6 @@ class TeacherListController extends Controller
             'classes_assigned.*' => 'nullable|exists:class_lists,id',
             'password'           => 'required|string|min:6',
         ]);
-        // dd($request->all());
-        //dd($request->all());
         // Custom DOB < DOJ validation
         $validator->after(function ($validator) use ($request) {
             if ($request->date_of_birth && $request->date_of_joining) {
