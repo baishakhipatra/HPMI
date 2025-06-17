@@ -10,7 +10,7 @@ class StudentMarkListController extends Controller
 {
     public function index()
     {
-        $marks = StudentsMark::with(['student', 'class', 'subject'])->get();
+        $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
         $sessions = StudentAdmission::with('session')
               ->select('session_id')
               ->distinct()
@@ -100,7 +100,7 @@ class StudentMarkListController extends Controller
         $validated = $request->validate([
             'class_id'   => 'required|exists:class_lists,id',
             'student_id' => 'required|exists:students,id',
-            'subject_id' => 'required|exists:class_wise_subjects,id',
+            'subject_id' => 'required|exists:subjects,id',
 
             'term_one_out_off' => 'nullable|integer',
             'term_one_stu_marks' => 'required_with:term_one_out_off|nullable|numeric',
@@ -123,7 +123,7 @@ class StudentMarkListController extends Controller
             return back()->withErrors(['error' => 'Student admission record not found.']);
         }
 
-        // Add student_admission_id to validated data
+
         $validated['student_admission_id'] = $admission->id;
 
         StudentsMark::create($validated);

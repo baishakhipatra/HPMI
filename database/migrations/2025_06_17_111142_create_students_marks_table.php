@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('students_marks', function (Blueprint $table) {
             $table->id();
+            
             $table->unsignedBigInteger('student_id');
             $table->unsignedBigInteger('class_id');
             $table->unsignedBigInteger('subject_id');
 
-
-            $table->string('academic_year');
+            $table->unsignedBigInteger('student_admission_id');
 
             $table->integer('term_one_out_off')->nullable();
             $table->integer('term_one_stu_marks')->nullable();
@@ -29,11 +29,12 @@ return new class extends Migration
             $table->integer('final_exam_out_off')->nullable();
             $table->integer('final_exam_stu_marks')->nullable();
 
+            $table->timestamps();
+
+            // Foreign Keys
             $table->foreign('student_id')->references('id')->on('students')->onDelete('cascade');
             $table->foreign('class_id')->references('id')->on('class_lists')->onDelete('cascade');
-            $table->foreign('subject_id')->references('id')->on('class_wise_subjects')->onDelete('cascade');
-            
-            $table->timestamps();
+            $table->foreign('subject_id')->references('id')->on('subjects')->onDelete('cascade');
         });
     }
 

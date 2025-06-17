@@ -10,7 +10,7 @@
 
 @section('content')
 
-@if($errors->any())
+{{-- @if($errors->any())
   <div class="alert alert-danger">
     <ul>
         @foreach($errors->all() as $error)
@@ -18,7 +18,7 @@
         @endforeach
     </ul>
   </div>
-@endif
+@endif --}}
 
 
 <div class="container py-4">
@@ -103,7 +103,7 @@
                         <tr>
                             <td>{{ $mark->student->student_name ?? '-' }}</td>
                             <td>{{ $mark->class->class ?? '-' }}</td>
-                            <td>{{ $mark->subject->sub_name ?? '-' }}</td>
+                            <td>{{ $mark->subjectlist->sub_name ?? '-' }}</td>
                             <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>

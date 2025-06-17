@@ -36,8 +36,12 @@ class StudentsMark extends Model
         return $this->belongsTo(ClassList::class);
     }
 
-    public function subject()
-    {
-        return $this->belongsTo(ClassWiseSubject::class);
+    // public function subject()
+    // {
+    //     return $this->belongsTo(ClassWiseSubject::class);
+    // }
+
+    public function subjectlist() {
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 }
