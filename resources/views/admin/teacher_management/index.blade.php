@@ -45,7 +45,7 @@
     </form>
   </div>
 
-  <div class="card-body">
+ <div class="card-body">
     <div class="table-responsive text-nowrap">
       <table class="table">
         <thead>
@@ -145,8 +145,9 @@
       {{ $admins->links() }}
     </div>
   </div>
+
   
-</div>
+
 <script>
   function deleteTeacher(userId) {
     Swal.fire({
