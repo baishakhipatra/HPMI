@@ -15,7 +15,7 @@
           <!-- Card Header -->
           <div class="card-header d-flex align-items-center justify-content-between">
             <h4 class="mb-0">Edit Student</h4>
-            <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-primary">
+            <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
             </a>
           </div>

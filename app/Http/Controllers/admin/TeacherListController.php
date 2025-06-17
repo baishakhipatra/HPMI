@@ -38,6 +38,7 @@ class TeacherListController extends Controller
     }
 
     public function store(Request $request) {
+        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'user_id'            => 'required|string|unique:admins,user_id',
             'user_type'          => 'required|in:Teacher,Employee,Admin',
@@ -55,12 +56,14 @@ class TeacherListController extends Controller
             'qualifications'     => 'nullable|string|max:255',
             'address'            => 'nullable|string',
             'subjects_taught'    => 'nullable|array',
-            'subjects_taught.*'  => 'nullable|exists:subjects,id',
+            //'subjects_taught.*'  => 'nullable|exists:subjects,id',
+            'subjects_taught.*'  => 'nullable|exists:class_wise_subjects,id',
             'classes_assigned'   => 'nullable|array',
             'classes_assigned.*' => 'nullable|exists:class_lists,id',
             'password'           => 'required|string|min:6',
         ]);
-
+        // dd($request->all());
+        //dd($request->all());
         // Custom DOB < DOJ validation
         $validator->after(function ($validator) use ($request) {
             if ($request->date_of_birth && $request->date_of_joining) {
@@ -69,7 +72,7 @@ class TeacherListController extends Controller
                 }
             }
         });
-
+        //dd($request->all());
         // Return with errors if any
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -89,7 +92,7 @@ class TeacherListController extends Controller
             'password'        => Hash::make($request->password),
             'status'          => 1,
         ]);
-
+        // dd($request->all());
         //  Save class associations
         if (count($request->subjects_taught) > 0) {
 
@@ -122,7 +125,10 @@ class TeacherListController extends Controller
         $classLists = ClassList::all();
 
         $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
-        $selectedSubjectIds = TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')->toArray();
+        //$selectedSubjectIds = TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')->toArray();
+        $selectedSubjectIds = ClassWiseSubject::whereIn('subject_id',
+            TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')
+        )->pluck('id')->toArray();
         $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
         return view('admin.teacher_management.edit', compact('data', 'selectedSubjectIds', 'selectedClassIds', 'classLists'));
     }
@@ -144,7 +150,7 @@ class TeacherListController extends Controller
             'qualifications'     => 'nullable|string|max:255',
             'address'            => 'nullable|string',
             'subjects_taught'    => 'nullable|array',
-            'subjects_taught.*'  => 'nullable|exists:subjects,id',
+            'subjects_taught.*'  => 'nullable|exists:class_wise_subjects,id',
             'classes_assigned'   => 'nullable|array',
             'classes_assigned.*' => 'nullable|exists:class_lists,id',
         ]);
@@ -174,7 +180,7 @@ class TeacherListController extends Controller
         ]);
 
         // Update Class Relations
-          if (count($request->subjects_taught) > 0) {
+          if (is_array($request->subjects_taught) && count($request->subjects_taught) > 0) {
             TeacherClass::where('teacher_id', $admin->id)->delete();
             TeacherSubject::where('teacher_id', $admin->id)->delete();
 
