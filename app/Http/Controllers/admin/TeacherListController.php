@@ -149,7 +149,7 @@ class TeacherListController extends Controller
             'subjects_taught'    => 'nullable|array',
             'subjects_taught.*'  => 'nullable|exists:class_wise_subjects,id',
             'classes_assigned'   => 'nullable|array',
-            'classes_assigned.*' => 'nullable|exists:class_wise_subjects,id',
+            'classes_assigned.*' => 'nullable|exists:class_lists,id',
         ]);
 
         // Custom DOB check
