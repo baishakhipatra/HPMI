@@ -8,9 +8,9 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 
 class StudentMarkListController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
+        
         $sessions = StudentAdmission::with('session')
               ->select('session_id')
               ->distinct()
@@ -28,6 +28,22 @@ class StudentMarkListController extends Controller
                 'name' => $class->class . ' - ' . $sectionList
             ];
         });
+
+        if ($request->ajax()) {
+            $query = $request->input('query');
+            $marks = StudentsMark::with(['student', 'class', 'subjectlist'])
+                ->whereHas('student', function ($q) use ($query) {
+                    $q->where('student_name', 'like', "%$query%");
+                })
+                ->get();
+            return response()->json([
+                'view' => view('admin.student_marks.partials.table', compact('marks'))->render()
+            ]);
+        }
+
+
+        $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
+
         return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'students', 'sessions','marks'));
     }
 
@@ -114,6 +130,34 @@ class StudentMarkListController extends Controller
             'final_exam_out_off' => 'nullable|integer',
             'final_exam_stu_marks' => 'required_with:final_exam_out_off|nullable|numeric',
         ]);
+
+        $errors = [];
+
+        if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
+            $errors['term_one_stu_marks'] = 'Term 1 marks required.';
+        }
+        if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
+            $errors['term_two_stu_marks'] = 'Term 2 marks required.';
+        }
+        if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
+            $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
+        }
+        if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
+            $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
+        }
+
+        if(
+            empty($request->term_one_out_off) &&
+            empty($request->term_two_out_off) &&
+            empty($request->mid_term_out_off) &&
+            empty($request->final_exam_out_off)
+        ) {
+            $errors['at_least_one_term'] = 'Select at least one term.';
+        }
+
+        if ($errors) {
+            return back()->withErrors($errors)->withInput();
+        }
 
         $admission = StudentAdmission::where('student_id', $validated['student_id'])
                                  ->where('class_id', $validated['class_id'])
