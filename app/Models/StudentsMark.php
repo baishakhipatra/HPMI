@@ -44,4 +44,9 @@ class StudentsMark extends Model
     public function subjectlist() {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
+
+    public function studentAdmission()
+    {
+        return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
+    }
 }
