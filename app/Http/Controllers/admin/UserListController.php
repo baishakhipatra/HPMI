@@ -87,7 +87,7 @@ class UserListController extends Controller
             'date_of_joining'  => $request->date_of_joining,
             'qualifications'   => $request->qualifications,
             'address'          => $request->address,
-            'subjects_taught'  => $request->subjects_taught,
+            // 'subjects_taught'  => $request->subjects_taught,
             'password'         => Hash::make($request->password),
             'user_type'        => 'Employee',
             'status'           => 1,
