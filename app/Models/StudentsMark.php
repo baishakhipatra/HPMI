@@ -15,7 +15,7 @@ class StudentsMark extends Model
         'student_id',
         'class_id',
         'subject_id',
-        'academic_year',
+        'student_admission_id',
         'term_one_out_off',
         'term_one_stu_marks',
         'term_two_out_off',

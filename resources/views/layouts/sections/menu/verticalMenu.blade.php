@@ -80,14 +80,14 @@
             <div>Master Module</div>
           </a>
           <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.classlist')}}" class="menu-link">
-                <div>Class List</div>
-              </a>
-            </li>
             <li class="menu-item {{ (request()->is('admin/master-module/subject-list')) ? 'open' : '' }}">
               <a href="{{route('admin.subjectlist.index')}}" class="menu-link">
                 <div>Subject List</div>
+              </a>
+            </li>
+            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.classlist')}}" class="menu-link">
+                <div>Class List</div>
               </a>
             </li>
           </ul>
