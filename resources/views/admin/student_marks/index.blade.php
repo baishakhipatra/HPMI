@@ -86,7 +86,15 @@
             <div class="col-md-4 mb-2">
                 <input type="text" id="student_name" name="student_name" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
             </div>
-            <div class="form-floating form-floating-outline col-md-3">
+            <div class="form-floating form-floating-outline col-md-2">
+                <select id="session_filter" name="session_filter" class="form-select">
+                    <option value="">All sessions</option>
+                    @foreach($academicSessions as $academic)
+                        <option value="{{ $academic->id }}" {{ request('session_filter') == $academic->id ? 'selected' : '' }}>{{ $academic->session_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-floating form-floating-outline col-md-2">
                 <select id="class_filter" name="class_filter" class="form-select">
                     <option value="">All Classes</option>
                     @foreach($classOptions as $class)
@@ -94,7 +102,7 @@
                     @endforeach
                 </select>
             </div>
-            <div class="form-floating form-floating-outline col-md-3 mb-2">
+            <div class="form-floating form-floating-outline col-md-2 mb-2">
                 <select id="subject_filter" name="subject_filter" class="form-select">
                     <option value="">All Subjects</option>
                     @foreach($subjects as $subject)
@@ -779,34 +787,34 @@
 {{-- for delete student mark --}}
 <script>
   function deleteMark(userId) {
-    Swal.fire({
-        icon: 'warning',
-        title: "Are you sure you want to delete this?",
-        text: "You won't be able to revert this!",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Delete",
-    }).then((result) => {
-        /* Read more about isConfirmed, isDenied below */
-        if (result.isConfirmed) {
-            $.ajax({
-                url: "{{ route('admin.student-marks.delete')}}",
-                type: 'POST',
-                data: {
-                    "id": userId,
-                    "_token": '{{ csrf_token() }}',
-                },
-                success: function (data){
-                    if (data.status != 200) {
-                        toastFire('error', data.message);
-                    } else {
-                        toastFire('success', data.message);
-                        location.reload();
+        Swal.fire({
+            icon: 'warning',
+            title: "Are you sure you want to delete this?",
+            text: "You won't be able to revert this!",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Delete",
+        }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: "{{ route('admin.student-marks.delete')}}",
+                    type: 'POST',
+                    data: {
+                        "id": userId,
+                        "_token": '{{ csrf_token() }}',
+                    },
+                    success: function (data){
+                        if (data.status != 200) {
+                            toastFire('error', data.message);
+                        } else {
+                            toastFire('success', data.message);
+                            location.reload();
+                        }
                     }
-                }
-            });
-        }
-    });
-  }
+                });
+            }
+        });
+    }     
 </script>

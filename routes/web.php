@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\Admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
-                                SubjectListController ,StudentMarkListController};
+                                SubjectListController ,StudentMarkListController, StudentProgressMarkingController};
 
 //End New Route
 
@@ -184,7 +184,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
             });
 
-           Route::prefix('studentmark-list')->group(function(){
+            Route::prefix('studentmark-list')->group(function(){
                 Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
                 Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
                 Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
@@ -193,6 +193,11 @@ Route::prefix('admin')->group(function () {
                 Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete');
                 Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
             });
+
+            // Route::prefix('student-progress-marking')->group(function(){
+            //     Route::get('/', [StudentProgressMarkingController::class, 'index'])->name('admin.studentprogressmarking');
+               
+            // });
             
         });
 

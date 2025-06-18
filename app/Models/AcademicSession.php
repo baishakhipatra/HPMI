@@ -11,7 +11,7 @@ class AcademicSession extends Model
     protected $fillable = [
         'session_name',
         'start_date',
-        'ens_date',
+        'end_date',
         'is_active'
     ];
     public function students()

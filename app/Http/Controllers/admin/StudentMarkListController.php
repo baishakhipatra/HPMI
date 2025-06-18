@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Http\Request;
-use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark};
+use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark, AcademicSession};
 
 class StudentMarkListController extends Controller
 {
@@ -22,6 +22,8 @@ class StudentMarkListController extends Controller
         $classes = ClassList::with('sections')->get();
         $subjects = Subject::all();
 
+        $academicSessions = AcademicSession::all();
+
        // $students = [];
 
         $classOptions = $classes->map(function($class){
@@ -34,7 +36,7 @@ class StudentMarkListController extends Controller
             ];
         });
         
-        $query = StudentsMark::with(['student', 'class', 'subjectlist']);
+        $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
 
         if($request->filled('student_name')) {
             $query->whereHas('student', function ($q) use ($request) {
@@ -50,6 +52,11 @@ class StudentMarkListController extends Controller
             $query->where('subject_id', $request->subject_filter);
         }
 
+        if ($request->filled('session_filter')) {
+            $query->whereHas('studentAdmission', function ($q) use ($request) {
+                $q->where('session_id', $request->session_filter);
+            });
+        }
 
         $marks = $query->get();
 
@@ -82,7 +89,7 @@ class StudentMarkListController extends Controller
             ? round($totalPercentage / $studentCount, 2)
             : 0;
 
-        return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'totalRecords', 'averagePercentage'));
+        return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'totalRecords', 'averagePercentage', 'academicSessions'));
     }
 
     public function getStudentsBySession(Request $request)
