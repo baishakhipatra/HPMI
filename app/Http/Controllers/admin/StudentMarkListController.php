@@ -197,7 +197,7 @@ class StudentMarkListController extends Controller
             empty($request->mid_term_out_off) &&
             empty($request->final_exam_out_off)
         ) {
-            $errors['at_least_one_term'] = 'Select at least one term.';
+            $errors['at_least_one_term'] = 'Select at least one term.'; 
         }
 
         if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
@@ -387,9 +387,9 @@ class StudentMarkListController extends Controller
             'Term Two Out Of',
             'Mid Term Marks',
             'Mid Term Out Of',
-            'Final Exam Marks',
-            'Final Exam Out Of',
-            'Created Date'
+            // 'Final Exam Marks',
+            // 'Final Exam Out Of',
+            // 'Created Date'
         ], $delimiter);
 
         foreach ($marks as $mark) {
@@ -405,9 +405,9 @@ class StudentMarkListController extends Controller
                 $mark->term_two_out_off,
                 $mark->mid_term_stu_marks,
                 $mark->mid_term_out_off,
-                $mark->final_exam_stu_marks ?? '',
-                $mark->final_exam_out_off ?? '', 
-                optional($mark->created_at)->format('d-m-Y h:i A')
+                // $mark->final_exam_stu_marks ?? '',
+                // $mark->final_exam_out_off ?? '', 
+                // optional($mark->created_at)->format('d-m-Y h:i A')
             ], $delimiter);
         }
 
