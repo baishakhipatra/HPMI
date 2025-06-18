@@ -155,7 +155,7 @@ class StudentMarkListController extends Controller
         }   
     }
 
-   public function storeStudentMarks(Request $request)
+    public function storeStudentMarks(Request $request)
     {
         // dd($request->all());
         $validated = $request->validate([
@@ -198,6 +198,22 @@ class StudentMarkListController extends Controller
             empty($request->final_exam_out_off)
         ) {
             $errors['at_least_one_term'] = 'Select at least one term.';
+        }
+
+        if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
+            $errors['term_one_stu_marks'] = 'Term 1 marks cannot be greater than term 1 out off.';
+        }
+
+        if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
+            $errors['term_one_stu_marks'] = 'Term 2 marks cannot be greater than term 2 out off.';
+        }
+
+        if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
+            $errors['mid_term_stu_marks'] = 'Mid term marks cannot be greater than mid term out off.';
+        }
+
+        if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
+            $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
         }
 
         if ($errors) {
