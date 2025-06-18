@@ -155,18 +155,28 @@
                                             <i class="ri-pencil-line me-1"></i> Edit
                                         </a> --}}
 
-                                        <button type="button" class="dropdown-item editMarksBtn" 
+                                        <button type="button" class="dropdown-item editMarksBtn"
                                             data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" {{-- Ensure this is accessible --}}
+                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
                                             data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
                                             data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
                                             data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
                                             data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
                                             data-subject-id="{{ $mark->subject_id ?? '' }}"
                                             data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+                                            
                                             data-term-one-out-off="{{ $mark->term_one_out_off }}"
                                             data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                            {{-- ... and so on for other marks fields --}}
+                                            
+                                            data-term-two-out-off="{{ $mark->term_two_out_off }}"
+                                            data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
+                                            
+                                            data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
+                                            data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
+                                            
+                                            data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
+                                            data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
+                                            
                                             data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
                                             Edit
                                         </button>
