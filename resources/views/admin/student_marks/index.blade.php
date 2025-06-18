@@ -43,7 +43,13 @@
             <small class="text-muted">Manage student marks and assessments</small>
         </div>
         <div>
-            <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Export Data">
+            <a href="{{ route('admin.student-marks.export', [
+                'student_name' => request('student_name'),
+                'class_filter' => request('class_filter'),
+                'subject_filter' => request('subject_filter')
+            ]) }}" 
+            class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+            data-toggle="tooltip" title="Export Data">
                 Export
             </a>
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
@@ -154,30 +160,29 @@
                                         {{-- <a class="dropdown-item" href="#" title="Edit" data-bs-toggle="tooltip">
                                             <i class="ri-pencil-line me-1"></i> Edit
                                         </a> --}}
-
-                                        <button type="button" class="dropdown-item editMarksBtn"
-                                            data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
-                                            data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
-                                            data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
-                                            data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
-                                            data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
-                                            data-subject-id="{{ $mark->subject_id ?? '' }}"
-                                            data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
-                                            
-                                            data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                            data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                            
-                                            data-term-two-out-off="{{ $mark->term_two_out_off }}"
-                                            data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
-                                            
-                                            data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
-                                            data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
-                                            
-                                            data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
-                                            data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
-                                            
-                                            data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
+                                        <button type="button" class="dropdown-item editMarksBtn" 
+                                                data-id="{{ $mark->id }}"
+                                                data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
+                                                data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
+                                                data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
+                                                data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
+                                                data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
+                                                data-subject-id="{{ $mark->subject_id ?? '' }}"
+                                                data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+                                                
+                                                data-term-one-out-off="{{ $mark->term_one_out_off }}"
+                                                data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
+                                                
+                                                data-term-two-out-off="{{ $mark->term_two_out_off }}"
+                                                data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
+                                                
+                                                data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
+                                                data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
+                                                
+                                                data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
+                                                data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
+                                                
+                                                data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
                                             Edit
                                         </button>
 
@@ -744,8 +749,25 @@
         $('#edit_student_id').on('change', function() {
             let sessionId = $('#edit_session_id').val();
             let studentId = $(this).val();
+
+             // Clear existing marks fields
+            $('#edit_term_one_out_off').val('');
+            $('#edit_term_one_stu_marks').val('');
+
+            $('#edit_term_two_out_off').val('');
+            $('#edit_term_two_stu_marks').val('');
+
+            $('#edit_mid_term_out_off').val('');
+            $('#edit_mid_term_stu_marks').val('');
+
+            $('#edit_final_exam_out_off').val('');
+            $('#edit_final_exam_stu_marks').val('');
+
+             // Preselect existing values if they were already selected before
+            let selectedClassId  = $('#edit_class_id').val();
+            let selectedSubjectId = $('#edit_subject_id').val();
             // Pass null for selectedClassId and selectedSubjectId as these are manual changes
-            loadEditClassesAndSubjects(sessionId, studentId);
+            loadEditClassesAndSubjects(sessionId, studentId, selectedClassId, selectedSubjectId);
         });
 
         // Your existing add modal scripts (if any)

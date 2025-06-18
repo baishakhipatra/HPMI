@@ -191,6 +191,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
                 Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
                 Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete');
+                Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
             });
             
         });

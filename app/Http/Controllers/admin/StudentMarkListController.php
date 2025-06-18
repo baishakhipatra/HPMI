@@ -11,44 +11,7 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 
 class StudentMarkListController extends Controller
 {
-    // public function index(Request $request)
-    // {
-        
-    //     $sessions = StudentAdmission::with('session')
-    //           ->select('session_id')
-    //           ->distinct()
-    //           ->get();
-    //     $classes = ClassList::with('sections')->get();
-    //     $subjects = Subject::all();
-
-    //     $students = [];
-
-    //     $classOptions = $classes->map(function($class){
-    //         $sections = $class->sections->pluck('section')->toArray();
-    //         $sectionList = implode(', ', $sections);
-    //         return [
-    //             'id' => $class->id,
-    //             'name' => $class->class . ' - ' . $sectionList
-    //         ];
-    //     });
-
-    //     if ($request->ajax()) {
-    //         $query = $request->input('query');
-    //         $marks = StudentsMark::with(['student', 'class', 'subjectlist'])
-    //             ->whereHas('student', function ($q) use ($query) {
-    //                 $q->where('student_name', 'like', "%$query%");
-    //             })
-    //             ->get();
-    //         return response()->json([
-    //             'view' => view('admin.student_marks.partials.table', compact('marks'))->render()
-    //         ]);
-    //     }
-
-
-    //     $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
-
-    //     return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'students', 'sessions','marks'));
-    // }
+    
     public function index(Request $request)
     {
         
@@ -257,22 +220,22 @@ class StudentMarkListController extends Controller
             // Validate request
             $validated = $request->validate([
                 'id' => 'required|exists:students_marks,id',
-                'session_id' => 'required|exists:academic_sessions,id',
-                'student_id' => 'required|exists:students,id',
-                'class_id' => 'required|exists:class_lists,id',
-                'subject_id' => 'required|exists:subjects,id',
+                'session_id'    => 'required|exists:academic_sessions,id',
+                'student_id'    => 'required|exists:students,id',
+                'class_id'      => 'required|exists:class_lists,id',
+                'subject_id'    => 'required|exists:subjects,id',
 
-                'term_one_out_off' => 'nullable|integer',
-                'term_one_stu_marks' => 'nullable|numeric|required_with:term_one_out_off|max:100',
+                'term_one_out_off'      => 'nullable|integer',
+                'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off|max:100',
 
-                'term_two_out_off' => 'nullable|integer',
-                'term_two_stu_marks' => 'nullable|numeric|required_with:term_two_out_off|max:100',
+                'term_two_out_off'      => 'nullable|integer',
+                'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off|max:100',
 
-                'mid_term_out_off' => 'nullable|integer',
-                'mid_term_stu_marks' => 'nullable|numeric|required_with:mid_term_out_off|max:100',
+                'mid_term_out_off'      => 'nullable|integer',
+                'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off|max:100',
 
-                'final_exam_out_off' => 'nullable|integer',
-                'final_exam_stu_marks' => 'nullable|numeric|required_with:final_exam_out_off|max:100',
+                'final_exam_out_off'    => 'nullable|integer',
+                'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off|max:100',
             ]);
 
             // Find the mark record
@@ -293,20 +256,21 @@ class StudentMarkListController extends Controller
 
             // Update marks
             // Update marks, including student_id, class_id, session_id
+            
             $mark->update([
-                'student_id' => $validated['student_id'],
-                'class_id' => $validated['class_id'],
-                'session_id' => $validated['session_id'], 
-                'student_admission_id' => $admission->id,
-                'subject_id' => $validated['subject_id'],
-                'term_one_out_off' => $validated['term_one_out_off'] ?? null,
-                'term_one_stu_marks' => $validated['term_one_stu_marks'] ?? null,
-                'term_two_out_off' => $validated['term_two_out_off'] ?? null,
-                'term_two_stu_marks' => $validated['term_two_stu_marks'] ?? null,
-                'mid_term_out_off' => $validated['mid_term_out_off'] ?? null,
-                'mid_term_stu_marks' => $validated['mid_term_stu_marks'] ?? null,
-                'final_exam_out_off' => $validated['final_exam_out_off'] ?? null,
-                'final_exam_stu_marks' => $validated['final_exam_stu_marks'] ?? null,
+                'student_id'    => $validated['student_id'],
+                'class_id'      => $validated['class_id'],
+                'session_id'    => $validated['session_id'], 
+                'student_admission_id'  => $admission->id,
+                'subject_id'    => $validated['subject_id'],
+                'term_one_out_off'      => $validated['term_one_out_off'] ?? null,
+                'term_one_stu_marks'    => $validated['term_one_stu_marks'] ?? null,
+                'term_two_out_off'      => $validated['term_two_out_off'] ?? null,
+                'term_two_stu_marks'    => $validated['term_two_stu_marks'] ?? null,
+                'mid_term_out_off'      => $validated['mid_term_out_off'] ?? null,
+                'mid_term_stu_marks'    => $validated['mid_term_stu_marks'] ?? null,
+                'final_exam_out_off'    => $validated['final_exam_out_off'] ?? null,
+                'final_exam_stu_marks'  => $validated['final_exam_stu_marks'] ?? null,
             ]);
 
 
@@ -317,7 +281,6 @@ class StudentMarkListController extends Controller
                 'request' => $request->all()
             ]);
             
-
             return redirect()->back()->with('error', 'Failed to update student marks. Please try again.');
         }
     }
@@ -338,5 +301,92 @@ class StudentMarkListController extends Controller
             'message'   => 'Student Mark deleted successfully.',
         ]);
     }
+
+    public function export(Request $request)
+    {
+        $studentName = $request->input('student_name');
+        $classId = $request->input('class_filter');
+        $subjectId = $request->input('subject_filter');
+
+        $query = StudentsMark::with([
+            'student',
+            'class',
+            'subjectlist',
+            'studentAdmission.class',
+            'studentAdmission.academicsession'
+        ]);
+
+        // Join with student name if filter is applied
+        if (!empty($studentName)) {
+            $query->whereHas('student', function ($q) use ($studentName) {
+                $q->where('student_name', 'like', '%' . $studentName . '%');
+            });
+        }
+
+        // Filter by class
+        if (!empty($classId)) {
+            $query->where('class_id', $classId);
+        }
+
+        // Filter by subject
+        if (!empty($subjectId)) {
+            $query->where('subject_id', $subjectId);
+        }
+
+        $marks = $query->latest()->get();
+
+        if ($marks->isEmpty()) {
+            return redirect()->back()->with('error', 'No records found to export.');
+        }
+
+        $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $delimiter = ",";
+        $f = fopen('php://memory', 'w');
+
+        // Header row
+        fputcsv($f, [
+            'Student Name',
+            'Student ID',
+            'Class',
+            'Subject',
+            'Academic Session',
+            'Term One Marks',
+            'Term One Out Of',
+            'Term Two Marks',
+            'Term Two Out Of',
+            'Mid Term Marks',
+            'Mid Term Out Of',
+            'Final Exam Marks',
+            'Final Exam Out Of',
+            'Created Date'
+        ], $delimiter);
+
+        foreach ($marks as $mark) {
+            fputcsv($f, [
+                $mark->student->student_name ?? '',
+                $mark->student->student_id ?? '',
+                $mark->class->class_name ?? '',
+                $mark->subjectlist->subject_name ?? '',
+                optional($mark->studentAdmission->academicsession)->session_name ?? '',
+                $mark->term_one_stu_marks,
+                $mark->term_one_out_off,
+                $mark->term_two_stu_marks,
+                $mark->term_two_out_off,
+                $mark->mid_term_stu_marks,
+                $mark->mid_term_out_off,
+                $mark->final_exam_stu_marks,
+                $mark->final_exam_out_off,
+                optional($mark->created_at)->format('d-m-Y h:i A')
+            ], $delimiter);
+        }
+
+        // Output file
+        fseek($f, 0);
+        header('Content-Type: text/csv');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        fpassthru($f);
+        exit;
+    }
+
 
 }
