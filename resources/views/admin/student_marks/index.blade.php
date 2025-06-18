@@ -44,13 +44,14 @@
         </div>
         <div>
             <a href="{{ route('admin.student-marks.export', [
-                'student_name' => request('student_name'),
-                'class_filter' => request('class_filter'),
-                'subject_filter' => request('subject_filter')
-            ]) }}" 
-            class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-            data-toggle="tooltip" title="Export Data">
-                Export
+                        'student_name' => request('student_name'),
+                        'class_filter' => request('class_filter'),
+                        'subject_filter' => request('subject_filter'),
+                        'session_filter'  => request('session_filter')
+                    ]) }}" 
+                class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                data-toggle="tooltip" title="Export Data">
+                    Export
             </a>
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
                + Add Marks

@@ -330,6 +330,7 @@ class StudentMarkListController extends Controller
         $studentName = $request->input('student_name');
         $classId = $request->input('class_filter');
         $subjectId = $request->input('subject_filter');
+        $sessionId = $request->input('session_filter');
 
         $query = StudentsMark::with([
             'student',
@@ -354,6 +355,13 @@ class StudentMarkListController extends Controller
         // Filter by subject
         if (!empty($subjectId)) {
             $query->where('subject_id', $subjectId);
+        }
+
+        //Filter by session
+        if (!empty($sessionId)) {
+            $query->whereHas('studentAdmission', function ($q) use ($sessionId) {
+                $q->where('session_id', $sessionId);
+            });
         }
 
         $marks = $query->latest()->get();
@@ -388,17 +396,17 @@ class StudentMarkListController extends Controller
             fputcsv($f, [
                 $mark->student->student_name ?? '',
                 $mark->student->student_id ?? '',
-                $mark->class->class_name ?? '',
-                $mark->subjectlist->subject_name ?? '',
-                optional($mark->studentAdmission->academicsession)->session_name ?? '',
+                $mark->class->class ?? '',
+                $mark->subjectlist->sub_name ?? '',
+                $mark->studentAdmission->academicsession->session_name ?? '',
                 $mark->term_one_stu_marks,
                 $mark->term_one_out_off,
                 $mark->term_two_stu_marks,
                 $mark->term_two_out_off,
                 $mark->mid_term_stu_marks,
                 $mark->mid_term_out_off,
-                $mark->final_exam_stu_marks,
-                $mark->final_exam_out_off,
+                $mark->final_exam_stu_marks ?? '',
+                $mark->final_exam_out_off ?? '', 
                 optional($mark->created_at)->format('d-m-Y h:i A')
             ], $delimiter);
         }
