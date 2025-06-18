@@ -73,15 +73,15 @@
             </div>
         </div>
     </div>
-
+    
 
     <form action="{{ route('admin.studentmarklist')}}" method="GET">
         <div class="row mb-4">
             <div class="col-md-4 mb-2">
-                <input type="text" id="search-student" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
+                <input type="text" id="student_name" name="student_name" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
             </div>
             <div class="form-floating form-floating-outline col-md-3">
-                <select id="class_id" name="class_id" class="form-select">
+                <select id="class_filter" name="class_filter" class="form-select">
                     <option value="">All Classes</option>
                     @foreach($classOptions as $class)
                         <option value="{{ $class['id'] }}" {{ request('class_id') == $class['id'] ? 'selected' : '' }}>{{ $class['name'] }}</option>
@@ -89,7 +89,7 @@
                 </select>
             </div>
             <div class="form-floating form-floating-outline col-md-3 mb-2">
-                <select id="subject_id" name="subject_id" class="form-select">
+                <select id="subject_filter" name="subject_filter" class="form-select">
                     <option value="">All Subjects</option>
                     @foreach($subjects as $subject)
                         <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->sub_name }}</option>
@@ -123,9 +123,9 @@
                 <tbody>
                     @foreach($marks as $mark)
                         <tr>
-                            <td class="mark-student-name">{{ $mark->student->student_name ?? '-' }}</td>
+                            <td class="mark-student-name">{{ ucwords($mark->student->student_name ?? '-') }}</td>
                             <td class="mark-class-name">{{ $mark->class->class ?? '-' }}</td>
-                            <td class="mark-subject-name">{{ $mark->subjectlist->sub_name ?? '-' }}</td>
+                            <td class="mark-subject-name">{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
                             <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
@@ -157,7 +157,7 @@
 
                                         <button type="button" class="dropdown-item editMarksBtn" 
                                             data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" 
+                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" {{-- Ensure this is accessible --}}
                                             data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
                                             data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
                                             data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
@@ -171,11 +171,11 @@
                                             Edit
                                         </button>
 
-                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="">
+                                        <a class="dropdown-item" href="javascript:void(0);" title="Delete" data-bs-toggle="tooltip" onclick="deleteMark({{ $mark->id }})">
                                             <i class="ri-delete-bin-6-line me-1"></i> Delete
                                         </a>
                                     </div>
-                                    </div>
+                                </div>
                                 </form>
                             </td>
                         </tr>
@@ -216,7 +216,7 @@
                             </div>
 
                             <div class="form-floating form-floating-outline col-md-6">
-                                <select name="student_id" id="student_id" class="form-select" >
+                                <select name="student_id" id="student_id" class="form-select">
                                     <option value="">Select Student</option>
                                 </select>
                                 <label for="student_id" class="form-label">Student</label>
@@ -224,7 +224,7 @@
 
 
                             <div class="form-floating form-floating-outline col-md-2">
-                                <select name="class_id" id="class_id" class="form-select" >
+                                <select name="class_id" id="class_id" class="form-select">
                                     <option value="">Select Class</option>
                                 </select>
                                 <label for="class_id" class="form-label">Class</label>
@@ -380,7 +380,7 @@
                                         </div>
 
                                         <div class="form-floating form-floating-outline col-md-6">
-                                            <select name="student_id" id="edit_student_id" class="form-select">>
+                                            <select name="student_id" id="edit_student_id" class="form-select">
                                                 <option value="">Select Student</option>
                                                 {{-- Students will be loaded here via AJAX --}}
                                             </select>
@@ -571,7 +571,6 @@
                                 $('#subject_id').append('<option value="'+subjectData.id+'" selected>'+subjectData.name+'</option>');
                             });
                         }
-                        console.log(response);
                     },
                     error: function(xhr) {
                         console.error(xhr);
@@ -714,6 +713,19 @@
             $('#edit_class_id').empty().append('<option value="">Select Class</option>');
             $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
 
+            // Clear existing marks fields
+            $('#edit_term_one_out_off').val('');
+            $('#edit_term_one_stu_marks').val('');
+
+            $('#edit_term_two_out_off').val('');
+            $('#edit_term_two_stu_marks').val('');
+
+            $('#edit_mid_term_out_off').val('');
+            $('#edit_mid_term_stu_marks').val('');
+
+            $('#edit_final_exam_out_off').val('');
+            $('#edit_final_exam_stu_marks').val('');
+
             loadEditStudents(sessionId); // No initial student selected here, as it's a manual change
             // No need to call loadEditClassesAndSubjects here directly, it will be handled by student change
         });
@@ -730,4 +742,39 @@
         // ... (your existing $('#session_id').on('change') and $('#student_id').on('change') for the ADD modal) ...
 
     });
+</script>
+
+{{-- for delete student mark --}}
+<script>
+  function deleteMark(userId) {
+    Swal.fire({
+        icon: 'warning',
+        title: "Are you sure you want to delete this?",
+        text: "You won't be able to revert this!",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Delete",
+    }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "{{ route('admin.student-marks.delete')}}",
+                type: 'POST',
+                data: {
+                    "id": userId,
+                    "_token": '{{ csrf_token() }}',
+                },
+                success: function (data){
+                    if (data.status != 200) {
+                        toastFire('error', data.message);
+                    } else {
+                        toastFire('success', data.message);
+                        location.reload();
+                    }
+                }
+            });
+        }
+    });
+  }
 </script>

@@ -11,9 +11,47 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 
 class StudentMarkListController extends Controller
 {
+    // public function index(Request $request)
+    // {
+        
+    //     $sessions = StudentAdmission::with('session')
+    //           ->select('session_id')
+    //           ->distinct()
+    //           ->get();
+    //     $classes = ClassList::with('sections')->get();
+    //     $subjects = Subject::all();
+
+    //     $students = [];
+
+    //     $classOptions = $classes->map(function($class){
+    //         $sections = $class->sections->pluck('section')->toArray();
+    //         $sectionList = implode(', ', $sections);
+    //         return [
+    //             'id' => $class->id,
+    //             'name' => $class->class . ' - ' . $sectionList
+    //         ];
+    //     });
+
+    //     if ($request->ajax()) {
+    //         $query = $request->input('query');
+    //         $marks = StudentsMark::with(['student', 'class', 'subjectlist'])
+    //             ->whereHas('student', function ($q) use ($query) {
+    //                 $q->where('student_name', 'like', "%$query%");
+    //             })
+    //             ->get();
+    //         return response()->json([
+    //             'view' => view('admin.student_marks.partials.table', compact('marks'))->render()
+    //         ]);
+    //     }
+
+
+    //     $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
+
+    //     return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'students', 'sessions','marks'));
+    // }
     public function index(Request $request)
     {
-
+        
         $sessions = StudentAdmission::with('session')
               ->select('session_id')
               ->distinct()
@@ -28,7 +66,7 @@ class StudentMarkListController extends Controller
             $sectionList = implode(', ', $sections);
             return [
                 'id' => $class->id,
-                // 'name' => $class->class . ' - ' . $sectionList
+                 //'name' => $class->class . ' - ' . $sectionList
                 'name' => $class->class
             ];
         });
@@ -41,12 +79,12 @@ class StudentMarkListController extends Controller
             });
         }
 
-        if($request->filled('class_id')){
-            $query->where('class_id', $request->class_id);
+        if($request->filled('class_filter')){
+            $query->where('class_id', $request->class_filter);
         }
 
-        if($request->filled('subject_id')){
-            $query->where('subject_id', $request->subject_id);
+        if($request->filled('subject_filter')){
+            $query->where('subject_id', $request->subject_filter);
         }
 
 
@@ -213,65 +251,6 @@ class StudentMarkListController extends Controller
     }
 
 
-    // public function update(Request $request)
-    // {
-    //     //dd($request->all());
-    //     // Validate request
-    //     $validated = $request->validate([
-    //         'id' => 'required|exists:students_marks,id',
-    //         'session_id' => 'required|exists:academic_sessions,id',
-    //         'student_id' => 'required|exists:students,id',
-    //         'class_id' => 'required|exists:class_lists,id',
-    //         'subject_id' => 'required|exists:subjects,id',
-            
-    //         'term_one_out_off' => 'nullable|integer',
-    //         'term_one_stu_marks' => 'nullable|numeric|required_with:term_one_out_off|max:100',
-            
-    //         'term_two_out_off' => 'nullable|integer',
-    //         'term_two_stu_marks' => 'nullable|numeric|required_with:term_two_out_off|max:100',
-            
-    //         'mid_term_out_off' => 'nullable|integer',
-    //         'mid_term_stu_marks' => 'nullable|numeric|required_with:mid_term_out_off|max:100',
-            
-    //         'final_exam_out_off' => 'nullable|integer',
-    //         'final_exam_stu_marks' => 'nullable|numeric|required_with:final_exam_out_off|max:100',
-    //     ]);
-
-    //     // Find the mark record
-    //     $mark = StudentsMark::findOrFail($validated['id']);
-
-    //     // Find or create student admission (use separate query so we don't skip updates)
-    //     $admission = StudentAdmission::where([
-    //         'student_id' => $validated['student_id'],
-    //         'class_id' => $validated['class_id'],
-    //         'session_id' => $validated['session_id']
-    //     ])->first();
-
-    //     if (!$admission) {
-    //         $admission = StudentAdmission::create([
-    //             'student_id' => $validated['student_id'],
-    //             'class_id' => $validated['class_id'],
-    //             'session_id' => $validated['session_id'],
-    //             'admission_date' => now(),
-    //         ]);
-    //     }
-
-    //     // Update marks
-    //     $mark->update([
-    //         'student_admission_id' => $admission->id,
-    //         'subject_id' => $validated['subject_id'],
-    //         'term_one_out_off' => $validated['term_one_out_off'] ?? null,
-    //         'term_one_stu_marks' => $validated['term_one_stu_marks'] ?? null,
-    //         'term_two_out_off' => $validated['term_two_out_off'] ?? null,
-    //         'term_two_stu_marks' => $validated['term_two_stu_marks'] ?? null,
-    //         'mid_term_out_off' => $validated['mid_term_out_off'] ?? null,
-    //         'mid_term_stu_marks' => $validated['mid_term_stu_marks'] ?? null,
-    //         'final_exam_out_off' => $validated['final_exam_out_off'] ?? null,
-    //         'final_exam_stu_marks' => $validated['final_exam_stu_marks'] ?? null,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Student marks updated successfully.');
-    // }
     public function update(Request $request)
     {
         try {
@@ -343,6 +322,21 @@ class StudentMarkListController extends Controller
         }
     }
 
-   
+    public function delete(Request $request){
+        $user = StudentsMark::find($request->id); 
+    
+        if (!$user) {
+            return response()->json([
+                'status'    => 404,
+                'message'   => 'user not found.',
+            ]);
+        }
+    
+        $user->delete(); 
+        return response()->json([
+            'status'    => 200,
+            'message'   => 'Student Mark deleted successfully.',
+        ]);
+    }
 
 }

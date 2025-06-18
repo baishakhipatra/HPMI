@@ -190,6 +190,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
                 Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
                 Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
+                Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete');
             });
             
         });
