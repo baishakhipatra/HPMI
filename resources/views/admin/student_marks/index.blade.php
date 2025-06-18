@@ -116,9 +116,9 @@
                 <tbody>
                     @foreach($marks as $mark)
                         <tr>
-                            <td class="mark-student-name">{{ $mark->student->student_name ?? '-' }}</td>
+                            <td class="mark-student-name">{{ ucwords($mark->student->student_name ?? '-') }}</td>
                             <td class="mark-class-name">{{ $mark->class->class ?? '-' }}</td>
-                            <td class="mark-subject-name">{{ $mark->subjectlist->sub_name ?? '-' }}</td>
+                            <td class="mark-subject-name">{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
                             <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
                             <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
@@ -164,7 +164,7 @@
                                             Edit
                                         </button>
 
-                                        <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="">
+                                        <a class="dropdown-item" href="javascript:void(0);" title="Delete" data-bs-toggle="tooltip" onclick="deleteMark({{ $mark->id }})">
                                             <i class="ri-delete-bin-6-line me-1"></i> Delete
                                         </a>
                                     </div>
@@ -720,6 +720,19 @@
             $('#edit_class_id').empty().append('<option value="">Select Class</option>');
             $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
 
+            // Clear existing marks fields
+            $('#edit_term_one_out_off').val('');
+            $('#edit_term_one_stu_marks').val('');
+
+            $('#edit_term_two_out_off').val('');
+            $('#edit_term_two_stu_marks').val('');
+
+            $('#edit_mid_term_out_off').val('');
+            $('#edit_mid_term_stu_marks').val('');
+
+            $('#edit_final_exam_out_off').val('');
+            $('#edit_final_exam_stu_marks').val('');
+
             loadEditStudents(sessionId); // No initial student selected here, as it's a manual change
             // No need to call loadEditClassesAndSubjects here directly, it will be handled by student change
         });
@@ -728,12 +741,64 @@
         $('#edit_student_id').on('change', function() {
             let sessionId = $('#edit_session_id').val();
             let studentId = $(this).val();
+
+             // Clear existing marks fields
+            $('#edit_term_one_out_off').val('');
+            $('#edit_term_one_stu_marks').val('');
+
+            $('#edit_term_two_out_off').val('');
+            $('#edit_term_two_stu_marks').val('');
+
+            $('#edit_mid_term_out_off').val('');
+            $('#edit_mid_term_stu_marks').val('');
+
+            $('#edit_final_exam_out_off').val('');
+            $('#edit_final_exam_stu_marks').val('');
+
+             // Preselect existing values if they were already selected before
+            let selectedClassId  = $('#edit_class_id').val();
+            let selectedSubjectId = $('#edit_subject_id').val();
             // Pass null for selectedClassId and selectedSubjectId as these are manual changes
-            loadEditClassesAndSubjects(sessionId, studentId);
+            loadEditClassesAndSubjects(sessionId, studentId, selectedClassId, selectedSubjectId);
         });
 
         // Your existing add modal scripts (if any)
         // ... (your existing $('#session_id').on('change') and $('#student_id').on('change') for the ADD modal) ...
 
     });
+</script>
+
+{{-- for delete student mark --}}
+<script>
+  function deleteMark(userId) {
+    Swal.fire({
+        icon: 'warning',
+        title: "Are you sure you want to delete this?",
+        text: "You won't be able to revert this!",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Delete",
+    }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            $.ajax({
+                url: "{{ route('admin.student-marks.delete')}}",
+                type: 'POST',
+                data: {
+                    "id": userId,
+                    "_token": '{{ csrf_token() }}',
+                },
+                success: function (data){
+                    if (data.status != 200) {
+                        toastFire('error', data.message);
+                    } else {
+                        toastFire('success', data.message);
+                        location.reload();
+                    }
+                }
+            });
+        }
+    });
+  }
 </script>
