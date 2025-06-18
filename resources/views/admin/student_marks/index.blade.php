@@ -43,7 +43,13 @@
             <small class="text-muted">Manage student marks and assessments</small>
         </div>
         <div>
-            <a href="" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Export Data">
+            <a href="{{ route('admin.student-marks.export', [
+                'student_name' => request('student_name'),
+                'class_filter' => request('class_filter'),
+                'subject_filter' => request('subject_filter')
+            ]) }}" 
+            class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+            data-toggle="tooltip" title="Export Data">
                 Export
             </a>
             <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
@@ -58,7 +64,7 @@
                 <div class="card-body">
                     <i class="ri-graduation-cap-line" style="font-size: 40px; color: #4e73df;"></i>
                     <h5 class="card-title">Total Records</h5>
-                    <h4>150</h4>
+                    <h4>{{ $totalRecords }}</h4>
                 </div>
             </div>
         </div>
@@ -68,33 +74,40 @@
                 <div class="card-body">
                     <i class="ri-percent-line" style="font-size: 40px; color: #1cc88a;"></i>
                     <h5 class="card-title">Average Percentage</h5>
-                    <h4>85%</h4>
+                    <h4>{{ $averagePercentage }}%</h4>
                 </div>
             </div>
         </div>
     </div>
+    
 
-    <div class="row mb-4">
-        <div class="col-md-4 mb-2">
-            <input type="text" id="search-student" class="form-control" placeholder="Search by student name...">
+    <form action="{{ route('admin.studentmarklist')}}" method="GET">
+        <div class="row mb-4">
+            <div class="col-md-4 mb-2">
+                <input type="text" id="student_name" name="student_name" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
+            </div>
+            <div class="form-floating form-floating-outline col-md-3">
+                <select id="class_filter" name="class_filter" class="form-select">
+                    <option value="">All Classes</option>
+                    @foreach($classOptions as $class)
+                        <option value="{{ $class['id'] }}" {{ request('class_id') == $class['id'] ? 'selected' : '' }}>{{ $class['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-floating form-floating-outline col-md-3 mb-2">
+                <select id="subject_filter" name="subject_filter" class="form-select">
+                    <option value="">All Subjects</option>
+                    @foreach($subjects as $subject)
+                        <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->sub_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 text-end"> 
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2">Reset</a>
+            </div>
         </div>
-        <div class="form-floating form-floating-outline col-md-4">
-            <select id="filter-class" class="form-select">
-                <option value="">All Classes</option>
-                @foreach($classOptions as $class)
-                    <option value="{{ $class['id'] }}">{{ $class['name'] }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-floating form-floating-outline col-md-4 mb-2">
-            <select id="filter-subject" class="form-select">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
+    </form>
 
     <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -147,20 +160,29 @@
                                         {{-- <a class="dropdown-item" href="#" title="Edit" data-bs-toggle="tooltip">
                                             <i class="ri-pencil-line me-1"></i> Edit
                                         </a> --}}
-
                                         <button type="button" class="dropdown-item editMarksBtn" 
-                                            data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" {{-- Ensure this is accessible --}}
-                                            data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
-                                            data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
-                                            data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
-                                            data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
-                                            data-subject-id="{{ $mark->subject_id ?? '' }}"
-                                            data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
-                                            data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                            data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                            {{-- ... and so on for other marks fields --}}
-                                            data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
+                                                data-id="{{ $mark->id }}"
+                                                data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
+                                                data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
+                                                data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
+                                                data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
+                                                data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
+                                                data-subject-id="{{ $mark->subject_id ?? '' }}"
+                                                data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+                                                
+                                                data-term-one-out-off="{{ $mark->term_one_out_off }}"
+                                                data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
+                                                
+                                                data-term-two-out-off="{{ $mark->term_two_out_off }}"
+                                                data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
+                                                
+                                                data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
+                                                data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
+                                                
+                                                data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
+                                                data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
+                                                
+                                                data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
                                             Edit
                                         </button>
 
@@ -168,7 +190,7 @@
                                             <i class="ri-delete-bin-6-line me-1"></i> Delete
                                         </a>
                                     </div>
-                                    </div>
+                                </div>
                                 </form>
                             </td>
                         </tr>
@@ -576,20 +598,6 @@
         });
     });
 
-    $(document).ready(function() {
-        $('#search-student').on('keyup', function() {
-            var query = $(this).val();
-
-            $.ajax({
-                url: "{{ route('admin.studentmarklist') }}", 
-                type: "GET",
-                data: { query: query },
-                success: function(data) {
-                    $('#marks-table').html(data.view);
-                }
-            });
-        });
-    });
 
 </script>
 

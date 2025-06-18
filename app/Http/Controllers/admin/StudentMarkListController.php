@@ -11,6 +11,7 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 
 class StudentMarkListController extends Controller
 {
+    
     public function index(Request $request)
     {
         
@@ -21,33 +22,67 @@ class StudentMarkListController extends Controller
         $classes = ClassList::with('sections')->get();
         $subjects = Subject::all();
 
-        $students = [];
+       // $students = [];
 
         $classOptions = $classes->map(function($class){
             $sections = $class->sections->pluck('section')->toArray();
             $sectionList = implode(', ', $sections);
             return [
                 'id' => $class->id,
-                'name' => $class->class . ' - ' . $sectionList
+                 //'name' => $class->class . ' - ' . $sectionList
+                'name' => $class->class
             ];
         });
+        
+        $query = StudentsMark::with(['student', 'class', 'subjectlist']);
 
-        if ($request->ajax()) {
-            $query = $request->input('query');
-            $marks = StudentsMark::with(['student', 'class', 'subjectlist'])
-                ->whereHas('student', function ($q) use ($query) {
-                    $q->where('student_name', 'like', "%$query%");
-                })
-                ->get();
-            return response()->json([
-                'view' => view('admin.student_marks.partials.table', compact('marks'))->render()
-            ]);
+        if($request->filled('student_name')) {
+            $query->whereHas('student', function ($q) use ($request) {
+                $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
+            });
+        }
+
+        if($request->filled('class_filter')){
+            $query->where('class_id', $request->class_filter);
+        }
+
+        if($request->filled('subject_filter')){
+            $query->where('subject_id', $request->subject_filter);
         }
 
 
-        $marks = StudentsMark::with(['student', 'class', 'subjectlist'])->get();
+        $marks = $query->get();
 
-        return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'students', 'sessions','marks'));
+        $totalRecords = $marks->count();
+
+        $totalPercentage = 0;
+        $studentCount = 0;
+
+        foreach ($marks as $mark) {
+            $obtained = 
+                ($mark->term_one_stu_marks ?? 0) +
+                ($mark->term_two_stu_marks ?? 0) +
+                ($mark->mid_term_stu_marks ?? 0) +
+                ($mark->final_exam_stu_marks ?? 0);
+
+            $fullMarks = 
+                ($mark->term_one_out_off ?? 0) +
+                ($mark->term_two_out_off ?? 0) +
+                ($mark->mid_term_out_off ?? 0) +
+                ($mark->final_exam_out_off ?? 0);
+                
+            if ($fullMarks > 0) {
+                $studentPercentage = ($obtained / $fullMarks) * 100;
+                $totalPercentage += $studentPercentage;
+                $studentCount++;
+            }
+        }
+
+        $averagePercentage = $studentCount > 0 
+            ? round($totalPercentage / $studentCount, 2)
+            : 0;
+
+        return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'totalRecords', 'averagePercentage'));
     }
 
     public function getStudentsBySession(Request $request)
@@ -266,5 +301,92 @@ class StudentMarkListController extends Controller
             'message'   => 'Student Mark deleted successfully.',
         ]);
     }
+
+    public function export(Request $request)
+    {
+        $studentName = $request->input('student_name');
+        $classId = $request->input('class_filter');
+        $subjectId = $request->input('subject_filter');
+
+        $query = StudentsMark::with([
+            'student',
+            'class',
+            'subjectlist',
+            'studentAdmission.class',
+            'studentAdmission.academicsession'
+        ]);
+
+        // Join with student name if filter is applied
+        if (!empty($studentName)) {
+            $query->whereHas('student', function ($q) use ($studentName) {
+                $q->where('student_name', 'like', '%' . $studentName . '%');
+            });
+        }
+
+        // Filter by class
+        if (!empty($classId)) {
+            $query->where('class_id', $classId);
+        }
+
+        // Filter by subject
+        if (!empty($subjectId)) {
+            $query->where('subject_id', $subjectId);
+        }
+
+        $marks = $query->latest()->get();
+
+        if ($marks->isEmpty()) {
+            return redirect()->back()->with('error', 'No records found to export.');
+        }
+
+        $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+        $delimiter = ",";
+        $f = fopen('php://memory', 'w');
+
+        // Header row
+        fputcsv($f, [
+            'Student Name',
+            'Student ID',
+            'Class',
+            'Subject',
+            'Academic Session',
+            'Term One Marks',
+            'Term One Out Of',
+            'Term Two Marks',
+            'Term Two Out Of',
+            'Mid Term Marks',
+            'Mid Term Out Of',
+            'Final Exam Marks',
+            'Final Exam Out Of',
+            'Created Date'
+        ], $delimiter);
+
+        foreach ($marks as $mark) {
+            fputcsv($f, [
+                $mark->student->student_name ?? '',
+                $mark->student->student_id ?? '',
+                $mark->class->class_name ?? '',
+                $mark->subjectlist->subject_name ?? '',
+                optional($mark->studentAdmission->academicsession)->session_name ?? '',
+                $mark->term_one_stu_marks,
+                $mark->term_one_out_off,
+                $mark->term_two_stu_marks,
+                $mark->term_two_out_off,
+                $mark->mid_term_stu_marks,
+                $mark->mid_term_out_off,
+                $mark->final_exam_stu_marks,
+                $mark->final_exam_out_off,
+                optional($mark->created_at)->format('d-m-Y h:i A')
+            ], $delimiter);
+        }
+
+        // Output file
+        fseek($f, 0);
+        header('Content-Type: text/csv');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        fpassthru($f);
+        exit;
+    }
+
 
 }
