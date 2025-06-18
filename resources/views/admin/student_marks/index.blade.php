@@ -38,7 +38,7 @@
                 <div class="card-body">
                     <i class="ri-graduation-cap-line" style="font-size: 40px; color: #4e73df;"></i>
                     <h5 class="card-title">Total Records</h5>
-                    <h4>150</h4>
+                    <h4>{{ $totalRecords }}</h4>
                 </div>
             </div>
         </div>
@@ -48,33 +48,40 @@
                 <div class="card-body">
                     <i class="ri-percent-line" style="font-size: 40px; color: #1cc88a;"></i>
                     <h5 class="card-title">Average Percentage</h5>
-                    <h4>85%</h4>
+                    <h4>{{ $averagePercentage }}%</h4>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-md-4 mb-2">
-            <input type="text" id="search-student" class="form-control" placeholder="Search by student name...">
+
+    <form action="{{ route('admin.studentmarklist')}}" method="GET">
+        <div class="row mb-4">
+            <div class="col-md-4 mb-2">
+                <input type="text" id="search-student" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
+            </div>
+            <div class="form-floating form-floating-outline col-md-3">
+                <select id="class_id" name="class_id" class="form-select">
+                    <option value="">All Classes</option>
+                    @foreach($classOptions as $class)
+                        <option value="{{ $class['id'] }}" {{ request('class_id') == $class['id'] ? 'selected' : '' }}>{{ $class['name'] }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-floating form-floating-outline col-md-3 mb-2">
+                <select id="subject_id" name="subject_id" class="form-select">
+                    <option value="">All Subjects</option>
+                    @foreach($subjects as $subject)
+                        <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->sub_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2 text-end"> 
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2">Reset</a>
+            </div>
         </div>
-        <div class="form-floating form-floating-outline col-md-4">
-            <select id="filter-class" class="form-select">
-                <option value="">All Classes</option>
-                @foreach($classOptions as $class)
-                    <option value="{{ $class['id'] }}">{{ $class['name'] }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="form-floating form-floating-outline col-md-4 mb-2">
-            <select id="filter-subject" class="form-select">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
+    </form>
 
     <div class="card shadow-sm">
         <div class="card-body p-0">
@@ -147,7 +154,7 @@
                                         </button> --}}
                                         <button type="button" class="dropdown-item editMarksBtn"
                                             data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" {{-- Ensure this is accessible --}}
+                                            data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" 
                                             data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
                                             data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
                                             data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
@@ -206,7 +213,7 @@
                             </div>
 
                             <div class="form-floating form-floating-outline col-md-6">
-                                <select name="student_id" id="student_id" class="form-select" required>
+                                <select name="student_id" id="student_id" class="form-select" >
                                     <option value="">Select Student</option>
                                 </select>
                                 <label for="student_id" class="form-label">Student</label>
@@ -214,7 +221,7 @@
 
 
                             <div class="form-floating form-floating-outline col-md-2">
-                                <select name="class_id" id="class_id" class="form-select" required>
+                                <select name="class_id" id="class_id" class="form-select" >
                                     <option value="">Select Class</option>
                                 </select>
                                 <label for="class_id" class="form-label">Class</label>
@@ -370,7 +377,7 @@
                                         </div>
 
                                         <div class="form-floating form-floating-outline col-md-6">
-                                            <select name="student_id" id="edit_student_id" class="form-select" required>
+                                            <select name="student_id" id="edit_student_id" class="form-select">>
                                                 <option value="">Select Student</option>
                                                 {{-- Students will be loaded here via AJAX --}}
                                             </select>
@@ -378,7 +385,7 @@
                                         </div>
 
                                         <div class="form-floating form-floating-outline col-md-2">
-                                            <select name="class_id" id="edit_class_id" class="form-select" required>
+                                            <select name="class_id" id="edit_class_id" class="form-select">
                                                 <option value="">Select Class</option>
                                                 {{-- Classes will be loaded here via AJAX --}}
                                             </select>
@@ -561,6 +568,7 @@
                                 $('#subject_id').append('<option value="'+subjectData.id+'" selected>'+subjectData.name+'</option>');
                             });
                         }
+                        console.log(response);
                     },
                     error: function(xhr) {
                         console.error(xhr);
@@ -573,20 +581,6 @@
         });
     });
 
-    $(document).ready(function() {
-        $('#search-student').on('keyup', function() {
-            var query = $(this).val();
-
-            $.ajax({
-                url: "{{ route('admin.studentmarklist') }}", 
-                type: "GET",
-                data: { query: query },
-                success: function(data) {
-                    $('#marks-table').html(data.view);
-                }
-            });
-        });
-    });
 
 </script>
 <script>
