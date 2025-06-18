@@ -15,7 +15,7 @@ class StudentsMark extends Model
         'student_id',
         'class_id',
         'subject_id',
-        'academic_year',
+        'student_admission_id',
         'term_one_out_off',
         'term_one_stu_marks',
         'term_two_out_off',
@@ -36,8 +36,17 @@ class StudentsMark extends Model
         return $this->belongsTo(ClassList::class);
     }
 
-    public function subject()
+    // public function subject()
+    // {
+    //     return $this->belongsTo(ClassWiseSubject::class);
+    // }
+
+    public function subjectlist() {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function studentAdmission()
     {
-        return $this->belongsTo(ClassWiseSubject::class);
+        return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
     }
 }

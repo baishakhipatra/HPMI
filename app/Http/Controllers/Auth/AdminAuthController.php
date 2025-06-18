@@ -27,7 +27,10 @@ class AdminAuthController extends Controller
             'mobile.unique' => 'This mobile number is already registered.',
             'mobile.digits' => 'Mobile number must be 10 digits.',
         ]);
+
+        $user_id = 'A' . time();
         Admin::create([
+            'user_id'  => $user_id, 
             'name'     => ucwords($request->name),
             'user_name' => $request->user_name,
             'user_type' => ucwords($request->user_type),

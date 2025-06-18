@@ -128,6 +128,10 @@ class TeacherListController extends Controller
                       ->where('class_id', $teacherSubject->class_id)
                       ->value('id');
         }   
+        //$selectedSubjectIds = TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')->toArray();
+        $selectedSubjectIds = ClassWiseSubject::whereIn('subject_id',
+            TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')
+        )->pluck('id')->toArray();
         $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
         return view('admin.teacher_management.edit', compact('data', 'selectedClassWiseSubjectIds', 'selectedClassIds', 'classLists'));
     }
@@ -179,7 +183,7 @@ class TeacherListController extends Controller
         ]);
 
         // Update Class Relations
-          if (count($request->subjects_taught) > 0) {
+          if (is_array($request->subjects_taught) && count($request->subjects_taught) > 0) {
             TeacherClass::where('teacher_id', $admin->id)->delete();
             TeacherSubject::where('teacher_id', $admin->id)->delete();
 

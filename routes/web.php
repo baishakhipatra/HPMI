@@ -184,9 +184,12 @@ Route::prefix('admin')->group(function () {
                 Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
             });
 
-            Route::prefix('studentmark-list')->group(function(){
+           Route::prefix('studentmark-list')->group(function(){
                 Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
                 Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
+                Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
+                Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
+                Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
             });
             
         });
@@ -211,7 +214,6 @@ Route::prefix('admin')->group(function () {
         
             Route::prefix('subject-list')->group(function(){
                 Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');               
-                // Route::get('/edit/{id}', [SubjectListController::class, 'edit'])->name('admin.subjectlist.edit');
                 Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
                 Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');
                 Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');

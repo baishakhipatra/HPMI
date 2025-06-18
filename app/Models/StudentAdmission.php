@@ -35,4 +35,6 @@ class StudentAdmission extends Model
         return $this->belongsTo(AcademicSession::class, 'session_id');
     }
 
+    
+
 }
