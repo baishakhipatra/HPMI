@@ -156,7 +156,8 @@
 
 <script>
     $(document).ready(function () {
-        let selectedSubjects = @json(old('subjects_taught', $selectedSubjectIds));
+        let selectedSubjects = @json($selectedClassWiseSubjectIds);
+        // console.log('selectedSubjectIds', selectedSubjects);
 
         function fetchSubjects(classIds) {
             $('#subjectDropdown').html('<option value="">Loading...</option>');
@@ -171,6 +172,8 @@
                 success: function (response) {
                     $('#subjectDropdown').html('');
                     if (response.data.length > 0) {
+                        console.log('Response data', response.data);
+
                         $.each(response.data, function (key, item) {
                             if (item.subject && item.class_list) {
                                 var label = 'Class ' + item.class_list.class + ' - ' + item.subject.sub_name;

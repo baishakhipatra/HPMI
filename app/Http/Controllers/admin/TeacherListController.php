@@ -56,7 +56,6 @@ class TeacherListController extends Controller
             'qualifications'     => 'nullable|string|max:255',
             'address'            => 'nullable|string',
             'subjects_taught'    => 'nullable|array',
-            //'subjects_taught.*'  => 'nullable|exists:subjects,id',
             'subjects_taught.*'  => 'nullable|exists:class_wise_subjects,id',
             'classes_assigned'   => 'nullable|array',
             'classes_assigned.*' => 'nullable|exists:class_lists,id',
@@ -70,7 +69,6 @@ class TeacherListController extends Controller
                 }
             }
         });
-        //dd($request->all());
         // Return with errors if any
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -123,12 +121,19 @@ class TeacherListController extends Controller
         $classLists = ClassList::all();
 
         $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
+        $teacherSubjects = TeacherSubject::where('teacher_id', $data->id)->get();
+        $selectedClassWiseSubjectIds = [];
+        foreach($teacherSubjects as $teacherSubject) {
+            $selectedClassWiseSubjectIds[] = ClassWiseSubject::where('subject_id', $teacherSubject->subject_id)
+                      ->where('class_id', $teacherSubject->class_id)
+                      ->value('id');
+        }   
         //$selectedSubjectIds = TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')->toArray();
         $selectedSubjectIds = ClassWiseSubject::whereIn('subject_id',
             TeacherSubject::where('teacher_id', $data->id)->pluck('subject_id')
         )->pluck('id')->toArray();
         $selectedClassIds = TeacherClass::where('teacher_id', $data->id)->pluck('class_id')->toArray();
-        return view('admin.teacher_management.edit', compact('data', 'selectedSubjectIds', 'selectedClassIds', 'classLists'));
+        return view('admin.teacher_management.edit', compact('data', 'selectedClassWiseSubjectIds', 'selectedClassIds', 'classLists'));
     }
 
     public function update(Request $request)

@@ -16,6 +16,26 @@
     </div>
 @endif
 
+@php
+    $errors = session('errors');
+@endphp
+@if ($errors && $errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $message)
+                <li>{{ $message }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+ @if(session('success'))
+    <div class="alert alert-success" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -134,25 +154,8 @@
                                         {{-- <a class="dropdown-item" href="#" title="Edit" data-bs-toggle="tooltip">
                                             <i class="ri-pencil-line me-1"></i> Edit
                                         </a> --}}
-                                        {{-- <button type="button" class="dropdown-item editMarksBtn"
-                                            data-id="{{ $mark->id }}"
-                                            data-session-id="{{ $mark->studentAdmission->session_id }}"
-                                            data-student-id="{{ $mark->studentAdmission->student_id }}"
-                                            data-class-id="{{ $mark->studentAdmission->class_id }}"
-                                            data-subject-id="{{ $mark->subject_id }}"
-                                            data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                            data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                            data-term-two-out-off="{{ $mark->term_two_out_off }}"
-                                            data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
-                                            data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
-                                            data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
-                                            data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
-                                            data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#editMarksModal">
-                                            Edit
-                                        </button> --}}
-                                        <button type="button" class="dropdown-item editMarksBtn"
+
+                                        <button type="button" class="dropdown-item editMarksBtn" 
                                             data-id="{{ $mark->id }}"
                                             data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}" 
                                             data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
@@ -164,7 +167,7 @@
                                             data-term-one-out-off="{{ $mark->term_one_out_off }}"
                                             data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
                                             {{-- ... and so on for other marks fields --}}
-                                            data-bs-toggle="modal" data-bs-target="#editMarksModal">
+                                            data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
                                             Edit
                                         </button>
 
@@ -509,7 +512,7 @@
     </div>
   
 </div>
-  @if ($errors->any())
+  @if ($errors && $errors->any())
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             var myModal = new bootstrap.Modal(document.getElementById('addMarksModal'));
@@ -583,12 +586,17 @@
 
 
 </script>
+
+{{-- for edit student --}}
 <script>
     $(document).ready(function() {
         // Function to load students for the edit modal
         function loadEditStudents(sessionId, selectedStudentId = null) {
             if (!sessionId) {
                 $('#edit_student_id').empty().append('<option value="">Select Student</option>');
+                // Also clear classes and subjects if session is cleared
+                $('#edit_class_id').empty().append('<option value="">Select Class</option>');
+                $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
                 return;
             }
 
@@ -607,7 +615,7 @@
                         if (selectedStudentId) {
                             $('#edit_student_id').val(selectedStudentId);
                         }
-                        $('#edit_student_id').trigger('change'); // Trigger change to load classes/subjects
+                        // No need to trigger change here, the loadEditClassesAndSubjects will be called directly in editMarksBtn handler
                     }
                 },
                 error: function(xhr) {
@@ -674,13 +682,15 @@
             // Set mark id in hidden input
             $('#edit_mark_id').val(markId);
 
-            // Set Session and trigger change to load students
+            // Set Session
             $('#edit_session_id').val(sessionId);
-            loadEditStudents(sessionId, studentId); // Pass the selected student ID
 
-            // Load classes and subjects using the initially retrieved session and student IDs
-            // The loadEditStudents will trigger a change event on #edit_student_id which will
-            // then call loadEditClassesAndSubjects. So, we don't need to call it directly here.
+            // Load students and pre-select the student
+            loadEditStudents(sessionId, studentId);
+
+            // Load classes and subjects and pre-select them
+            // This is crucial: call loadEditClassesAndSubjects directly here with all initial IDs
+            loadEditClassesAndSubjects(sessionId, studentId, classId, subjectId);
 
             // Set marks values (these don't require AJAX for their values)
             $('#edit_term_one_out_off').val(btn.data('term-one-out-off'));
@@ -699,10 +709,13 @@
         // --- Change event listener for Session in EDIT modal ---
         $('#edit_session_id').on('change', function() {
             let sessionId = $(this).val();
-            loadEditStudents(sessionId); // No initial student selected here, as it's a manual change
-            // Also clear class and subject if session changes, they'll be reloaded by student change
+            // Clear previously selected student, class, and subject when session changes
+            $('#edit_student_id').empty().append('<option value="">Select Student</option>');
             $('#edit_class_id').empty().append('<option value="">Select Class</option>');
             $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
+
+            loadEditStudents(sessionId); // No initial student selected here, as it's a manual change
+            // No need to call loadEditClassesAndSubjects here directly, it will be handled by student change
         });
 
         // --- Change event listener for Student in EDIT modal ---
