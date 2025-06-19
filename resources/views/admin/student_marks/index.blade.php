@@ -801,7 +801,7 @@
 
 {{-- for delete student mark --}}
 <script>
-  function deleteMark(userId) {
+    function deleteMark(userId) {
         Swal.fire({
             icon: 'warning',
             title: "Are you sure you want to delete this?",

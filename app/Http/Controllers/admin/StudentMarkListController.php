@@ -269,15 +269,59 @@ class StudentMarkListController extends Controller
                 'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off|max:100',
             ]);
 
+            $errors = [];
+
+            if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
+                $errors['term_one_stu_marks'] = 'Term 1 marks required.';
+            }
+            if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
+                $errors['term_two_stu_marks'] = 'Term 2 marks required.';
+            }
+            if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
+                $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
+            }
+            if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
+                $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
+            }
+
+            if(
+                empty($request->term_one_out_off) &&
+                empty($request->term_two_out_off) &&
+                empty($request->mid_term_out_off) &&
+                empty($request->final_exam_out_off)
+            ) {
+                $errors['at_least_one_term'] = 'Select at least one term.'; 
+            }
+
+            if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
+                $errors['term_one_stu_marks'] = 'Term 1 marks cannot be greater than term 1 out off.';
+            }
+
+            if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
+                $errors['term_one_stu_marks'] = 'Term 2 marks cannot be greater than term 2 out off.';
+            }
+
+            if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
+                $errors['mid_term_stu_marks'] = 'Mid term marks cannot be greater than mid term out off.';
+            }
+
+            if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
+                $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
+            }
+
+            if ($errors) {
+                return back()->withErrors($errors)->withInput();
+            }
+
             // Find the mark record
             $mark = StudentsMark::findOrFail($validated['id']);
 
             // Find or create student admission
             $admission = StudentAdmission::firstOrCreate(
                 [
-                    'student_id' => $validated['student_id'],
-                    'class_id' => $validated['class_id'],
-                    'session_id' => $validated['session_id'],
+                    'student_id'    => $validated['student_id'],
+                    'class_id'      => $validated['class_id'],
+                    'session_id'    => $validated['session_id'],
                 ],
                 [
                     'admission_date' => now(),
