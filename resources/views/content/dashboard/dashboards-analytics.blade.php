@@ -18,7 +18,7 @@
 @endsection
 
 @section('content')
-  <div class="row gy-6">
+  {{-- <div class="row gy-6">
     <!-- Congratulations card -->
     <div class="col-md-12 col-lg-4">
       <div class="card">
@@ -783,5 +783,5 @@
       </div>
     </div>
     <!--/ Data Tables -->
-  </div>
+  </div> --}}
 @endsection
