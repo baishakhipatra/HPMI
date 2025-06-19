@@ -32,6 +32,14 @@
 
                     {{-- Row 1: Name, Teacher ID, Type --}}
                     <div class="row mb-3">
+                          <div class="col-md-4">
+                        <div class="form-floating form-floating-outline">
+                        <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
+                        <label>Teacher ID</label>
+                        @error('user_id') <p class="text-danger small">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name', $data->name) }}">
@@ -39,13 +47,7 @@
                         @error('name') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-floating-outline">
-                        <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
-                        <label>Teacher ID</label>
-                        @error('user_id') <p class="text-danger small">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
+                  
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="user_type" value="{{ old('user_type', $data->user_type) }}" class="form-control" readonly>

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class StudentAdmission extends Model
 {
-    protected $table = 'Student_admissions';
+    protected $table = 'student_admissions';
 
     protected $fillable = [
          'student_id', 'session_id', 'class_id', 'section', 'roll_number', 'admission_date'
