@@ -9,32 +9,78 @@
 @section('title', 'Marks - List')
 
 @section('content')
+<style>
+    .session-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
 
-@if($errors->has('term_required'))
-    <div class="alert alert-danger">
-        {{ $errors->first('term_required') }}
-    </div>
-@endif
+    .session-header {
+        font-size: 18px;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #a312cf;
+        padding-bottom: 5px;
+    }
 
-@php
-    $errors = session('errors');
-@endphp
-@if ($errors && $errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $message)
-                <li>{{ $message }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+    table.marks-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
 
- @if(session('success'))
-    <div class="alert alert-success" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-@endif
+    .marks-table th,
+    .marks-table td {
+        border: 1px solid #ccc;
+        text-align: center;
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .marks-table th {
+        background-color: #d3c4f3;
+        font-weight: 600;
+    }
+
+    .grade {
+        font-weight: bold;
+        color: #193687;
+    }
+
+    .actions-cell {
+        white-space: nowrap;
+    }
+</style>
+    @if($errors->has('term_required'))
+        <div class="alert alert-danger">
+            {{ $errors->first('term_required') }}
+        </div>
+    @endif
+
+    @php
+        $errors = session('errors');
+    @endphp
+    @if ($errors && $errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $message)
+                    <li>{{ $message }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if(session('success'))
+        <div class="alert alert-success" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -119,419 +165,387 @@
     </form>
 
     <div class="card shadow-sm">
-        <div class="card-body p-0">
-            <table class="table table-hover mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Student</th>
-                        <th>Class</th>
-                        <th>Subject</th>
-                        <th>Term 1</th>
-                        <th>Midterm</th>
-                        <th>Term 2</th>
-                        <th>Final</th>
-                        <th>Total</th>
-                        <th>Grade</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($marks as $mark)
-                        <tr>
-                            <td class="mark-student-name">{{ ucwords($mark->student->student_name ?? '-') }}</td>
-                            <td class="mark-class-name">{{ $mark->class->class ?? '-' }}</td>
-                            <td class="mark-subject-name">{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
-                            <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
-                            <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
-                            <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
-                            <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
-                            <td>
-                                <strong>
-                                    {{
-                                        ($mark->term_one_stu_marks ?? 0) +
-                                        ($mark->term_two_stu_marks ?? 0) +
-                                        ($mark->mid_term_stu_marks ?? 0) +
-                                        ($mark->final_exam_stu_marks ?? 0)
-                                    }}
-                                </strong>
-                            </td>
-                            <td>
-                                {{-- <span class="badge {{ calculateGrade(($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0)) == 'F' ? 'bg-danger' : 'bg-success' }}">
-                                    {{ calculateGrade(($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0)) }}
-                                </span> --}}
-                            </td>
-                            <td>
-                                <div class="dropdown">
-                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                        <i class="ri-more-2-line"></i>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        {{-- <a class="dropdown-item" href="#" title="Edit" data-bs-toggle="tooltip">
-                                            <i class="ri-pencil-line me-1"></i> Edit
-                                        </a> --}}
-                                        <button type="button" class="dropdown-item editMarksBtn" 
-                                                data-id="{{ $mark->id }}"
-                                                data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
-                                                data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
-                                                data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
-                                                data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
-                                                data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
-                                                data-subject-id="{{ $mark->subject_id ?? '' }}"
-                                                data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
-                                                
-                                                data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                                data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                                
-                                                data-term-two-out-off="{{ $mark->term_two_out_off }}"
-                                                data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
-                                                
-                                                data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
-                                                data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
-                                                
-                                                data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
-                                                data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
-                                                
-                                                data-bs-toggle="modal" data-bs-target="#editMarksModal"><i class="ri-pencil-line me-1"></i>
-                                            Edit
-                                        </button>
+        <div class="card-body">
+                @php
+                    $groupedMarks = $marks->groupBy(function($item) {
+                        return $item->studentAdmission->student->student_name . '_' . $item->studentAdmission->session->session . '_' . $item->studentAdmission->class->class;
+                    });
+                @endphp
 
-                                        <a class="dropdown-item" href="javascript:void(0);" title="Delete" data-bs-toggle="tooltip" onclick="deleteMark({{ $mark->id }})">
-                                            <i class="ri-delete-bin-6-line me-1"></i> Delete
-                                        </a>
-                                    </div>
-                                </div>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach
+                @forelse($groupedMarks as $groupKey => $studentMarks)
+                    @php
+                        $student = $studentMarks->first()->studentAdmission->student->student_name ?? '-';
+                        $session = $studentMarks->first()->studentAdmission->session->session_name ?? '-';
+                        $class = $studentMarks->first()->studentAdmission->class->class ?? '-';
+                    @endphp
 
-                    @if($marks->isEmpty())
-                        <tr>
-                            <td colspan="10" class="text-center text-muted">No records found</td>
-                        </tr>
-                    @endif
-                </tbody>
+                    <div class="session-card mb-4">
+                        <div class="session-header">
+                            Session: {{ $session }} | Class: {{ $class }} | Student: {{ ucwords($student) }}
+                        </div>
+
+                        <table class="table table-bordered marks-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Term 1</th>
+                                    <th>Midterm</th>
+                                    <th>Term 2</th>
+                                    <th>Final</th>
+                                    <th>Total</th>
+                                    <th>Grade</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($studentMarks as $mark)
+                                {{-- @php
+                                    $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
+                                    $grade = calculateGrade($total); 
+                                @endphp --}}
+                                <tr>
+                                    <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
+                                    <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
+                                    <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
+                                    <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
+                                    <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
+                                    <td><strong></strong></td>
+                                    <td><span class="grade"></span></td>
+                                    <td class="actions-cell">
+                                        <div class="dropdown">
+                                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <i class="ri-more-2-line"></i>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <button type="button" class="dropdown-item editMarksBtn"
+                                                    data-id="{{ $mark->id }}"
+                                                    data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
+                                                    data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
+                                                    data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
+                                                    data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
+                                                    data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
+                                                    data-subject-id="{{ $mark->subject_id ?? '' }}"
+                                                    data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+
+                                                    data-term-one-out-off="{{ $mark->term_one_out_off }}"
+                                                    data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
+
+                                                    data-term-two-out-off="{{ $mark->term_two_out_off }}"
+                                                    data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
+
+                                                    data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
+                                                    data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
+
+                                                    data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
+                                                    data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
+
+                                                    data-bs-toggle="modal" data-bs-target="#editMarksModal">
+                                                    <i class="ri-pencil-line me-1"></i> Edit
+                                                </button>
+
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="deleteMark({{ $mark->id }})">
+                                                    <i class="ri-delete-bin-6-line me-1"></i> Delete
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                        </table>
+                    </div>
+
+                @empty
+                    <p class="text-muted">No records found.</p>
+                @endforelse
+            </tbody>
+
+            
+            {{-- for add marks --}}
+            <div class="modal fade" id="addMarksModal" tabindex="-1" aria-labelledby="addMarksModalLabel"           aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+
+                    <div class="modal-content">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form action="{{route('admin.student-marks.store')}}" method="POST">
+                        @csrf
+                        <div class="modal-body">
+                        <div class="row g-3">
+
+                        <div class="form-floating form-floating-outline col-md-2">
+                            <select name="session_id" id="session_id" class="form-select">
+                                <option value="">Select Session</option>
+                                @foreach($sessions as $item)
+                                    <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                @endforeach
+                            </select>
+                            <label for="session_id" class="form-label">Session</label>
+                        </div>
+
+                        <div class="form-floating form-floating-outline col-md-6">
+                            <select name="student_id" id="student_id" class="form-select">
+                                <option value="">Select Student</option>
+                            </select>
+                            <label for="student_id" class="form-label">Student</label>
+                        </div>
+
+
+                        <div class="form-floating form-floating-outline col-md-2">
+                            <select name="class_id" id="class_id" class="form-select">
+                                <option value="">Select Class</option>
+                            </select>
+                            <label for="class_id" class="form-label">Class</label>
+                        </div>
+
+                        
+                        <div class="form-floating form-floating-outline col-md-2">
+                            <select name="subject_id" id="subject_id" class="form-select" >
+                                <option value="">Select Subject</option>
+                                @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                                @endforeach
+                            </select>
+                            <label for="subject_id" class="form-label">Subject</label>
+                        </div>
+
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <select name="term_one_out_off" id="term_one_out_off" class="form-select">
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                            <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
+                        </div>
+
+                        
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <input type="number" name="term_one_stu_marks" id="term_one_stu_marks" class="form-control" placeholder="Enter marks" >
+                            <label for="term_one_stu_marks">Term 1 Student Marks</label>
+                        </div>
+
+                    
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <select name="term_two_out_off" id="term_two_out_off" class="form-select">
+                                <option value="">Select</option>
+                                 @foreach (range(50, 100, 5) as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                            <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
+                        </div>
 
                 
-                {{-- for add marks --}}
-                <div class="modal fade" id="addMarksModal" tabindex="-1" aria-labelledby="addMarksModalLabel"           aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <input type="number" name="term_two_stu_marks" id="term_two_stu_marks" class="form-control" placeholder="Enter marks">
+                            <label for="term_two_stu_marks">Term 2 Student Marks</label>
+                        </div>
 
-                        <div class="modal-content">
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" >
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                            <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
+                        </div>
 
+                    
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks" class="form-control" placeholder="Enter marks" >
+                            <label for="mid_term_stu_marks">Mid Term Student Marks</label>
+                        </div>
+
+                        
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
+                                <option value="">Select</option>
+                                 @foreach (range(50, 100, 5) as $value)
+                                    <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                            </select>
+                            <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
+                        </div>
+
+                    
+                        <div class="form-floating form-floating-outline col-md-3">
+                            <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks" class="form-control" placeholder="Enter marks" >
+                            <label for="final_exam_stu_marks">Final Exam Student Marks</label>
+                        </div>
+
+                        </div>
+                        </div>
+
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Marks</button>
+                        </div>
+
+                    </form>
+                    </div>
+                </div>
+            </div>
+
+            {{-- for update marks --}}
+            <div class="modal fade" id="editMarksModal" tabindex="-1" aria-labelledby="editMarksModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
+                            <h5 class="modal-title" id="editMarksModalLabel">Edit Marks</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
 
-                        <form action="{{route('admin.student-marks.store')}}" method="POST">
+                        <form action="{{ route('admin.student-marks.update') }}" method="POST">
                             @csrf
+                            {{-- @method('PUT') This is crucial for Laravel's update method --}}
+
+                            <input type="hidden" id="edit_mark_id" name="id"> {{-- This input will hold the mark ID --}}
+
                             <div class="modal-body">
-                            <div class="row g-3">
+                                <div class="row g-3">
+                                    <div class="form-floating form-floating-outline col-md-2">
+                                        <select name="session_id" id="edit_session_id" class="form-select">
+                                            <option value="">Select Session</option>
+                                            @foreach($sessions as $item)
+                                                <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="edit_session_id" class="form-label">Session</label>
+                                    </div>
 
-                            <div class="form-floating form-floating-outline col-md-2">
-                                <select name="session_id" id="session_id" class="form-select">
-                                    <option value="">Select Session</option>
-                                    @foreach($sessions as $item)
-                                        <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="session_id" class="form-label">Session</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-6">
+                                        <select name="student_id" id="edit_student_id" class="form-select">
+                                            <option value="">Select Student</option>
+                                            {{-- Students will be loaded here via AJAX --}}
+                                        </select>
+                                        <label for="edit_student_id" class="form-label">Student</label>
+                                    </div>
 
-                            <div class="form-floating form-floating-outline col-md-6">
-                                <select name="student_id" id="student_id" class="form-select">
-                                    <option value="">Select Student</option>
-                                </select>
-                                <label for="student_id" class="form-label">Student</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-2">
+                                        <select name="class_id" id="edit_class_id" class="form-select">
+                                            <option value="">Select Class</option>
+                                            {{-- Classes will be loaded here via AJAX --}}
+                                        </select>
+                                        <label for="edit_class_id" class="form-label">Class</label>
+                                    </div>
 
+                                    <div class="form-floating form-floating-outline col-md-2">
+                                        <select name="subject_id" id="edit_subject_id" class="form-select">
+                                            <option value="">Select Subject</option>
+                                            {{-- Subjects will be loaded here via AJAX --}}
+                                        </select>
+                                        <label for="edit_subject_id" class="form-label">Subject</label>
+                                    </div>
 
-                            <div class="form-floating form-floating-outline col-md-2">
-                                <select name="class_id" id="class_id" class="form-select">
-                                    <option value="">Select Class</option>
-                                </select>
-                                <label for="class_id" class="form-label">Class</label>
-                            </div>
+                                    {{-- ... rest of your form fields for marks ... --}}
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <select name="term_one_out_off" id="edit_term_one_out_off" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="50">50</option>
+                                            <option value="55">55</option>
+                                            <option value="60">60</option>
+                                            <option value="65">65</option>
+                                            <option value="70">70</option>
+                                            <option value="75">75</option>
+                                            <option value="80">80</option>
+                                            <option value="85">85</option>
+                                            <option value="90">90</option>
+                                            <option value="95">95</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <label for="edit_term_one_out_off" class="form-label">Term 1 Out Of</label>
+                                    </div>
 
-                            
-                            <div class="form-floating form-floating-outline col-md-2">
-                                <select name="subject_id" id="subject_id" class="form-select" >
-                                    <option value="">Select Subject</option>
-                                    @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="subject_id" class="form-label">Subject</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <input type="number" name="term_one_stu_marks" id="edit_term_one_stu_marks" class="form-control" placeholder="Enter marks">
+                                        <label for="edit_term_one_stu_marks">Term 1 Student Marks</label>
+                                    </div>
 
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <select name="term_one_out_off" id="term_one_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="50">50</option>
-                                    <option value="55">55</option>
-                                    <option value="60">60</option>
-                                    <option value="65">65</option>
-                                    <option value="70">70</option>
-                                    <option value="75">75</option>
-                                    <option value="80">80</option>
-                                    <option value="85">85</option>
-                                    <option value="90">90</option>
-                                    <option value="95">95</option>
-                                    <option value="100">100</option>
-                                </select>
-                                <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <select name="term_two_out_off" id="edit_term_two_out_off" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="50">50</option>
+                                            <option value="55">55</option>
+                                            <option value="60">60</option>
+                                            <option value="65">65</option>
+                                            <option value="70">70</option>
+                                            <option value="75">75</option>
+                                            <option value="80">80</option>
+                                            <option value="85">85</option>
+                                            <option value="90">90</option>
+                                            <option value="95">95</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <label for="edit_term_two_out_off" class="form-label">Term 2 Out Of</label>
+                                    </div>
 
-                            
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="term_one_stu_marks" id="term_one_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="term_one_stu_marks">Term 1 Student Marks</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <input type="number" name="term_two_stu_marks" id="edit_term_two_stu_marks" class="form-control" placeholder="Enter marks">
+                                        <label for="edit_term_two_stu_marks">Term 2 Student Marks</label>
+                                    </div>
 
-                        
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <select name="term_two_out_off" id="term_two_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="50">50</option>
-                                    <option value="55">55</option>
-                                    <option value="60">60</option>
-                                    <option value="65">65</option>
-                                    <option value="70">70</option>
-                                    <option value="75">75</option>
-                                    <option value="80">80</option>
-                                    <option value="85">85</option>
-                                    <option value="90">90</option>
-                                    <option value="95">95</option>
-                                    <option value="100">100</option>
-                                </select>
-                                <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="50">50</option>
+                                            <option value="55">55</option>
+                                            <option value="60">60</option>
+                                            <option value="65">65</option>
+                                            <option value="70">70</option>
+                                            <option value="75">75</option>
+                                            <option value="80">80</option>
+                                            <option value="85">85</option>
+                                            <option value="90">90</option>
+                                            <option value="95">95</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <label for="edit_mid_term_out_off" class="form-label">Mid Term Out Of</label>
+                                    </div>
 
-                    
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="term_two_stu_marks" id="term_two_stu_marks" class="form-control" placeholder="Enter marks">
-                                <label for="term_two_stu_marks">Term 2 Student Marks</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <input type="number" name="mid_term_stu_marks" id="edit_mid_term_stu_marks" class="form-control" placeholder="Enter marks">
+                                        <label for="edit_mid_term_stu_marks">Mid Term Student Marks</label>
+                                    </div>
 
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" >
-                                    <option value="">Select</option>
-                                    <option value="50">50</option>
-                                    <option value="55">55</option>
-                                    <option value="60">60</option>
-                                    <option value="65">65</option>
-                                    <option value="70">70</option>
-                                    <option value="75">75</option>
-                                    <option value="80">80</option>
-                                    <option value="85">85</option>
-                                    <option value="90">90</option>
-                                    <option value="95">95</option>
-                                    <option value="100">100</option>
-                                </select>
-                                <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <select name="final_exam_out_off" id="edit_final_exam_out_off" class="form-select">
+                                            <option value="">Select</option>
+                                            <option value="50">50</option>
+                                            <option value="55">55</option>
+                                            <option value="60">60</option>
+                                            <option value="65">65</option>
+                                            <option value="70">70</option>
+                                            <option value="75">75</option>
+                                            <option value="80">80</option>
+                                            <option value="85">85</option>
+                                            <option value="90">90</option>
+                                            <option value="95">95</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                        <label for="edit_final_exam_out_off" class="form-label">Final Exam Out Of</label>
+                                    </div>
 
-                        
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="mid_term_stu_marks">Mid Term Student Marks</label>
-                            </div>
+                                    <div class="form-floating form-floating-outline col-md-3">
+                                        <input type="number" name="final_exam_stu_marks" id="edit_final_exam_stu_marks" class="form-control" placeholder="Enter marks">
+                                        <label for="edit_final_exam_stu_marks">Final Exam Student Marks</label>
+                                    </div>
 
-                            
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    <option value="50">50</option>
-                                    <option value="55">55</option>
-                                    <option value="60">60</option>
-                                    <option value="65">65</option>
-                                    <option value="70">70</option>
-                                    <option value="75">75</option>
-                                    <option value="80">80</option>
-                                    <option value="85">85</option>
-                                    <option value="90">90</option>
-                                    <option value="95">95</option>
-                                    <option value="100">100</option>
-                                </select>
-                                <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
-                            </div>
-
-                        
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="final_exam_stu_marks">Final Exam Student Marks</label>
-                            </div>
-
-                            </div>
+                                </div>
                             </div>
 
                             <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Marks</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Update Marks</button>
                             </div>
-
                         </form>
-                        </div>
                     </div>
                 </div>
-
-                {{-- for update marks --}}
-                <div class="modal fade" id="editMarksModal" tabindex="-1" aria-labelledby="editMarksModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editMarksModalLabel">Edit Marks</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-
-                            <form action="{{ route('admin.student-marks.update') }}" method="POST">
-                                @csrf
-                                {{-- @method('PUT') This is crucial for Laravel's update method --}}
-
-                                <input type="hidden" id="edit_mark_id" name="id"> {{-- This input will hold the mark ID --}}
-
-                                <div class="modal-body">
-                                    <div class="row g-3">
-                                        <div class="form-floating form-floating-outline col-md-2">
-                                            <select name="session_id" id="edit_session_id" class="form-select">
-                                                <option value="">Select Session</option>
-                                                @foreach($sessions as $item)
-                                                    <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
-                                                @endforeach
-                                            </select>
-                                            <label for="edit_session_id" class="form-label">Session</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-6">
-                                            <select name="student_id" id="edit_student_id" class="form-select">
-                                                <option value="">Select Student</option>
-                                                {{-- Students will be loaded here via AJAX --}}
-                                            </select>
-                                            <label for="edit_student_id" class="form-label">Student</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-2">
-                                            <select name="class_id" id="edit_class_id" class="form-select">
-                                                <option value="">Select Class</option>
-                                                {{-- Classes will be loaded here via AJAX --}}
-                                            </select>
-                                            <label for="edit_class_id" class="form-label">Class</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-2">
-                                            <select name="subject_id" id="edit_subject_id" class="form-select">
-                                                <option value="">Select Subject</option>
-                                                {{-- Subjects will be loaded here via AJAX --}}
-                                            </select>
-                                            <label for="edit_subject_id" class="form-label">Subject</label>
-                                        </div>
-
-                                        {{-- ... rest of your form fields for marks ... --}}
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <select name="term_one_out_off" id="edit_term_one_out_off" class="form-select">
-                                                <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                            <label for="edit_term_one_out_off" class="form-label">Term 1 Out Of</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <input type="number" name="term_one_stu_marks" id="edit_term_one_stu_marks" class="form-control" placeholder="Enter marks">
-                                            <label for="edit_term_one_stu_marks">Term 1 Student Marks</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <select name="term_two_out_off" id="edit_term_two_out_off" class="form-select">
-                                                <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                            <label for="edit_term_two_out_off" class="form-label">Term 2 Out Of</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <input type="number" name="term_two_stu_marks" id="edit_term_two_stu_marks" class="form-control" placeholder="Enter marks">
-                                            <label for="edit_term_two_stu_marks">Term 2 Student Marks</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select">
-                                                <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                            <label for="edit_mid_term_out_off" class="form-label">Mid Term Out Of</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <input type="number" name="mid_term_stu_marks" id="edit_mid_term_stu_marks" class="form-control" placeholder="Enter marks">
-                                            <label for="edit_mid_term_stu_marks">Mid Term Student Marks</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <select name="final_exam_out_off" id="edit_final_exam_out_off" class="form-select">
-                                                <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                            <label for="edit_final_exam_out_off" class="form-label">Final Exam Out Of</label>
-                                        </div>
-
-                                        <div class="form-floating form-floating-outline col-md-3">
-                                            <input type="number" name="final_exam_stu_marks" id="edit_final_exam_stu_marks" class="form-control" placeholder="Enter marks">
-                                            <label for="edit_final_exam_stu_marks">Final Exam Student Marks</label>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Update Marks</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </table>
+            </div>
         </div>
     </div>
   

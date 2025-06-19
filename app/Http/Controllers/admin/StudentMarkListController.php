@@ -231,6 +231,14 @@ class StudentMarkListController extends Controller
 
         $validated['student_admission_id'] = $admission->id;
 
+        $existing = StudentsMark::where('student_admission_id', $validated['student_admission_id'])
+                        ->where('subject_id', $validated['subject_id'])
+                        ->first();
+
+        if ($existing) {
+            return back()->withErrors(['error' => 'Marks already entered for this subject in this session, You can only edit the existing entry.']);
+        }
+
         StudentsMark::create($validated);
         // dd($validated);
         return back()->with('success', 'Marks Added Successfully');

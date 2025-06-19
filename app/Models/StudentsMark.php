@@ -47,6 +47,6 @@ class StudentsMark extends Model
 
     public function studentAdmission()
     {
-        return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
+        return $this->belongsTo(StudentAdmission::class, 'student_admission_id')->with('session', 'class', 'student');
     }
 }
