@@ -425,6 +425,18 @@ class StudentMarkListController extends Controller
             );
             //dd($validated['session_id']);
 
+            // Duplicate check: Same student_admission_id, subject_id, excluding the current record
+            $duplicate = StudentsMark::where('student_admission_id', $admission->id)
+                ->where('subject_id', $validated['subject_id'])
+                ->where('id', '!=', $validated['id']) // exclude current mark being edited
+                ->first();
+
+            if ($duplicate) {
+                return back()->withErrors([
+                    'duplicate_error' => 'Marks for this student, subject, and session already exist. Please edit the existing entry.'
+                ])->withInput();
+            }
+
             // Update marks
             // Update marks, including student_id, class_id, session_id
             

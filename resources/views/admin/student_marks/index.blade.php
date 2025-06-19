@@ -453,17 +453,9 @@
                                         <div class="form-floating form-floating-outline col-md-3">
                                             <select name="term_one_out_off" id="edit_term_one_out_off" class="form-select">
                                                 <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
+                                                @foreach (range(50, 100, 5) as $value)
+                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                @endforeach
                                             </select>
                                             <label for="edit_term_one_out_off" class="form-label">Term 1 Out Of</label>
                                         </div>
@@ -476,17 +468,9 @@
                                         <div class="form-floating form-floating-outline col-md-3">
                                             <select name="term_two_out_off" id="edit_term_two_out_off" class="form-select">
                                                 <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
+                                                @foreach (range(50, 100, 5) as $value)
+                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                @endforeach
                                             </select>
                                             <label for="edit_term_two_out_off" class="form-label">Term 2 Out Of</label>
                                         </div>
@@ -497,19 +481,11 @@
                                         </div>
 
                                         <div class="form-floating form-floating-outline col-md-3">
-                                            <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select">
+                                            <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select" >
                                                 <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
+                                                @foreach (range(50, 100, 5) as $value)
+                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                @endforeach
                                             </select>
                                             <label for="edit_mid_term_out_off" class="form-label">Mid Term Out Of</label>
                                         </div>
@@ -522,17 +498,9 @@
                                         <div class="form-floating form-floating-outline col-md-3">
                                             <select name="final_exam_out_off" id="edit_final_exam_out_off" class="form-select">
                                                 <option value="">Select</option>
-                                                <option value="50">50</option>
-                                                <option value="55">55</option>
-                                                <option value="60">60</option>
-                                                <option value="65">65</option>
-                                                <option value="70">70</option>
-                                                <option value="75">75</option>
-                                                <option value="80">80</option>
-                                                <option value="85">85</option>
-                                                <option value="90">90</option>
-                                                <option value="95">95</option>
-                                                <option value="100">100</option>
+                                                @foreach (range(50, 100, 5) as $value)
+                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                @endforeach
                                             </select>
                                             <label for="edit_final_exam_out_off" class="form-label">Final Exam Out Of</label>
                                         </div>
