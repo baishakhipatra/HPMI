@@ -166,99 +166,105 @@
 
         <div class="card shadow-sm">
             <div class="card-body">
-                    @php
-                        $groupedMarks = $marks->groupBy(function($item) {
-                            return $item->studentAdmission->student->student_name . '_' . $item->studentAdmission->session->session . '_' . $item->studentAdmission->class->class;
-                        });
-                    @endphp
+                @php
+                    // Group strictly by student_id + session_id + class_id (not by names)
+                    $groupedMarks = $marks->groupBy(function($item) {
+                        return $item->studentAdmission->student_id . '_' .
+                            $item->studentAdmission->session_id . '_' .
+                            $item->studentAdmission->class_id;
+                    });
+                @endphp
 
+                <div class="session-card mb-4">
                     @forelse($groupedMarks as $groupKey => $studentMarks)
                         @php
-                            $student = $studentMarks->first()->studentAdmission->student->student_name ?? '-';
-                            $session = $studentMarks->first()->studentAdmission->session->session_name ?? '-';
-                            $class = $studentMarks->first()->studentAdmission->class->class ?? '-';
+                            $first = $studentMarks->first();
+                            $student = $first->studentAdmission->student->student_name ?? '-';
+                            $session = $first->studentAdmission->session->session_name ?? '-';
+                            $class = $first->studentAdmission->class->class ?? '-';
                         @endphp
 
-                        <div class="session-card mb-4">
-                            <div class="session-header">
+                        <div class="student-section mb-3">
+                            <div class="session-header fw-bold">
                                 Session: {{ $session }} | Class: {{ $class }} | Student: {{ ucwords($student) }}
                             </div>
 
-                            <table class="table table-bordered marks-table">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Subject</th>
-                                        <th>Term 1</th>
-                                        <th>Midterm</th>
-                                        <th>Term 2</th>
-                                        <th>Final</th>
-                                        <th>Total</th>
-                                        <th>Grade</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($studentMarks as $mark)
-                                    {{-- @php
-                                        $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
-                                        $grade = calculateGrade($total); 
-                                    @endphp --}}
-                                    <tr>
-                                        <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
-                                        <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
-                                        <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
-                                        <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
-                                        <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
-                                        <td><strong></strong></td>
-                                        <td><span class="grade"></span></td>
-                                        <td class="actions-cell">
-                                            <div class="dropdown">
-                                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                    <i class="ri-more-2-line"></i>
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    <button type="button" class="dropdown-item editMarksBtn"
-                                                        data-id="{{ $mark->id }}"
-                                                        data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
-                                                        data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
-                                                        data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
-                                                        data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
-                                                        data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
-                                                        data-subject-id="{{ $mark->subject_id ?? '' }}"
-                                                        data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+                            <div class="table-responsive">
+                                <table class="table table-bordered marks-table mt-2">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Term 1</th>
+                                            <th>Midterm</th>
+                                            <th>Term 2</th>
+                                            <th>Final</th>
+                                            <th>Total</th>
+                                            <th>Grade</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($studentMarks as $mark)
+                                        @php
+                                            $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
+                                            $grade = calculateGrade($total);
+                                        @endphp
+                                            <tr>
+                                                <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
+                                                <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
+                                                <td><strong>{{ $total }}</strong></td>
+                                                <td><span class="grade">{{ $grade }}</span></td>
+                                                <td class="actions-cell">
+                                                    <div class="dropdown">
+                                                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                            <i class="ri-more-2-line"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu">
+                                                            <button type="button" class="dropdown-item editMarksBtn"
+                                                                data-id="{{ $mark->id }}"
+                                                                data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
+                                                                data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
+                                                                data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
+                                                                data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
+                                                                data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
+                                                                data-subject-id="{{ $mark->subject_id ?? '' }}"
+                                                                data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
+                                                                data-term-one-out-off="{{ $mark->term_one_out_off }}"
+                                                                data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
+                                                                data-term-two-out-off="{{ $mark->term_two_out_off }}"
+                                                                data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
+                                                                data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
+                                                                data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
+                                                                data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
+                                                                data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
+                                                                data-bs-toggle="modal" data-bs-target="#editMarksModal">
+                                                                <i class="ri-pencil-line me-1"></i> Edit
+                                                            </button>
 
-                                                        data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                                        data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-
-                                                        data-term-two-out-off="{{ $mark->term_two_out_off }}"
-                                                        data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
-
-                                                        data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
-                                                        data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
-
-                                                        data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
-                                                        data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
-
-                                                        data-bs-toggle="modal" data-bs-target="#editMarksModal">
-                                                        <i class="ri-pencil-line me-1"></i> Edit
-                                                    </button>
-
-                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="deleteMark({{ $mark->id }})">
-                                                        <i class="ri-delete-bin-6-line me-1"></i> Delete
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                                                            <a class="dropdown-item" href="javascript:void(0);" onclick="deleteMark({{ $mark->id }})">
+                                                                <i class="ri-delete-bin-6-line me-1"></i> Delete
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-
                     @empty
                         <p class="text-muted">No records found.</p>
+                       
                     @endforelse
-                
+                    <div class="d-flex justify-content-end">
+                            {{ $marks->links() }}
+                    </div>
+                </div>
+
 
                 
                 {{-- for add marks --}}
@@ -558,7 +564,7 @@
             });
         </script>
     @endif
-
+    
 @endsection
     <script>
         $(document).ready(function() {

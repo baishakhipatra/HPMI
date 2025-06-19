@@ -62,3 +62,13 @@ if (!function_exists('generateTeacherId')) {
         return 'TEACH' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }
+
+function calculateGrade($total)
+{
+    if($total >= 90) return 'A+';
+    if($total >= 80) return 'A';
+    if($total >= 70) return 'B+';
+    if($total >= 60) return 'B';
+    if($total >= 50) return 'C';
+    return 'F';
+}
