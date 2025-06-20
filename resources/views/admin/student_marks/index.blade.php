@@ -205,16 +205,16 @@
                                     </thead>
                                     <tbody>
                                         @foreach($studentMarks as $mark)
-                                        @php
-                                            $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
-                                            $grade = calculateGrade($total);
-                                        @endphp
+                                            @php
+                                                $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
+                                                $grade = calculateGrade($total);
+                                            @endphp
                                             <tr>
                                                 <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
-                                                <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->term_one_out_off.'/'.$mark->term_one_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->mid_term_out_off.'/'.$mark->mid_term_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->term_two_out_off.'/'.$mark->term_two_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->final_exam_out_off.'/'.$mark->final_exam_stu_marks ?? '-' }}</td>
                                                 <td><strong>{{ $total }}</strong></td>
                                                 <td><span class="grade">{{ $grade }}</span></td>
                                                 <td class="actions-cell">
@@ -251,7 +251,6 @@
                                                     </div>
                                                 </td>
                                             </tr>
-
 
                                         @endforeach
                                     </tbody>
@@ -559,17 +558,17 @@
                 $('.text-danger').text('');
                 $('input, select').removeClass('is-invalid');
                 $.ajax({
-                    url: "{{ route('admin.student-marks.store') }}", // adjust to your route
+                    url: "{{ route('admin.student-marks.store') }}", 
                     type: "POST",
                     data: formData,
-                    contentType: false, // required for FormData
-                    processData: false, // required for FormData
+                    contentType: false, 
+                    processData: false,
                     success: function (response) {
                         if (response.success === true) {
                             $('#formAlert')
                                 .removeClass('d-none alert-danger')
                                 .addClass('alert alert-success')
-                                .text(response.message); // should now work
+                                .text(response.message); 
 
                             $('#StudentMarksStore')[0].reset();
                              setTimeout(function () {
@@ -577,28 +576,58 @@
                             }, 2000);
                         }
                     },
-                   error: function (xhr) {
-                    $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
-                         if (xhr.status === 422) {
+                    // error: function (xhr) {
+                    // $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
+                    //      if (xhr.status === 422) {
+                    //         let response = xhr.responseJSON;
+
+                            
+                    //         if (response.message) {
+                    //             $('#formAlert').html(response.message);
+                    //         }
+
+                    //         // Show field-wise errors if any
+                    //         if (response.errors) {
+                    //             $('.text-danger').text('');
+                    //             $.each(response.errors, function (key, value) {
+                    //                 $('#error_' + key).text(value[0]);
+                    //                 $('#' + key).addClass('is-invalid');
+                    //             });
+                    //         }
+                    //     } else {
+                    //         $('#formAlert').html('An unexpected error occurred. Please try again.');
+                    //     }
+                    // }
+                    error: function (xhr) {
+                        $('#formAlert')
+                            .removeClass('d-none alert-success')
+                            .addClass('alert alert-danger');
+
+                        if (xhr.status === 422) {
                             let response = xhr.responseJSON;
 
-                            // If message is available, show it
+
                             if (response.message) {
                                 $('#formAlert').html(response.message);
                             }
 
-                            // Show field-wise errors if any
+
                             if (response.errors) {
-                                $('.text-danger').text('');
+                                let errorHtml = '';
                                 $.each(response.errors, function (key, value) {
-                                    $('#error_' + key).text(value[0]);
+                                    errorHtml += `<div>${value}</div>`;
+
+                                    $('#error_' + key).text(value);
                                     $('#' + key).addClass('is-invalid');
                                 });
+
+                                $('#formAlert').html(errorHtml);
                             }
                         } else {
                             $('#formAlert').html('An unexpected error occurred. Please try again.');
                         }
                     }
+
                 });
             });
         });
