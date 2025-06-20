@@ -408,7 +408,7 @@
                            <div id="formAlert" class="alert d-none" role="alert"></div>
                           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                           <button type="button" class="btn btn-primary" id="StudentMarksStoreButton">Save Marks</button>
-                          
+
                         </div>
                       </form>
                     </div>
@@ -547,7 +547,7 @@
     <script>
         $(document).ready(function () {
             $('#StudentMarksStoreButton').on('click', function (e) {
-                e.preventDefault(); // Prevent default button action
+                e.preventDefault(); 
 
                 // Get the form element
                 var form = $('#StudentMarksStore')[0];
@@ -576,28 +576,7 @@
                             }, 2000);
                         }
                     },
-                    // error: function (xhr) {
-                    // $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
-                    //      if (xhr.status === 422) {
-                    //         let response = xhr.responseJSON;
 
-                            
-                    //         if (response.message) {
-                    //             $('#formAlert').html(response.message);
-                    //         }
-
-                    //         // Show field-wise errors if any
-                    //         if (response.errors) {
-                    //             $('.text-danger').text('');
-                    //             $.each(response.errors, function (key, value) {
-                    //                 $('#error_' + key).text(value[0]);
-                    //                 $('#' + key).addClass('is-invalid');
-                    //             });
-                    //         }
-                    //     } else {
-                    //         $('#formAlert').html('An unexpected error occurred. Please try again.');
-                    //     }
-                    // }
                     error: function (xhr) {
                         $('#formAlert')
                             .removeClass('d-none alert-success')
