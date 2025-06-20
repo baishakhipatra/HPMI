@@ -188,6 +188,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
                 Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
                 Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
+                Route::get('/student-marks/edit-data/{id}', [StudentMarkListController::class, 'getEditData'])->name('admin.student-marks.getData');
                 Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
                 Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
                 Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete');

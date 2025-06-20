@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -36,4 +36,4 @@
     <a href="{{ url('/') }}">Go to Home</a>
 
 </body>
-</html>
+</html> --}}

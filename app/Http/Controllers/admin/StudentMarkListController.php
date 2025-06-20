@@ -13,30 +13,76 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 class StudentMarkListController extends Controller
 {
     
+    // public function index(Request $request)
+    // {
+        
+    //     $sessions = StudentAdmission::with('session')
+    //           ->select('session_id')
+    //           ->distinct()
+    //           ->get();
+    //     $classes = ClassList::with('sections')->get();
+    //     $subjects = Subject::all();
+
+    //     $academicSessions = AcademicSession::all();
+
+    //    // $students = [];
+
+    //     $classOptions = $classes->map(function($class){
+    //         $sections = $class->sections->pluck('section')->toArray();
+    //         $sectionList = implode(', ', $sections);
+    //         return [
+    //             'id' => $class->id,
+    //              //'name' => $class->class . ' - ' . $sectionList
+    //             'name' => $class->class
+    //         ];
+    //     });
+        
+    //     $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
+
+    //     if($request->filled('student_name')) {
+    //         $query->whereHas('student', function ($q) use ($request) {
+    //             $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
+    //         });
+    //     }
+
+    //     if($request->filled('class_filter')){
+    //         $query->where('class_id', $request->class_filter);
+    //     }
+
+    //     if($request->filled('subject_filter')){
+    //         $query->where('subject_id', $request->subject_filter);
+    //     }
+
+    //     if ($request->filled('session_filter')) {
+    //         $query->whereHas('studentAdmission', function ($q) use ($request) {
+    //             $q->where('session_id', $request->session_filter);
+    //         });
+    //     }
+
+    //     $marks = $query->paginate(10);
+
+    //     return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'academicSessions'));
+    // }
     public function index(Request $request)
     {
-        
         $sessions = StudentAdmission::with('session')
-              ->select('session_id')
-              ->distinct()
-              ->get();
+            ->select('session_id')
+            ->distinct()
+            ->get();
+
         $classes = ClassList::with('sections')->get();
         $subjects = Subject::all();
-
         $academicSessions = AcademicSession::all();
-
-       // $students = [];
 
         $classOptions = $classes->map(function($class){
             $sections = $class->sections->pluck('section')->toArray();
             $sectionList = implode(', ', $sections);
             return [
                 'id' => $class->id,
-                 //'name' => $class->class . ' - ' . $sectionList
                 'name' => $class->class
             ];
         });
-        
+
         $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
 
         if($request->filled('student_name')) {
@@ -60,39 +106,22 @@ class StudentMarkListController extends Controller
         }
 
         $marks = $query->paginate(10);
-        $marks->appends($request->all());
 
-        $totalRecords = $marks->count();
+        // Move group + transformation logic from Blade to here
+        $groupedMarks = $marks->getCollection()->groupBy(function($item) {
+            return $item->studentAdmission->student_id . '_' .
+                $item->studentAdmission->session_id . '_' .
+                $item->studentAdmission->class_id;
+        });
 
-        $totalPercentage = 0;
-        $studentCount = 0;
+        // Replace original collection with empty one to avoid double data
+        $marks->setCollection(collect());
 
-        foreach ($marks as $mark) {
-            $obtained = 
-                ($mark->term_one_stu_marks ?? 0) +
-                ($mark->term_two_stu_marks ?? 0) +
-                ($mark->mid_term_stu_marks ?? 0) +
-                ($mark->final_exam_stu_marks ?? 0);
-
-            $fullMarks = 
-                ($mark->term_one_out_off ?? 0) +
-                ($mark->term_two_out_off ?? 0) +
-                ($mark->mid_term_out_off ?? 0) +
-                ($mark->final_exam_out_off ?? 0);
-                
-            if ($fullMarks > 0) {
-                $studentPercentage = ($obtained / $fullMarks) * 100;
-                $totalPercentage += $studentPercentage;
-                $studentCount++;
-            }
-        }
-
-        $averagePercentage = $studentCount > 0 
-            ? round($totalPercentage / $studentCount, 2)
-            : 0;
-
-        return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'totalRecords', 'averagePercentage', 'academicSessions'));
+        return view('admin.student_marks.index', compact('classes', 'subjects', 'classOptions', 'sessions',
+            'marks', 'groupedMarks', 'academicSessions'
+        ));
     }
+
 
     public function getStudentsBySession(Request $request)
     {
@@ -156,12 +185,52 @@ class StudentMarkListController extends Controller
             ]);
         }   
     }
+    public function getEditData($id) {
+        try {
+            $mark = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission'])
+                        ->where('id', $id)
+                        ->first();
+            if (!$mark) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Mark record not found.'
+                ], 404);
+            }
+
+            // You can format response data here if needed
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $mark->id,
+                    'session_id' => optional($mark->studentAdmission)->session_id,
+                    'student_id' => $mark->student_id,
+                    'class_id' => $mark->class_id,
+                    'subject_id' => $mark->subject_id,
+                    'term_one_out_off' => $mark->term_one_out_off,
+                    'term_one_stu_marks' => $mark->term_one_stu_marks,
+                    'term_two_out_off' => $mark->term_two_out_off,
+                    'term_two_stu_marks' => $mark->term_two_stu_marks,
+                    'mid_term_out_off' => $mark->mid_term_out_off,
+                    'mid_term_stu_marks' => $mark->mid_term_stu_marks,
+                    'final_exam_out_off' => $mark->final_exam_out_off,
+                    'final_exam_stu_marks' => $mark->final_exam_stu_marks,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while fetching data.',
+                'error' => $e->getMessage()
+            ], 500);
+        }  
+    }
 
 
     public function storeStudentMarks(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'session_id' => 'required|exists:academic_sessions,id',
+        $validated = $request->validate([
+            'session_id' => 'required|exists:academic_sessions,id', // Added
             'class_id'   => 'required|exists:class_lists,id',
             'student_id' => 'required|exists:students,id',
             'subject_id' => 'required|exists:subjects,id',
@@ -182,58 +251,57 @@ class StudentMarkListController extends Controller
         $errors = [];
 
         if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
-            $errors['term_one_stu_marks'] = 'Term 1 marks required.';
+            $errors['message'] = 'Term 1 marks required.';
         }
         if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
-            $errors['term_two_stu_marks'] = 'Term 2 marks required.';
+            $errors['message'] = 'Term 2 marks required.';
         }
         if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
-            $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
+            $errors['message'] = 'Mid Term marks required.';
         }
         if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
-            $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
+            $errors['message'] = 'Final Exam marks required.';
         }
 
-        if (
+        if(
             empty($request->term_one_out_off) &&
             empty($request->term_two_out_off) &&
             empty($request->mid_term_out_off) &&
             empty($request->final_exam_out_off)
         ) {
-            $errors['at_least_one_term'] = 'Select at least one term.';
+            $errors['message'] = 'Select at least one term.';
         }
 
-        if ($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off) {
-            $errors['term_one_stu_marks'] = 'Marks cannot be greater than out off marks.';
-        }
-        if ($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off) {
-            $errors['term_two_stu_marks'] = 'Marks cannot be greater than out off marks.';
-        }
-        if ($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off) {
-            $errors['mid_term_stu_marks'] = 'Marks cannot be greater than out off marks.';
-        }
-        if ($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off) {
-            $errors['final_exam_stu_marks'] = 'Marks cannot be greater than out off marks.';
+        if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
+            $errors['message'] = 'Term 1 marks cannot be greater than term 1 out off.';
         }
 
-        if ($validator->fails() || !empty($errors)) {
+        if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
+            $errors['message'] = 'Term 2 marks cannot be greater than term 2 out off.';
+        }
+
+        if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
+            $errors['message'] = 'Mid term marks cannot be greater than mid term out off.';
+        }
+
+        if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
+            $errors['message'] = 'Final exam marks cannot be greater than final exam out off.';
+        }
+
+        if (!empty($errors)) {
             return response()->json([
                 'success' => false,
-                'errors' => array_merge(
-                    $validator->errors()->toArray(),
-                    $errors
-                )
+                'message' => $errors['message']
             ], 422);
         }
 
-        $validated = $validator->validated();
-
+        // Correct admission lookup with session
         $admission = StudentAdmission::where('student_id', $validated['student_id'])
-            ->where('class_id', $validated['class_id'])
-            ->where('session_id', $validated['session_id'])
-            ->first();
+                            ->where('class_id', $validated['class_id'])
+                            ->where('session_id', $validated['session_id'])
+                            ->first();
 
-        if (!$admission) {
+       if (!$admission) {
             return response()->json([
                 'success' => false,
                 'message' => 'Student admission record not found.'
@@ -243,8 +311,8 @@ class StudentMarkListController extends Controller
         $validated['student_admission_id'] = $admission->id;
 
         $existing = StudentsMark::where('student_admission_id', $validated['student_admission_id'])
-            ->where('subject_id', $validated['subject_id'])
-            ->first();
+                        ->where('subject_id', $validated['subject_id'])
+                        ->first();
 
         if ($existing) {
             return response()->json([
@@ -261,133 +329,255 @@ class StudentMarkListController extends Controller
         ]);
     }
 
-    
+    // public function update(Request $request)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'id' => 'required|exists:students_marks,id',
+    //             'session_id'    => 'required|exists:academic_sessions,id',
+    //             'student_id'    => 'required|exists:students,id',
+    //             'class_id'      => 'required|exists:class_lists,id',
+    //             'subject_id'    => 'required|exists:subjects,id',
+    //             'term_one_out_off'      => 'nullable|integer',
+    //             'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off|max:100',
+    //             'term_two_out_off'      => 'nullable|integer',
+    //             'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off|max:100',
+    //             'mid_term_out_off'      => 'nullable|integer',
+    //             'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off|max:100',
+    //             'final_exam_out_off'    => 'nullable|integer',
+    //             'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off|max:100',
+    //         ]);
+
+    //         $errors = [];
+
+    //         if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
+    //             $errors['term_one_stu_marks'] = 'Term 1 marks required.';
+    //         }
+    //         if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
+    //             $errors['term_two_stu_marks'] = 'Term 2 marks required.';
+    //         }
+    //         if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
+    //             $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
+    //         }
+    //         if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
+    //             $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
+    //         }
+
+    //         if(
+    //             empty($request->term_one_out_off) &&
+    //             empty($request->term_two_out_off) &&
+    //             empty($request->mid_term_out_off) &&
+    //             empty($request->final_exam_out_off)
+    //         ) {
+    //             $errors['at_least_one_term'] = 'Select at least one term.';
+    //         }
+
+    //         if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
+    //             $errors['term_one_stu_marks'] = 'Term 1 marks cannot be greater than term 1 out off.';
+    //         }
+
+    //         if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
+    //             $errors['term_two_stu_marks'] = 'Term 2 marks cannot be greater than term 2 out off.';
+    //         }
+
+    //         if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
+    //             $errors['mid_term_stu_marks'] = 'Mid term marks cannot be greater than mid term out off.';
+    //         }
+
+    //         if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
+    //             $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
+    //         }
+
+    //         if ($errors) {
+    //             return response()->json(['success' => false, 'errors' => $errors], 422);
+    //         }
+
+    //         $mark = StudentsMark::findOrFail($validated['id']);
+
+    //         $admission = StudentAdmission::firstOrCreate(
+    //             [
+    //                 'student_id' => $validated['student_id'],
+    //                 'class_id' => $validated['class_id'],
+    //                 'session_id' => $validated['session_id'],
+    //             ],
+    //             ['admission_date' => now()]
+    //         );
+
+    //         // Duplicate check
+    //         $duplicate = StudentsMark::where('student_admission_id', $admission->id)
+    //             ->where('subject_id', $validated['subject_id'])
+    //             ->where('id', '!=', $validated['id'])
+    //             ->first();
+
+    //         if ($duplicate) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'errors' => ['duplicate_error' => 'Marks for this student, subject, and session already exist.']
+    //             ], 422);
+    //         }
+
+    //         $mark->update([
+    //             'student_id'    => $validated['student_id'],
+    //             'class_id'      => $validated['class_id'],
+    //             'session_id'    => $validated['session_id'],
+    //             'student_admission_id'  => $admission->id,
+    //             'subject_id'    => $validated['subject_id'],
+    //             'term_one_out_off'      => $validated['term_one_out_off'] ?? null,
+    //             'term_one_stu_marks'    => $validated['term_one_stu_marks'] ?? null,
+    //             'term_two_out_off'      => $validated['term_two_out_off'] ?? null,
+    //             'term_two_stu_marks'    => $validated['term_two_stu_marks'] ?? null,
+    //             'mid_term_out_off'      => $validated['mid_term_out_off'] ?? null,
+    //             'mid_term_stu_marks'    => $validated['mid_term_stu_marks'] ?? null,
+    //             'final_exam_out_off'    => $validated['final_exam_out_off'] ?? null,
+    //             'final_exam_stu_marks'  => $validated['final_exam_stu_marks'] ?? null,
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Student marks updated successfully.'
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         \Log::error('Marks update failed: ' . $e->getMessage());
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Something went wrong. Please try again later.'
+    //         ], 500);
+    //     }
+    // }
+
     public function update(Request $request)
     {
         try {
-            // Validate request
             $validated = $request->validate([
-                'id' => 'required|exists:students_marks,id',
-                'session_id'    => 'required|exists:academic_sessions,id',
-                'student_id'    => 'required|exists:students,id',
-                'class_id'      => 'required|exists:class_lists,id',
-                'subject_id'    => 'required|exists:subjects,id',
+                'id'             => 'required|exists:students_marks,id',
+                'session_id'     => 'required|exists:academic_sessions,id',
+                'class_id'       => 'required|exists:class_lists,id',
+                'student_id'     => 'required|exists:students,id',
+                'subject_id'     => 'required|exists:subjects,id',
 
                 'term_one_out_off'      => 'nullable|integer',
-                'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off|max:100',
+                'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off',
 
                 'term_two_out_off'      => 'nullable|integer',
-                'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off|max:100',
+                'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off',
 
                 'mid_term_out_off'      => 'nullable|integer',
-                'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off|max:100',
+                'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off',
 
                 'final_exam_out_off'    => 'nullable|integer',
-                'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off|max:100',
+                'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off',
             ]);
 
+            // --- Custom logic checks ---
             $errors = [];
 
-            if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
-                $errors['term_one_stu_marks'] = 'Term 1 marks required.';
-            }
-            if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
-                $errors['term_two_stu_marks'] = 'Term 2 marks required.';
-            }
-            if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
-                $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
-            }
-            if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
-                $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
-            }
-
-            if(
+            if (
                 empty($request->term_one_out_off) &&
                 empty($request->term_two_out_off) &&
                 empty($request->mid_term_out_off) &&
                 empty($request->final_exam_out_off)
             ) {
-                $errors['at_least_one_term'] = 'Select at least one term.'; 
+                $errors['message'] = 'Select at least one term.';
             }
 
-            if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
-                $errors['term_one_stu_marks'] = 'Term 1 marks cannot be greater than term 1 out off.';
+            if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
+                $errors['message'] = 'Term 1 marks required.';
+            }
+            if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
+                $errors['message'] = 'Term 2 marks required.';
+            }
+            if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
+                $errors['message'] = 'Mid Term marks required.';
+            }
+            if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
+                $errors['message'] = 'Final Exam marks required.';
             }
 
-            if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
-                $errors['term_one_stu_marks'] = 'Term 2 marks cannot be greater than term 2 out off.';
+            if ($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off) {
+                $errors['message'] = 'Term 1 marks cannot be greater than term 1 out off.';
+            }
+            if ($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off) {
+                $errors['message'] = 'Term 2 marks cannot be greater than term 2 out off.';
+            }
+            if ($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off) {
+                $errors['message'] = 'Mid term marks cannot be greater than mid term out off.';
+            }
+            if ($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off) {
+                $errors['message'] = 'Final exam marks cannot be greater than final exam out off.';
             }
 
-            if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
-                $errors['mid_term_stu_marks'] = 'Mid term marks cannot be greater than mid term out off.';
+            if (!empty($errors)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errors['message']
+                ], 422);
             }
 
-            if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
-                $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
-            }
-
-            if ($errors) {
-                return back()->withErrors($errors)->withInput();
-            }
-
-           
-            $mark = StudentsMark::findOrFail($validated['id']);
-
-         
-            $admission = StudentAdmission::firstOrCreate(
-                [
-                    'student_id'    => $validated['student_id'],
-                    'class_id'      => $validated['class_id'],
-                    'session_id'    => $validated['session_id'],
-                ],
-                [
-                    'admission_date' => now(),
-                ]
-            );
-            //dd($validated['session_id']);
-
-            // Duplicate check: Same student_admission_id, subject_id, excluding the current record
-            $duplicate = StudentsMark::where('student_admission_id', $admission->id)
-                ->where('subject_id', $validated['subject_id'])
-                ->where('id', '!=', $validated['id']) // exclude current mark being edited
+            // --- Check student admission ---
+            $admission = StudentAdmission::where('student_id', $validated['student_id'])
+                ->where('class_id', $validated['class_id'])
+                ->where('session_id', $validated['session_id'])
                 ->first();
 
-            if ($duplicate) {
-                return back()->withErrors([
-                    'duplicate_error' => 'Marks for this student, subject, and session already exist. Please edit the existing entry.'
-                ])->withInput();
+            if (!$admission) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Student admission record not found.'
+                ], 422);
             }
 
-            // Update marks
-            // Update marks, including student_id, class_id, session_id
-            
+            $validated['student_admission_id'] = $admission->id;
+
+            // --- Duplicate check ---
+            $existing = StudentsMark::where('student_admission_id', $validated['student_admission_id'])
+                ->where('subject_id', $validated['subject_id'])
+                ->where('id', '!=', $validated['id']) // exclude current record
+                ->first();
+
+            if ($existing) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Marks already exist for this subject and session. Please update the existing one.'
+                ], 422);
+            }
+
+            // --- Update record ---
+            $mark = StudentsMark::findOrFail($validated['id']);
+
             $mark->update([
-                'student_id'    => $validated['student_id'],
-                'class_id'      => $validated['class_id'],
-                'session_id'    => $validated['session_id'], 
-                'student_admission_id'  => $admission->id,
-                'subject_id'    => $validated['subject_id'],
-                'term_one_out_off'      => $validated['term_one_out_off'] ?? null,
-                'term_one_stu_marks'    => $validated['term_one_stu_marks'] ?? null,
-                'term_two_out_off'      => $validated['term_two_out_off'] ?? null,
-                'term_two_stu_marks'    => $validated['term_two_stu_marks'] ?? null,
-                'mid_term_out_off'      => $validated['mid_term_out_off'] ?? null,
-                'mid_term_stu_marks'    => $validated['mid_term_stu_marks'] ?? null,
-                'final_exam_out_off'    => $validated['final_exam_out_off'] ?? null,
-                'final_exam_stu_marks'  => $validated['final_exam_stu_marks'] ?? null,
+                'student_id'             => $validated['student_id'],
+                'class_id'               => $validated['class_id'],
+                'session_id'             => $validated['session_id'],
+                'student_admission_id'   => $validated['student_admission_id'],
+                'subject_id'             => $validated['subject_id'],
+
+                'term_one_out_off'       => $validated['term_one_out_off'] ?? null,
+                'term_one_stu_marks'     => $validated['term_one_stu_marks'] ?? null,
+
+                'term_two_out_off'       => $validated['term_two_out_off'] ?? null,
+                'term_two_stu_marks'     => $validated['term_two_stu_marks'] ?? null,
+
+                'mid_term_out_off'       => $validated['mid_term_out_off'] ?? null,
+                'mid_term_stu_marks'     => $validated['mid_term_stu_marks'] ?? null,
+
+                'final_exam_out_off'     => $validated['final_exam_out_off'] ?? null,
+                'final_exam_stu_marks'   => $validated['final_exam_stu_marks'] ?? null,
             ]);
 
-
-            return redirect()->back()->with('success', 'Student marks updated successfully.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Student marks updated successfully.'
+            ]);
         } catch (\Exception $e) {
-            //dd($e->getMessage());
-            \Log::error('Marks update failed: ' . $e->getMessage(), [
-                'request' => $request->all()
-            ]);
-            
-            return redirect()->back()->with('error', 'Failed to update student marks. Please try again.');
+            \Log::error('Marks update failed: ' . $e->getMessage(), ['request' => $request->all()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong. Please try again later.'
+            ], 500);
         }
     }
+
+   
 
     public function delete(Request $request){
         $user = StudentsMark::find($request->id); 
