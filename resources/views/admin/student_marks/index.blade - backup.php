@@ -205,16 +205,16 @@
                                     </thead>
                                     <tbody>
                                         @foreach($studentMarks as $mark)
-                                            @php
-                                                $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
-                                                $grade = calculateGrade($total);
-                                            @endphp
+                                        @php
+                                            $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) + ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
+                                            $grade = calculateGrade($total);
+                                        @endphp
                                             <tr>
                                                 <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
-                                                <td>{{ $mark->term_one_out_off.'/'.$mark->term_one_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->mid_term_out_off.'/'.$mark->mid_term_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->term_two_out_off.'/'.$mark->term_two_stu_marks ?? '-' }}</td>
-                                                <td>{{ $mark->final_exam_out_off.'/'.$mark->final_exam_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->term_one_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->mid_term_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->term_two_stu_marks ?? '-' }}</td>
+                                                <td>{{ $mark->final_exam_stu_marks ?? '-' }}</td>
                                                 <td><strong>{{ $total }}</strong></td>
                                                 <td><span class="grade">{{ $grade }}</span></td>
                                                 <td class="actions-cell">
@@ -225,24 +225,11 @@
                                                         <div class="dropdown-menu">
                                                             <button type="button" class="dropdown-item editMarksBtn"
                                                                 data-id="{{ $mark->id }}"
-                                                                data-session-id="{{ $mark->studentAdmission->session_id ?? '' }}"
-                                                                data-student-id="{{ $mark->studentAdmission->student_id ?? '' }}"
-                                                                data-student-name="{{ $mark->studentAdmission->student->name ?? '' }}"
-                                                                data-class-id="{{ $mark->studentAdmission->class_id ?? '' }}"
-                                                                data-class-name="{{ $mark->studentAdmission->class->class_name ?? '' }}"
-                                                                data-subject-id="{{ $mark->subject_id ?? '' }}"
-                                                                data-subject-name="{{ $mark->subject->subject_name ?? '' }}"
-                                                                data-term-one-out-off="{{ $mark->term_one_out_off }}"
-                                                                data-term-one-stu-marks="{{ $mark->term_one_stu_marks }}"
-                                                                data-term-two-out-off="{{ $mark->term_two_out_off }}"
-                                                                data-term-two-stu-marks="{{ $mark->term_two_stu_marks }}"
-                                                                data-mid-term-out-off="{{ $mark->mid_term_out_off }}"
-                                                                data-mid-term-stu-marks="{{ $mark->mid_term_stu_marks }}"
-                                                                data-final-exam-out-off="{{ $mark->final_exam_out_off }}"
-                                                                data-final-exam-stu-marks="{{ $mark->final_exam_stu_marks }}"
-                                                                data-bs-toggle="modal" data-bs-target="#editMarksModal">
+                                                                data-bs-toggle="modal"
+                                                                data-bs-target="#editMarksModal">
                                                                 <i class="ri-pencil-line me-1"></i> Edit
                                                             </button>
+
 
                                                             <a class="dropdown-item" href="javascript:void(0);" onclick="deleteMark({{ $mark->id }})">
                                                                 <i class="ri-delete-bin-6-line me-1"></i> Delete
@@ -251,6 +238,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+
 
                                         @endforeach
                                     </tbody>
@@ -424,11 +412,10 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
 
-                            <form action="{{ route('admin.student-marks.update') }}" method="POST">
+                            <form id="editMarksForm" method="POST">
                                 @csrf
-                                {{-- @method('PUT') This is crucial for Laravel's update method --}}
 
-                                <input type="hidden" id="edit_mark_id" name="id"> {{-- This input will hold the mark ID --}}
+                                <input type="hidden" id="edit_mark_id" name="id" value="{{ old('id') }}"> {{-- This input will hold the mark ID --}}
 
                                 <div class="modal-body">
                                     <div class="row g-3">
@@ -436,7 +423,10 @@
                                             <select name="session_id" id="edit_session_id" class="form-select">
                                                 <option value="">Select Session</option>
                                                 @foreach($sessions as $item)
-                                                    <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                                    <option value="{{ $item->session_id }}"
+                                                        {{ old('session_id') == $item->session_id ? 'selected' : '' }}>
+                                                        {{ $item->session->session_name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <label for="edit_session_id" class="form-label">Session</label>
@@ -470,8 +460,10 @@
                                         <div class="form-floating form-floating-outline col-md-3">
                                             <select name="term_one_out_off" id="edit_term_one_out_off" class="form-select">
                                                 <option value="">Select</option>
-                                                @foreach (range(50, 100, 5) as $value)
-                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                               @foreach (range(50, 100, 5) as $value)
+                                                    <option value="{{ $value }}" {{ old('term_one_out_off') == $value ? 'selected' : '' }}>
+                                                        {{ $value }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <label for="edit_term_one_out_off" class="form-label">Term 1 Out Of</label>
@@ -486,7 +478,9 @@
                                             <select name="term_two_out_off" id="edit_term_two_out_off" class="form-select">
                                                 <option value="">Select</option>
                                                 @foreach (range(50, 100, 5) as $value)
-                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                    <option value="{{ $value }}" {{ old('term_two_out_off') == $value ? 'selected' : '' }}>
+                                                        {{ $value }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <label for="edit_term_two_out_off" class="form-label">Term 2 Out Of</label>
@@ -501,7 +495,9 @@
                                             <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select" >
                                                 <option value="">Select</option>
                                                 @foreach (range(50, 100, 5) as $value)
-                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                    <option value="{{ $value }}" {{ old('mid_term_out_off') == $value ? 'selected' : '' }}>
+                                                        {{ $value }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <label for="edit_mid_term_out_off" class="form-label">Mid Term Out Of</label>
@@ -516,7 +512,9 @@
                                             <select name="final_exam_out_off" id="edit_final_exam_out_off" class="form-select">
                                                 <option value="">Select</option>
                                                 @foreach (range(50, 100, 5) as $value)
-                                                    <option value="{{ $value }}">{{ $value }}</option>
+                                                    <option value="{{ $value }}" {{ old('final_exam_out_off') == $value ? 'selected' : '' }}>
+                                                        {{ $value }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                             <label for="edit_final_exam_out_off" class="form-label">Final Exam Out Of</label>
@@ -558,17 +556,17 @@
                 $('.text-danger').text('');
                 $('input, select').removeClass('is-invalid');
                 $.ajax({
-                    url: "{{ route('admin.student-marks.store') }}", 
+                    url: "{{ route('admin.student-marks.store') }}", // adjust to your route
                     type: "POST",
                     data: formData,
-                    contentType: false, 
-                    processData: false,
+                    contentType: false, // required for FormData
+                    processData: false, // required for FormData
                     success: function (response) {
                         if (response.success === true) {
                             $('#formAlert')
                                 .removeClass('d-none alert-danger')
                                 .addClass('alert alert-success')
-                                .text(response.message); 
+                                .text(response.message); // should now work
 
                             $('#StudentMarksStore')[0].reset();
                              setTimeout(function () {
@@ -576,58 +574,28 @@
                             }, 2000);
                         }
                     },
-                    // error: function (xhr) {
-                    // $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
-                    //      if (xhr.status === 422) {
-                    //         let response = xhr.responseJSON;
-
-                            
-                    //         if (response.message) {
-                    //             $('#formAlert').html(response.message);
-                    //         }
-
-                    //         // Show field-wise errors if any
-                    //         if (response.errors) {
-                    //             $('.text-danger').text('');
-                    //             $.each(response.errors, function (key, value) {
-                    //                 $('#error_' + key).text(value[0]);
-                    //                 $('#' + key).addClass('is-invalid');
-                    //             });
-                    //         }
-                    //     } else {
-                    //         $('#formAlert').html('An unexpected error occurred. Please try again.');
-                    //     }
-                    // }
-                    error: function (xhr) {
-                        $('#formAlert')
-                            .removeClass('d-none alert-success')
-                            .addClass('alert alert-danger');
-
-                        if (xhr.status === 422) {
+                   error: function (xhr) {
+                    $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
+                         if (xhr.status === 422) {
                             let response = xhr.responseJSON;
 
-
+                            // If message is available, show it
                             if (response.message) {
                                 $('#formAlert').html(response.message);
                             }
 
-
+                            // Show field-wise errors if any
                             if (response.errors) {
-                                let errorHtml = '';
+                                $('.text-danger').text('');
                                 $.each(response.errors, function (key, value) {
-                                    errorHtml += `<div>${value}</div>`;
-
-                                    $('#error_' + key).text(value);
+                                    $('#error_' + key).text(value[0]);
                                     $('#' + key).addClass('is-invalid');
                                 });
-
-                                $('#formAlert').html(errorHtml);
                             }
                         } else {
                             $('#formAlert').html('An unexpected error occurred. Please try again.');
                         }
                     }
-
                 });
             });
         });
@@ -698,208 +666,128 @@
             });
         });
 
-        $(document).ready(function() {
-            // Function to load students for the edit modal
-            function loadEditStudents(sessionId, selectedStudentId = null) {
-                if (!sessionId) {
-                    $('#edit_student_id').empty().append('<option value="">Select Student</option>');
-                    // Also clear classes and subjects if session is cleared
-                    $('#edit_class_id').empty().append('<option value="">Select Class</option>');
-                    $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
-                    return;
-                }
+        // for edit student marks
 
-                $.ajax({
-                    url: "{{ route('admin.get-students-by-session') }}",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: { sessionId: sessionId },
-                    success: function (response) {
-                        if (response.success) {
-                            $('#edit_student_id').empty().append('<option value="">Select Student</option>'); // Always add a default option
-                            $.each(response.students, function (i, student) {
-                                $('#edit_student_id').append('<option value="' + student.id + '">' + student.name + '</option>');
-                            });
-                            // Set the selected student after all options are loaded
-                            if (selectedStudentId) {
-                                $('#edit_student_id').val(selectedStudentId);
-                            }
-                            // No need to trigger change here, the loadEditClassesAndSubjects will be called directly in editMarksBtn handler
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error("Error fetching students for edit modal:", xhr);
-                    }
-                });
-            }
-
-            // Function to load classes and subjects for the edit modal
-            function loadEditClassesAndSubjects(sessionId, studentId, selectedClassId = null, selectedSubjectId = null) {
-                if (!sessionId || !studentId) {
-                    $('#edit_class_id').empty().append('<option value="">Select Class</option>');
-                    $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
-                    return;
-                }
-
-                $.ajax({
-                    url: "{{ route('admin.get-class-by-session-and-student') }}",
-                    type: 'GET',
-                    dataType: 'json',
-                    data: {
-                        session_id: sessionId,
-                        student_id: studentId
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            // Populate classes
-                            $('#edit_class_id').empty().append('<option value="">Select Class</option>');
-                            $.each(response.classes, function (key, classData) {
-                                $('#edit_class_id').append('<option value="' + classData.id + '">' + classData.name + '</option>');
-                            });
-                            // Set the selected class after all options are loaded
-                            if (selectedClassId) {
-                                $('#edit_class_id').val(selectedClassId);
-                            }
-
-                            // Populate subjects
-                            $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
-                            $.each(response.subjects, function (key, subjectData) {
-                                $('#edit_subject_id').append('<option value="' + subjectData.id + '">' + subjectData.name + '</option>');
-                            });
-                            // Set the selected subject after all options are loaded
-                            if (selectedSubjectId) {
-                                $('#edit_subject_id').val(selectedSubjectId);
-                            }
-                        }
-                    },
-                    error: function(xhr) {
-                        console.error("Error fetching classes/subjects for edit modal:", xhr);
-                    }
-                });
-            }
-
-            // --- Event handler for opening the EDIT modal ---
-            $(document).on('click', '.editMarksBtn', function () {
-                let btn = $(this);
-
-                let markId = btn.data('id');
-                let sessionId = btn.data('session-id');
-                let studentId = btn.data('student-id');
-                let classId = btn.data('class-id');
-                let subjectId = btn.data('subject-id');
-
-                // Set mark id in hidden input
+        $(document).ready(function () {
+            $('.editMarksBtn').on('click', function () {
+                let markId = $(this).data('id');
+                // console.log(markId);
                 $('#edit_mark_id').val(markId);
+                let baseUrl = "{{ url('/admin/studentmark-list/student-marks') }}";
+                let url = `${baseUrl}/${markId}/edit-data`;
+                console.log(baseUrl);
 
-                // Set Session
-                $('#edit_session_id').val(sessionId);
+                $.ajax({
+                    url: "{{ route('admin.student-marks.getData', 0) }}".replace('0', markId),
+                    type: 'GET',
+                    success: function (res) {
+                        if (res.success) {
+                            const d = res.data;
 
-                // Load students and pre-select the student
-                loadEditStudents(sessionId, studentId);
+                            // Populate fields using IDs from DB
+                            $('#edit_session_id').val(d.session_id).trigger('change');
 
-                // Load classes and subjects and pre-select them
-                // This is crucial: call loadEditClassesAndSubjects directly here with all initial IDs
-                loadEditClassesAndSubjects(sessionId, studentId, classId, subjectId);
+                            setTimeout(() => {
+                                $('#edit_student_id').val(d.student_id).trigger('change');
+                                $('#edit_class_id').val(d.class_id).trigger('change');
+                                $('#edit_subject_id').val(d.subject_id).trigger('change');
+                            }, 300); // Ensure dropdowns are loaded
 
-                // Set marks values (these don't require AJAX for their values)
-                $('#edit_term_one_out_off').val(btn.data('term-one-out-off'));
-                $('#edit_term_one_stu_marks').val(btn.data('term-one-stu-marks'));
-
-                $('#edit_term_two_out_off').val(btn.data('term-two-out-off'));
-                $('#edit_term_two_stu_marks').val(btn.data('term-two-stu-marks'));
-
-                $('#edit_mid_term_out_off').val(btn.data('mid-term-out-off'));
-                $('#edit_mid_term_stu_marks').val(btn.data('mid-term-stu-marks'));
-
-                $('#edit_final_exam_out_off').val(btn.data('final-exam-out-off'));
-                $('#edit_final_exam_stu_marks').val(btn.data('final-exam-stu-marks'));
-            });
-
-            // --- Change event listener for Session in EDIT modal ---
-            $('#edit_session_id').on('change', function() {
-                let sessionId = $(this).val();
-                // Clear previously selected student, class, and subject when session changes
-                $('#edit_student_id').empty().append('<option value="">Select Student</option>');
-                $('#edit_class_id').empty().append('<option value="">Select Class</option>');
-                $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
-
-                // Clear existing marks fields
-                $('#edit_term_one_out_off').val('');
-                $('#edit_term_one_stu_marks').val('');
-
-                $('#edit_term_two_out_off').val('');
-                $('#edit_term_two_stu_marks').val('');
-
-                $('#edit_mid_term_out_off').val('');
-                $('#edit_mid_term_stu_marks').val('');
-
-                $('#edit_final_exam_out_off').val('');
-                $('#edit_final_exam_stu_marks').val('');
-
-                loadEditStudents(sessionId); // No initial student selected here, as it's a manual change
-                // No need to call loadEditClassesAndSubjects here directly, it will be handled by student change
-            });
-
-            // --- Change event listener for Student in EDIT modal ---
-            $('#edit_student_id').on('change', function() {
-                let sessionId = $('#edit_session_id').val();
-                let studentId = $(this).val();
-
-                // Clear existing marks fields
-                $('#edit_term_one_out_off').val('');
-                $('#edit_term_one_stu_marks').val('');
-
-                $('#edit_term_two_out_off').val('');
-                $('#edit_term_two_stu_marks').val('');
-
-                $('#edit_mid_term_out_off').val('');
-                $('#edit_mid_term_stu_marks').val('');
-
-                $('#edit_final_exam_out_off').val('');
-                $('#edit_final_exam_stu_marks').val('');
-
-                // Preselect existing values if they were already selected before
-                let selectedClassId  = $('#edit_class_id').val();
-                let selectedSubjectId = $('#edit_subject_id').val();
-                // Pass null for selectedClassId and selectedSubjectId as these are manual changes
-                loadEditClassesAndSubjects(sessionId, studentId, selectedClassId, selectedSubjectId);
-            });
-
-            // Your existing add modal scripts (if any)
-            // ... (your existing $('#session_id').on('change') and $('#student_id').on('change') for the ADD modal) ...
-
-        });
-        function deleteMark(userId) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: "Are you sure you want to delete this?",
-                    text: "You won't be able to revert this!",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Delete",
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.student-marks.delete')}}",
-                            type: 'POST',
-                            data: {
-                                "id": userId,
-                                "_token": '{{ csrf_token() }}',
-                            },
-                            success: function (data){
-                                if (data.status != 200) {
-                                    toastFire('error', data.message);
-                                } else {
-                                    toastFire('success', data.message);
-                                    location.reload();
-                                }
-                            }
-                        });
+                            $('#edit_term_one_out_off').val(d.term_one_out_off);
+                            $('#edit_term_one_stu_marks').val(d.term_one_stu_marks);
+                            $('#edit_term_two_out_off').val(d.term_two_out_off);
+                            $('#edit_term_two_stu_marks').val(d.term_two_stu_marks);
+                            $('#edit_mid_term_out_off').val(d.mid_term_out_off);
+                            $('#edit_mid_term_stu_marks').val(d.mid_term_stu_marks);
+                            $('#edit_final_exam_out_off').val(d.final_exam_out_off);
+                            $('#edit_final_exam_stu_marks').val(d.final_exam_stu_marks);
+                        }
                     }
                 });
-            }     
+            });
+
+            // Submit form by AJAX
+            $('#editMarksForm').on('submit', function (e) {
+                e.preventDefault();
+                let formData = $(this).serialize();
+
+                $.ajax({
+                    url: "{{ route('admin.student-marks.update') }}",
+                    method: "POST",
+                    data: formData,
+                    success: function (res) {
+                        if (res.success) {
+                            $('#editMarksModal').modal('hide');
+                            alert(res.message);
+                            location.reload();
+                        }
+                    },
+                    error: function (xhr) {
+                        $('.is-invalid').removeClass('is-invalid');
+                        $('.invalid-feedback').remove();
+                        $('#editMarksModal .alert-danger').remove();
+
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorList = '<ul>';
+
+                            $.each(errors, function (key, msg) {
+                                let field = $('[name="' + key + '"]');
+                                field.addClass('is-invalid');
+
+                                if (field.next('.invalid-feedback').length === 0) {
+                                    field.after('<div class="invalid-feedback">' + msg[0] + '</div>');
+                                }
+
+                                errorList += '<li>' + msg[0] + '</li>';
+                            });
+
+                            errorList += '</ul>';
+                            $('#editMarksModal .modal-body').prepend('<div class="alert alert-danger">' + errorList + '</div>');
+                        }
+                    }
+                });
+            });
+
+            $('#editMarksModal').on('show.bs.modal', function () {
+                $(this).find('.alert-danger').remove();
+            });
+        });
+
+
+
+        // for delete student marks
+        function deleteMark(userId) {
+            Swal.fire({
+                icon: 'warning',
+                title: "Are you sure you want to delete this?",
+                text: "You won't be able to revert this!",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Delete",
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('admin.student-marks.delete')}}",
+                        type: 'POST',
+                        data: {
+                            "id": userId,
+                            "_token": '{{ csrf_token() }}',
+                        },
+                        success: function (data){
+                            if (data.status != 200) {
+                                toastFire('error', data.message);
+                            } else {
+                                toastFire('success', data.message);
+                                location.reload();
+                            }
+                        }
+                    });
+                }
+            });
+        }     
     </script>
 {{-- @endsection --}}
     
