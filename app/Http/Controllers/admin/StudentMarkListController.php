@@ -309,8 +309,14 @@ class StudentMarkListController extends Controller
             $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
         }
 
-        if ($errors) {
-            return back()->withErrors($errors)->withInput();
+        if (!empty($errors)) {
+                return response()->json([
+                'success' => false,
+                'errors' => array_merge(
+                    $validator->errors()->toArray(),
+                    $errors
+                )
+            ], 422);
         }
 
         // Correct admission lookup with session
@@ -319,24 +325,32 @@ class StudentMarkListController extends Controller
                             ->where('session_id', $validated['session_id'])
                             ->first();
 
-        if (!$admission) {
-            return back()->withErrors(['error' => 'Student admission record not found.']);
+       if (!$admission) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Student admission record not found.'
+            ], 422);
         }
 
         $validated['student_admission_id'] = $admission->id;
 
-        // Prevent duplicate for same subject, same admission (including session)
         $existing = StudentsMark::where('student_admission_id', $validated['student_admission_id'])
                         ->where('subject_id', $validated['subject_id'])
                         ->first();
 
         if ($existing) {
-            return back()->withErrors(['error' => 'Marks already entered for this subject in this session. You can only edit the existing entry.']);
+            return response()->json([
+                'success' => false,
+                'message' => 'Marks already entered for this subject in this session. You can only edit the existing entry.'
+            ], 422);
         }
 
         StudentsMark::create($validated);
 
-        return back()->with('success', 'Marks Added Successfully');
+        return response()->json([
+            'success' => true,
+            'message' => 'Marks stored successfully!'
+        ]);
     }
 
 

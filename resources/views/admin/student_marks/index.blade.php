@@ -251,6 +251,8 @@
                                                     </div>
                                                 </td>
                                             </tr>
+
+
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -268,134 +270,150 @@
 
                 
                 {{-- for add marks --}}
-                <div class="modal fade" id="addMarksModal" tabindex="-1" aria-labelledby="addMarksModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
+                <div class="modal fade" id="addMarksModal" tabindex="-1" aria-labelledby="addMarksModalLabel"
+                  aria-hidden="true">
+                  <div class="modal-dialog modal-xl">
 
-                        <div class="modal-content">
+                    <div class="modal-content">
 
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-
-                        <form action="{{route('admin.student-marks.store')}}" method="POST">
-                            @csrf
-                            <div class="modal-body">
-                            <div class="row g-3">
-
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="addMarksModalLabel">Add New Marks</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <form method="POST" id="StudentMarksStore" enctype="multipart/form-data">
+                        @csrf
+                        <div class="modal-body">
+                          <div class="row g-3">
                             <div class="form-floating form-floating-outline col-md-2">
-                                <select name="session_id" id="session_id" class="form-select">
-                                    <option value="">Select Session</option>
-                                    @foreach($sessions as $item)
-                                        <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="session_id" class="form-label">Session</label>
+                              <select name="session_id" id="session_id" class="form-select">
+                                <option value="">Select Session</option>
+                                @foreach($sessions as $item)
+                                <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                @endforeach
+                              </select>
+                              <label for="session_id" class="form-label">Session</label>
+                              <div class="text-danger" id="error_session_id"></div>
                             </div>
 
                             <div class="form-floating form-floating-outline col-md-6">
-                                <select name="student_id" id="student_id" class="form-select">
-                                    <option value="">Select Student</option>
-                                </select>
-                                <label for="student_id" class="form-label">Student</label>
+                              <select name="student_id" id="student_id" class="form-select">
+                                <option value="">Select Student</option>
+                              </select>
+                              <label for="student_id" class="form-label">Student</label>
+                              <div class="text-danger" id="error_student_id"></div>
                             </div>
 
 
                             <div class="form-floating form-floating-outline col-md-2">
-                                <select name="class_id" id="class_id" class="form-select">
-                                    <option value="">Select Class</option>
-                                </select>
-                                <label for="class_id" class="form-label">Class</label>
+                              <select name="class_id" id="class_id" class="form-select">
+                                <option value="">Select Class</option>
+                              </select>
+                              <label for="class_id" class="form-label">Class</label>
+                              <div class="text-danger" id="error_class_id"></div>
                             </div>
 
-                            
+
                             <div class="form-floating form-floating-outline col-md-2">
-                                <select name="subject_id" id="subject_id" class="form-select" >
-                                    <option value="">Select Subject</option>
-                                    @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="subject_id" class="form-label">Subject</label>
+                              <select name="subject_id" id="subject_id" class="form-select">
+                                <option value="">Select Subject</option>
+                                @foreach($subjects as $subject)
+                                <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                                @endforeach
+                              </select>
+                              <label for="subject_id" class="form-label">Subject</label>
+                              <div class="text-danger" id="error_subject_id"></div>
                             </div>
 
                             <div class="form-floating form-floating-outline col-md-3">
-                                <select name="term_one_out_off" id="term_one_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    @foreach (range(50, 100, 5) as $value)
-                                        <option value="{{ $value }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
+                              <select name="term_one_out_off" id="term_one_out_off" class="form-select">
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                              </select>
+                              <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
+                              <div class="text-danger" id="error_term_one_out_off"></div>
                             </div>
 
-                            
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="term_one_stu_marks" id="term_one_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="term_one_stu_marks">Term 1 Student Marks</label>
-                            </div>
-
-                        
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <select name="term_two_out_off" id="term_two_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    @foreach (range(50, 100, 5) as $value)
-                                        <option value="{{ $value }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
-                            </div>
-
-                    
-                            <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="term_two_stu_marks" id="term_two_stu_marks" class="form-control" placeholder="Enter marks">
-                                <label for="term_two_stu_marks">Term 2 Student Marks</label>
-                            </div>
 
                             <div class="form-floating form-floating-outline col-md-3">
-                                <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" >
-                                    <option value="">Select</option>
-                                    @foreach (range(50, 100, 5) as $value)
-                                        <option value="{{ $value }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
+                              <input type="number" name="term_one_stu_marks" id="term_one_stu_marks"
+                                class="form-control" placeholder="Enter marks">
+                              <label for="term_one_stu_marks">Term 1 Student Marks</label>
+                              <div class="text-danger" id="error_term_one_stu_marks"></div>
                             </div>
 
-                        
+
                             <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="mid_term_stu_marks">Mid Term Student Marks</label>
+                              <select name="term_two_out_off" id="term_two_out_off" class="form-select">
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                              </select>
+                              <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
+                              <div class="text-danger" id="error_term_two_out_off"></div>
                             </div>
 
-                            
+
                             <div class="form-floating form-floating-outline col-md-3">
-                                <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
-                                    <option value="">Select</option>
-                                    @foreach (range(50, 100, 5) as $value)
-                                        <option value="{{ $value }}">{{ $value }}</option>
-                                    @endforeach
-                                </select>
-                                <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
+                              <input type="number" name="term_two_stu_marks" id="term_two_stu_marks"
+                                class="form-control" placeholder="Enter marks">
+                              <label for="term_two_stu_marks">Term 2 Student Marks</label>
+                              <div class="text-danger" id="error_term_two_stu_marks"></div>
                             </div>
 
-                        
                             <div class="form-floating form-floating-outline col-md-3">
-                                <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks" class="form-control" placeholder="Enter marks" >
-                                <label for="final_exam_stu_marks">Final Exam Student Marks</label>
+                              <select name="mid_term_out_off" id="mid_term_out_off" class="form-select">
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                              </select>
+                              <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
+                              <div class="text-danger" id="error_mid_term_out_off"></div>
                             </div>
 
-                            </div>
+
+                            <div class="form-floating form-floating-outline col-md-3">
+                              <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks"
+                                class="form-control" placeholder="Enter marks">
+                              <label for="mid_term_stu_marks">Mid Term Student Marks</label>
+                              <div class="text-danger" id="error_mid_term_stu_marks"></div>
                             </div>
 
-                            <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Save Marks</button>
+
+                            <div class="form-floating form-floating-outline col-md-3">
+                              <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
+                                <option value="">Select</option>
+                                @foreach (range(50, 100, 5) as $value)
+                                <option value="{{ $value }}">{{ $value }}</option>
+                                @endforeach
+                              </select>
+                              <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
+                              <div class="text-danger" id="error_final_exam_out_off"></div>
                             </div>
 
-                        </form>
+
+                            <div class="form-floating form-floating-outline col-md-3">
+                              <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks"
+                                class="form-control" placeholder="Enter marks">
+                              <label for="final_exam_stu_marks">Final Exam Student Marks</label>
+                              <div class="text-danger" id="error_final_exam_stu_marks"></div>
+                            </div>
+
+                          </div>
                         </div>
+
+                        <div class="modal-footer">
+                           <div id="formAlert" class="alert d-none" role="alert"></div>
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="button" class="btn btn-primary" id="StudentMarksStoreButton">Save Marks</button>
+                          
+                        </div>
+                      </form>
                     </div>
+                  </div>
                 </div>
 
                 {{-- for update marks --}}
@@ -524,17 +542,73 @@
             </div>
         </div>
     </div>
-    @if ($errors && $errors->any())
-        <script>
-            document.addEventListener("DOMContentLoaded", function () {
-                var myModal = new bootstrap.Modal(document.getElementById('addMarksModal'));
-                myModal.show();
-            });
-        </script>
-    @endif
     
 @endsection
+{{-- @section('scripts') --}}
     <script>
+        $(document).ready(function () {
+            $('#StudentMarksStoreButton').on('click', function (e) {
+                e.preventDefault(); // Prevent default button action
+
+                // Get the form element
+                var form = $('#StudentMarksStore')[0];
+
+                // Create FormData from the form
+                var formData = new FormData(form);
+                $('#formAlert').addClass('d-none').removeClass('alert-danger alert-success').text('');
+                $('.text-danger').text('');
+                $('input, select').removeClass('is-invalid');
+                $.ajax({
+                    url: "{{ route('admin.student-marks.store') }}", // adjust to your route
+                    type: "POST",
+                    data: formData,
+                    contentType: false, // required for FormData
+                    processData: false, // required for FormData
+                    success: function (response) {
+                        if (response.success === true) {
+                            $('#formAlert')
+                                .removeClass('d-none alert-danger')
+                                .addClass('alert alert-success')
+                                .text(response.message); // should now work
+
+                            $('#StudentMarksStore')[0].reset();
+                             setTimeout(function () {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    },
+                   error: function (xhr) {
+                    $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
+                         if (xhr.status === 422) {
+                            let response = xhr.responseJSON;
+
+                            // If message is available, show it
+                            if (response.message) {
+                                $('#formAlert').html(response.message);
+                            }
+
+                            // Show field-wise errors if any
+                            if (response.errors) {
+                                $('.text-danger').text('');
+                                $.each(response.errors, function (key, value) {
+                                    $('#error_' + key).text(value[0]);
+                                    $('#' + key).addClass('is-invalid');
+                                });
+                            }
+                        } else {
+                            $('#formAlert').html('An unexpected error occurred. Please try again.');
+                        }
+                    }
+                });
+            });
+        });
+
+        $('input, select').on('input change', function () {
+            var field = $(this).attr('id');
+            $('#error_' + field).text('');
+            $(this).removeClass('is-invalid');
+        });
+
         $(document).ready(function() {
             $('#session_id').on('change', function() {
                 var sessionId = $(this).val();
@@ -594,10 +668,7 @@
                 }
             });
         });
-    </script>
 
-    {{-- for edit student --}}
-    <script>
         $(document).ready(function() {
             // Function to load students for the edit modal
             function loadEditStudents(sessionId, selectedStudentId = null) {
@@ -769,10 +840,6 @@
             // ... (your existing $('#session_id').on('change') and $('#student_id').on('change') for the ADD modal) ...
 
         });
-    </script>
-
-    {{-- for delete student mark --}}
-    <script>
         function deleteMark(userId) {
                 Swal.fire({
                     icon: 'warning',
@@ -805,3 +872,5 @@
                 });
             }     
     </script>
+{{-- @endsection --}}
+    

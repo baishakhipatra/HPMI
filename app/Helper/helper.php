@@ -47,7 +47,7 @@ if (!function_exists('generateEmployeeId')) {
 if (!function_exists('generateTeacherId')) {
     function generateTeacherId()
     {
-         $lastId = Admin::withTrashed()
+        $lastId = Admin::withTrashed()
             ->where('user_id', 'LIKE', 'TEACH%')
             ->orderByRaw("CAST(SUBSTRING(user_id, 6) AS UNSIGNED) DESC") // Start from 6th char (after 'TEACH')
             ->value('user_id');
