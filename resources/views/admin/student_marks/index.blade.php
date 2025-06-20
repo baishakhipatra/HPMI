@@ -409,7 +409,7 @@
 
                             <form action="{{ route('admin.student-marks.update') }}" method="POST">
                                 @csrf
-                                {{-- @method('PUT') This is crucial for Laravel's update method --}}
+
 
                                 <input type="hidden" id="edit_mark_id" name="id"> {{-- This input will hold the mark ID --}}
 
@@ -774,34 +774,34 @@
     {{-- for delete student mark --}}
     <script>
         function deleteMark(userId) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: "Are you sure you want to delete this?",
-                    text: "You won't be able to revert this!",
-                    showCancelButton: true,
-                    confirmButtonColor: "#3085d6",
-                    cancelButtonColor: "#d33",
-                    confirmButtonText: "Delete",
-                }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: "{{ route('admin.student-marks.delete')}}",
-                            type: 'POST',
-                            data: {
-                                "id": userId,
-                                "_token": '{{ csrf_token() }}',
-                            },
-                            success: function (data){
-                                if (data.status != 200) {
-                                    toastFire('error', data.message);
-                                } else {
-                                    toastFire('success', data.message);
-                                    location.reload();
-                                }
+            Swal.fire({
+                icon: 'warning',
+                title: "Are you sure you want to delete this?",
+                text: "You won't be able to revert this!",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Delete",
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('admin.student-marks.delete')}}",
+                        type: 'POST',
+                        data: {
+                            "id": userId,
+                            "_token": '{{ csrf_token() }}',
+                        },
+                        success: function (data){
+                            if (data.status != 200) {
+                                toastFire('error', data.message);
+                            } else {
+                                toastFire('success', data.message);
+                                location.reload();
                             }
-                        });
-                    }
-                });
-            }     
+                        }
+                    });
+                }
+            });
+        }     
     </script>
