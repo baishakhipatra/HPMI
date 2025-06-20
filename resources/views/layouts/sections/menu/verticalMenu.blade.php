@@ -71,11 +71,11 @@
                 <div>Student Marks</div>
               </a>
             </li>
-            {{-- <li class="menu-item {{ (request()->is('admin/student-management/student-progress-marking*')) ? 'open' : '' }}">
+            <li class="menu-item {{ (request()->is('admin/student-management/student-progress-marking*')) ? 'open' : '' }}">
               <a href="{{route('admin.studentprogressmarking')}}" class="menu-link">
                 <div>Progress Marking</div>
               </a>
-            </li> --}}
+            </li>
           </ul>
         </li>
 

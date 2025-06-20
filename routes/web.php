@@ -195,10 +195,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
             });
 
-            // Route::prefix('student-progress-marking')->group(function(){
-            //     Route::get('/', [StudentProgressMarkingController::class, 'index'])->name('admin.studentprogressmarking');
+            Route::prefix('student-progress-marking')->group(function(){
+                Route::get('/', [StudentProgressMarkingController::class, 'index'])->name('admin.studentprogressmarking');
                
-            // });
+            });
             
         });
 
