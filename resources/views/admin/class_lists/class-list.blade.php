@@ -6,7 +6,7 @@
 @section('title', 'Class - List')
 
 @section('content')
-
+{{-- 
 @if ($errors->any())
 <div class="alert alert-danger">
   <ul class="mb-0">
@@ -15,9 +15,7 @@
     @endforeach
   </ul>
 </div>
-@endif
-
-
+@endif --}}
 <div class="container-fluid">
   <div class="row">
     <div class="col-8">
@@ -105,20 +103,6 @@
 
                 <input type="hidden" name="deleted_section_ids" id="deleted_section_ids" value="">
 
-                {{-- @foreach($update_data->sections as $key=>$section_item)
-                    <div>
-                        <div class="input-group mb-2">
-                            <div class="form-floating form-floating-outline flex-grow-1">
-                            <input type="text" name="section[]" class="form-control" placeholder="Enter Section" value="{{$section_item->section}}">
-                            <label>Section</label>
-                            </div>
-                            <button type="button" class="btn btn-outline-danger remove-section ms-2" id="{{$section_item->id}}">
-                            <i class="ri-close-line"></i>
-                            </button>
-                        </div>
-                    </div>
-                @endforeach --}}
-
                 @foreach($update_data->sections as $key=>$section_item)
                     <div class="input-group mb-2 existing-section">
                         <div class="form-floating form-floating-outline flex-grow-1">
@@ -137,6 +121,9 @@
                         <input type="text" name="section[]" class="form-control" placeholder="Enter Section">
                         <label>Section</label>
                         </div>
+                        @error('section')
+                        <p class="small text-danger"> {{$message}} </p>
+                        @enderror
                         <button type="button" class="btn btn-outline-secondary add-section ms-2">
                         <i class="menu-icon tf-icons ri-add-line"></i>
                         </button>
@@ -172,15 +159,20 @@
                 {{-- <label>Section</label> --}}
 
                 <div id="section-container">
-                <div class="input-group mb-2">
-                    <div class="form-floating form-floating-outline flex-grow-1">
-                    <input type="text" name="section[]" class="form-control" placeholder="Enter Section">
-                    <label>Section</label>
-                    </div>
-                    <button type="button" class="btn btn-outline-secondary add-section ms-2">
-                    <i class="menu-icon tf-icons ri-add-line"></i>
-                    </button>
-                </div>
+                  @foreach(old('section', ['']) as $index => $section)
+                      <div class="input-group mb-2">
+                          <div class="form-floating form-floating-outline flex-grow-1">
+                          <input type="text" name="section[]" class="form-control" placeholder="Enter Section">
+                          <label>Section</label>
+                          @error("section.$index")
+                          <p class="small text-danger"> {{$message}} </p>
+                          @enderror
+                          </div>
+                          <button type="button" class="btn btn-outline-secondary add-section ms-2">
+                          <i class="menu-icon tf-icons ri-add-line"></i>
+                          </button>
+                      </div>
+                  @endforeach
                 </div>
 
                 <div class="d-flex justify-content-end">

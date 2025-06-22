@@ -150,7 +150,7 @@ class StudentListController extends Controller
             return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
 
         } catch (\Exception $e) {
-            \Log::error('Student Admission Error: '.$e->getMessage());
+            //Log::error('Student Admission Error: '.$e->getMessage());
             //dd($e->getMessage());
             return back()->with('error', 'Something went wrong while processing admission.');
         }
@@ -272,7 +272,7 @@ class StudentListController extends Controller
             return redirect()->route('admin.studentlist')->with('success', 'Student updated successfully.');
 
         } catch (\Exception $e) {
-            \Log::error('Student Update Error: ' . $e->getMessage());
+           // \Log::error('Student Update Error: ' . $e->getMessage());
             return back()->with('error', 'Something went wrong while updating the student.');
         }
     }
@@ -411,7 +411,7 @@ class StudentListController extends Controller
             'roll_number' => [
                 'required',
                 'integer',
-                Role::unique('student_admissions')->where(function ($query) use ($request) {
+                Rule::unique('student_admissions')->where(function ($query) use ($request) {
                     return $query->where('class_id', $request->class_id)
                                 ->where('section', $request->section_id);
                 }),

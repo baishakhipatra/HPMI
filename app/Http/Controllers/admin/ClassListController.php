@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use App\Models\{ClassList, SectionList, ClassWiseSubject, Subject};
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class ClassListController extends Controller
 {
@@ -43,6 +43,9 @@ class ClassListController extends Controller
                 }),
             ],
             'section.*' => 'required|string|max:255',
+        ],
+        [
+            'section.*.required' => 'Section Is Required'
         ]);
 
 
@@ -74,7 +77,7 @@ class ClassListController extends Controller
     {
         $classData = ClassList::with('sections')->findOrFail($id);
 
-        $classlist = ClassList::select('class', \DB::raw('MAX(status) as status'))
+        $classlist = ClassList::select('class', DB::raw('MAX(status) as status'))
             ->groupBy('class')
             ->get()
             ->map(function ($item) {
