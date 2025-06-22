@@ -208,6 +208,19 @@ class ClassListController extends Controller
     }
 
     public function addSubjectToclass(Request $request) {
+       // dd($request->all());
+        $request->validate([
+            'subjectId' => 'required|numeric|min:1',
+            'classId' => 'required|numeric|min:1'
+        ], [
+            // 'subjectId.required' => 'Please select a subject',
+            'subjectId.numeric' => 'Please select a subject',
+            'subjectId.min' => 'Please select a valid subject',
+            // 'classId.required' => 'Class reference is missing',
+            // 'classId.numeric' => 'Invalid class reference',
+            // 'classId.min' => 'Invalid class reference'
+        ]);
+        
         $checkIfExists = ClassWiseSubject::where([
                 'subject_id' => $request->subjectId,
                 'class_id' => $request->classId,

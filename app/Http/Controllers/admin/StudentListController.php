@@ -10,36 +10,7 @@ use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmissi
 
 class StudentListController extends Controller
 {
-    // public function index(Request $request) 
-    // {
-    //     //dd($request->all());
-    //     // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
-    //     //     abort(403, 'Unauthorized access.');
-    //     // }
-
-    //     $keyword = $request->input('keyword');
-
-    //     $query = Student::with('session');
-
-    //     $query->when($keyword, function ($q) use ($keyword) {
-    //         $q->where(function($subQuery) use ($keyword) {
-    //             $subQuery->where('student_name', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('student_id', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('gender', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('parent_name', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('email', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('phone_number', 'like', '%'. $keyword . '%')
-    //                     ->orWhere('address', 'like', '%'. $keyword . '%');
-    //         })
-    //         ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-    //             $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
-    //         });
-    //     });
-
-    //     $students = $query->latest('id')->paginate(10);
-
-    //     return view('admin.student_management.studentlist', compact('students'));
-    // }
+   
     public function index(Request $request) 
     {
         $keyword = $request->input('keyword');
@@ -165,53 +136,7 @@ class StudentListController extends Controller
         return view('admin.student_management.update_student', compact('student','classrooms','sessions'));
     }
 
-    // public function update(Request $request,$id)
-    // {
-    //     $validated = $request->validate([
-    //         'student_name' => 'required|string|max:255',
-    //         'date_of_birth' => 'required|date',
-    //         'gender' => 'required',
-    //         'parent_name' => 'required|string|max:255',
-    //         'email' => 'nullable|email',
-    //         'phone_number' => 'nullable|string|max:20',
-    //         'address' => 'nullable|string|max:255', 
-    //         'admission_date' => 'required|date',
-    //         // 'class' => 'required|string|max:50',
-    //         // 'section' => 'required|string|max:50',
-    //         // 'roll_number' => 'required|integer',
-    //         'class_id' => 'required|exists:class_lists,id',
-    //         'section_id' => 'required|string',
-    //         'roll_number' => 'required|integer',
-    //         'session_id' => 'required|exists:academic_sessions,id'
-    //     ]);
-
-    //     $student = Student::findOrFail($id);
-    //     $student->update([
-    //         'student_name' => $request->student_name,
-    //         'date_of_birth' => $request->date_of_birth,
-    //         'gender' => $request->gender,
-    //         'parent_name' => $request->parent_name,
-    //         'email' => $request->email,
-    //         'phone_number' => $request->phone_number,
-    //         'address' => $request->address,
-    //         'academic_session_id' => $request->session_id
-    //     ]);
-    //     //$student->update($validated);
-
-    //     $admission = StudentAdmission::where('student_id', $id)->first();
-
-    //     if ($admission) {
-    //         $admission->update([
-    //             'session_id' => $request->session_id,
-    //             'class_id' => $request->class_id,
-    //             'section' => $request->section_id,
-    //             'roll_number' => $request->roll_number,
-    //             'admission_date' => $request->admission_date,
-    //         ]);
-    //     }
-
-    //     return redirect()->route('admin.studentlist')->with('success', 'Student updated successfully');
-    // }
+   
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -322,39 +247,7 @@ class StudentListController extends Controller
         return view('admin.student_management.admission_history',compact('student','admissionHistories','sessions','classes'));
     }
 
-    // public function admissionhistoryUpdate(Request $request)
-    // {
-    //     dd($request->all());
-    //     $request->validate([
-    //         'id' => 'required|exists:student_admissions,id',
-    //         'session_id' => 'required|integer',
-    //         'class_id' => 'required|integer',
-    //         'section_id' => 'required',
-    //         'roll_number' => 'required|numeric',
-    //         'admission_date' => 'required|date',
-    //     ]);
-
-    //     $history = StudentAdmission::findOrFail($request->id);
-    //     $alreadyAdmitted = StudentAdmission::where('student_id', $history->student_id)
-    //                     ->where('session_id', $request->session_id)
-    //                     ->where('id', '!=', $history->id)
-    //                     ->exists();
-
-    //     if ($alreadyAdmitted) {
-    //         return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
-    //                                 ->withInput();
-    //     }
-
-    //     $history->update([
-    //         'session_id' => $request->session_id,
-    //         'class_id' => $request->class_id,
-    //         'section' => $request->section_id,
-    //         'roll_number' => $request->roll_number,
-    //         'admission_date' => $request->admission_date,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Admission history updated successfully.');
-    // }
+    
     public function admissionhistoryUpdate(Request $request)
     {
         // dd($request->all());

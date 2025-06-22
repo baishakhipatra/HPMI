@@ -55,7 +55,7 @@
           </ul>
         </li>
 
-        <li class="menu-item {{ (request()->is('admin/bom-parts*')) ? 'open' : '' }}" style="">
+        <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
           <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
             <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
             <div>Student Management</div>
@@ -64,6 +64,16 @@
             <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
               <a href="{{route('admin.studentlist')}}" class="menu-link">
                 <div>Student List</div>
+              </a>
+            </li>
+            <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.studentmarklist')}}" class="menu-link">
+                <div>Student Marks</div>
+              </a>
+            </li>
+            <li class="menu-item {{ (request()->is('admin/student-management/student-progress-marking*')) ? 'open' : '' }}">
+              <a href="{{route('admin.studentprogressmarking')}}" class="menu-link">
+                <div>Progress Marking</div>
               </a>
             </li>
           </ul>
@@ -75,14 +85,14 @@
             <div>Master Module</div>
           </a>
           <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.classlist')}}" class="menu-link">
-                <div>Class List</div>
-              </a>
-            </li>
             <li class="menu-item {{ (request()->is('admin/master-module/subject-list')) ? 'open' : '' }}">
               <a href="{{route('admin.subjectlist.index')}}" class="menu-link">
                 <div>Subject List</div>
+              </a>
+            </li>
+            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.classlist')}}" class="menu-link">
+                <div>Class List</div>
               </a>
             </li>
           </ul>

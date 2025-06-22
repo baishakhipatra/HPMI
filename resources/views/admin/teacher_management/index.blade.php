@@ -50,29 +50,61 @@
       <table class="table">
         <thead>
           <tr>
-            <th width="10%">Name</th>
-            <th width="5%">Email</th>
-            <th width="5%">Mobile</th>
-            <th width="5%">Teacher ID</th>
-            <th width="10%">DOB</th>
-            <th width="5%">Address</th>  
-            <th width="5%">Classes Assigned</th>
-            <th width="10%">Subjects Taught</th>
+            <th width="20%">Name</th>
+            <th width="10%">Email</th>
+            <th width="10%">Mobile</th>
+            <th width="15%">Classes</th>
+            <th width="40%">Subjects</th>
             <th width="5%">Status</th>
             <th width="10%">Actions</th>
           </tr>
         </thead>
         <tbody class="table-border-bottom-0">
           @foreach($admins as $item)
+            @php
+              $classes = [];
+              $subjects = [];
+              foreach ($item->teacherSubjects as $teacherSubject) {
+                $clasName = $teacherSubject->classList->class;
+                $subjectName = $teacherSubject->subjectList->sub_name;
+
+                if (!in_array($clasName, $classes)) {
+                  $classes[] = $clasName;
+                }
+                $subjects[] = 'Class ' . $clasName . ' - ' . ucfirst($subjectName);
+              }
+              // dd($subjects);
+            @endphp
             <tr>
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              <td>{{ $item->user_id }}</td>
-              <td>{{ $item->date_of_birth }}</td>
-              <td>{{ ucfirst($item->address) }}</td>
-              <td>{{ ucfirst($item->class->class ?? '-') }}</td>
-              <td>{{ ucfirst($item->subject->sub_name ?? '-') }}</td>
+              <td>
+                @if(count($classes) > 0)
+                  <ul class="mb-0">
+                      @foreach($classes as $eachClassItem)
+                        <li>{{ $eachClassItem ?? '-' }}</li>
+                      @endforeach
+                  </ul>
+                @else
+                    -
+                @endif
+              </td>
+             
+              <td>
+                @if(count($subjects) > 0)
+                    <ul class="mb-0">
+                        @foreach($subjects as $eachSubjectItem)
+                            <li>
+                                {{ $eachSubjectItem }}
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    -
+                @endif
+              </td>
+
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
@@ -84,19 +116,28 @@
               <td>
                 <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
+                    <i class="ri-more-2-line"></i>
                   </button>
                   <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.teacher.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
-                          <i class="ri-pencil-line me-1"></i> Edit
-                      </a>
-                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteTeacher({{$item->id}})">
-                          <i class="ri-delete-bin-6-line me-1"></i> Delete
-                      </a>
+                    {{-- Show --}}
+                    <a class="dropdown-item" href="{{ route('admin.teacher.show', $item->id) }}" title="View" data-bs-toggle="tooltip">
+                      <i class="ri-eye-line me-1"></i> View
+                    </a>
+
+                    {{-- Edit --}}
+                    <a class="dropdown-item" href="{{ route('admin.teacher.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
+                      <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+
+                    {{-- Delete --}}
+                    <a class="dropdown-item" href="javascript:void(0);" title="Delete" data-bs-toggle="tooltip" onclick="deleteTeacher({{ $item->id }})">
+                      <i class="ri-delete-bin-6-line me-1"></i> Delete
+                    </a>
                   </div>
                 </div>
               </td>
- 
+
+              
             </tr>
           @endforeach         
         </tbody>

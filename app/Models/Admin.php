@@ -13,7 +13,7 @@ class Admin extends Authenticatable
     protected $guard = 'admin';
 
     protected $fillable = ['name', 'user_id', 'user_name', 'user_type', 'status', 'email', 'mobile', 'address',
-    'date_of_birth', 'date_of_joining','qualifications', 'subjects_taught', 'classes_assigned', 'password'];
+    'date_of_birth', 'date_of_joining','qualifications', 'password'];
 
     protected $hidden = ['password'];
 
@@ -25,5 +25,15 @@ class Admin extends Authenticatable
     public function subject()
     {
         return $this->belongsTo(Subject::class, 'subjects_taught');
+    }
+
+    public function teacherClasses()
+    {
+        return $this->hasMany(TeacherClass::class, 'teacher_id');
+    }
+
+    public function teacherSubjects()
+    {
+        return $this->hasMany(TeacherSubject::class, 'teacher_id');
     }
 }

@@ -1,3 +1,8 @@
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
 @extends('layouts/contentNavbarLayout')
 
@@ -15,7 +20,7 @@
           <div class="card-header d-flex align-items-center justify-content-between">
             <h5 class="mb-0">Edit Teacher</h5>
             <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
-              <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
+              <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
             </a>
           </div>
 
@@ -27,6 +32,14 @@
 
                     {{-- Row 1: Name, Teacher ID, Type --}}
                     <div class="row mb-3">
+                          <div class="col-md-4">
+                        <div class="form-floating form-floating-outline">
+                        <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
+                        <label>Teacher ID</label>
+                        @error('user_id') <p class="text-danger small">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                    
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name', $data->name) }}">
@@ -34,13 +47,7 @@
                         @error('name') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-floating form-floating-outline">
-                        <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
-                        <label>Teacher ID</label>
-                        @error('user_id') <p class="text-danger small">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
+                  
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="user_type" value="{{ old('user_type', $data->user_type) }}" class="form-control" readonly>
@@ -102,18 +109,16 @@
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
                   
-                    {{-- @php
-                        $classLists = \App\Models\ClassList::all();
-                    @endphp
+                    {{-- Pass $classLists and $selectedClassIds, $selectedSubjectIds from controller --}}
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <div class="form-floating form-floating-outline">
-                                <select name="classes_assigned" id="classDropdown" class="form-control">
-                                    <option value="">-- Select Class --</option>
+                                <select name="classes_assigned[]" id="classDropdown" class="form-control" multiple>
                                     @foreach($classLists as $class)
-                                      <option value="{{ $class->id}}" {{ old('class_assigned', $data->classes_assigned) == $class->id ? 'selected' : ''}}>
-                                        {{$class->class}}
-                                      </option>
+                                        <option value="{{ $class->id }}" 
+                                            {{ in_array($class->id, old('classes_assigned', $selectedClassIds)) ? 'selected' : '' }}>
+                                            {{ $class->class }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <label>Class Assigned</label>
@@ -123,62 +128,22 @@
 
                         <div class="col-md-4">
                             <div class="form-floating form-floating-outline">
-                              <select name="subjects_taught" id="subjectDropdown" class="form-control">
-                                <option value="">--Select Subject--</option>
-                                @if($data->classes_assigned)
-                                  @php
-                                    $subjects = \App\Models\ClassWiseSubject::with('subject')
-                                    ->where('class_id', $data->classes_assigned)
-                                    ->get()
-                                    ->pluck('subject')
-                                    ->filter();
-                                  @endphp
-                                  @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subjects_taught', $data->subjects_taught) == $subject->id ? 'selected' : ''}}>
-                                      {{ $subject->sub_name}}
-                                    </option>
-                                  @endforeach
-                                @endif  
-                              </select>    
+                                <select name="subjects_taught[]" id="subjectDropdown" class="form-control" multiple>
+                                    {{-- Will be populated dynamically --}}
+                                </select>
+                                <label>Subjects Taught</label>
+                                @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
                         </div>
-                    </div> --}}
+                    </div>
 
-                    {{-- Class and Subject Dropdowns --}}
-       @php
-    $classLists = \App\Models\ClassList::all();
-@endphp
+                    <input type="hidden" name="id" value="{{ $data->id }}">
 
-<div class="row mb-3">
-    <div class="col-md-4">
-        <div class="form-floating form-floating-outline">
-            <select name="classes_assigned" id="classDropdown" class="form-control">
-                <option value="">-- Select Class --</option>
-                @foreach($classLists as $class)
-                    <option value="{{ $class->id }}"
-                        {{ old('classes_assigned', $data->classes_assigned) == $class->id ? 'selected' : '' }}>
-                        {{ $class->class }}
-                    </option>
-                @endforeach
-            </select>
-            <label>Class Assigned</label>
-            @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
-        </div>
-    </div>
-
-    <div class="col-md-4">
-        <div class="form-floating form-floating-outline">
-            <select name="subjects_taught" id="subjectDropdown" class="form-control">
-                <option value="{{ $data->subjects_taught }}" selected>
-                    {{ \App\Models\Subject::find($data->subjects_taught)->sub_name ?? '-- Select Subject --' }}
-                </option>
-            </select>
-            <label>Subject Taught</label>
-            @error('subjects_taught') <p class="text-danger small">{{ $message }}</p> @enderror
-        </div>
-    </div>
-</div>
-
+                    <div class="text-end">
+                      <button type="submit" class="btn btn-primary px-4 py-2">Update</button>
+                    </div>
+                </form>
+            </div>
 
           <!-- End Card Body -->
 
@@ -190,26 +155,56 @@
 </section>
 
 @endsection
+
 <script>
-  $(document).ready(function () {
-    $('#classDropdown').on('change', function () {
-      var classId = $(this).val();
-      $('#subjectDropdown').html('<option value="">Loading...</option>');
-      if (classId) {
-        $.ajax({
-          url: "{{ route('admin.getSubjectsByClass') }}",
-          type: "GET",
-          data: { class_id: classId },
-          success: function (data) {
-            $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-            $.each(data, function (key, subject) {
-              $('#subjectDropdown').append('<option value="' + subject.id + '">' + subject.sub_name + '</option>');
+    $(document).ready(function () {
+        let selectedSubjects = @json($selectedClassWiseSubjectIds);
+        // console.log('selectedSubjectIds', selectedSubjects);
+
+        function fetchSubjects(classIds) {
+            $('#subjectDropdown').html('<option value="">Loading...</option>');
+            $.ajax({
+                url: "{{ route('admin.getSubjectsByClass') }}",
+                type: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    'class_ids[]': classIds
+                },
+                traditional: true,
+                success: function (response) {
+                    $('#subjectDropdown').html('');
+                    if (response.data.length > 0) {
+                        console.log('Response data', response.data);
+
+                        $.each(response.data, function (key, item) {
+                            if (item.subject && item.class_list) {
+                                var label = 'Class ' + item.class_list.class + ' - ' + item.subject.sub_name;
+                                var selected = selectedSubjects.includes(item.id) ? 'selected' : '';
+                                $('#subjectDropdown').append('<option value="' + item.id + '" ' + selected + '>' + label + '</option>');
+                            }
+                        });
+                    } else {
+                        $('#subjectDropdown').html('<option value="">No subjects available</option>');
+                    }
+                }
             });
-          },
+        }
+
+        // Initial load for pre-selected classes
+        const preSelectedClasses = $('#classDropdown').val();
+        if (preSelectedClasses && preSelectedClasses.length > 0) {
+            fetchSubjects(preSelectedClasses);
+        }
+
+        // On change
+        $('#classDropdown').on('change', function () {
+            let classIds = $(this).val();
+            selectedSubjects = []; // reset selected subjects on change
+            if (classIds.length > 0) {
+                fetchSubjects(classIds);
+            } else {
+                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+            }
         });
-      } else {
-        $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-      }
     });
-  });
 </script>

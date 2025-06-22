@@ -26,7 +26,15 @@ class Student extends Model
         'class',
         'section',
         'roll_number',
-        'status'
+        'status',
+        'aadhar_no',
+        'blood_group',
+        'height',
+        'weight',
+        'father_name',
+        'mother_name',
+        'divyang'
+
     ];
 
     public function admissions()

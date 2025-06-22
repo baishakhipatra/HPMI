@@ -47,7 +47,7 @@ if (!function_exists('generateEmployeeId')) {
 if (!function_exists('generateTeacherId')) {
     function generateTeacherId()
     {
-         $lastId = Admin::withTrashed()
+        $lastId = Admin::withTrashed()
             ->where('user_id', 'LIKE', 'TEACH%')
             ->orderByRaw("CAST(SUBSTRING(user_id, 6) AS UNSIGNED) DESC") // Start from 6th char (after 'TEACH')
             ->value('user_id');
@@ -61,4 +61,14 @@ if (!function_exists('generateTeacherId')) {
 
         return 'TEACH' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
+}
+
+function calculateGrade($total)
+{
+    if($total >= 90) return 'A+';
+    if($total >= 80) return 'A';
+    if($total >= 70) return 'B+';
+    if($total >= 60) return 'B';
+    if($total >= 50) return 'C';
+    return 'F';
 }

@@ -37,9 +37,14 @@
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
-                  <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Export Data">
+                  <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                    <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" 
+                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                      data-toggle="tooltip" title="Export Data">
                       Export
-                  </a>
+                    </a>
+                  </div>
+                 
                 </div>
               </div>
             </div>
