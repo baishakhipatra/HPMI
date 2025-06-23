@@ -182,6 +182,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
                 Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
                 Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+
+                Route::get('/student-progress-marking/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist');
             });
 
             Route::prefix('studentmark-list')->group(function(){
@@ -195,8 +197,12 @@ Route::prefix('admin')->group(function () {
                 Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
             });
 
-            Route::prefix('student-progress-marking')->group(function(){
-                Route::get('/', [StudentProgressMarkingController::class, 'index'])->name('admin.studentprogressmarking');
+            Route::prefix('student-progress-categories')->group(function(){
+                Route::get('/', [StudentProgressMarkingController::class, 'studentProgress'])->name('admin.student.progresslist');
+                Route::post('/store', [StudentProgressMarkingController::class, 'studentProgressStore'])->name('admin.student.progressstore');
+                Route::post('/update/{id}', [StudentProgressMarkingController::class, 'studentProgressUpdate'])->name('admin.student.progressupdate');
+                Route::get('/status/{id}', [StudentProgressMarkingController::class, 'studentProgressStatusToggle'])->name('admin.student.progressstatus');
+                Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete');
                
             });
             

@@ -72,8 +72,8 @@
               </a>
             </li>
             <li class="menu-item {{ (request()->is('admin/student-management/student-progress-marking*')) ? 'open' : '' }}">
-              <a href="{{route('admin.studentprogressmarking')}}" class="menu-link">
-                <div>Progress Marking</div>
+              <a href="{{route('admin.student.progresslist')}}" class="menu-link">
+                <div>Progress Marking Category</div>
               </a>
             </li>
           </ul>

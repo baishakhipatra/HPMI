@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, };
+use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory};
 
 class StudentListController extends Controller
 {
@@ -394,6 +394,29 @@ class StudentListController extends Controller
         } else {
             return redirect()->back()->with('error', 'No records found to export.');
         }
+    }
+
+    public function studentProgressList($student_id, $current_session){
+
+    $student = Student::with('admissions.session')->find($student_id);
+
+    if (!$student) {
+        abort(404, 'Student not found');
+    }
+
+    $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
+        ->groupBy('field')
+        ->map(function ($items) {
+            return $items->pluck('value')->toArray(); // get only values per field
+        })
+        ->toArray();
+
+    // Create array: session_name => admission_id
+    $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
+        return [$admission->session->session_name ?? 'Unknown' => $admission->id];
+    })->toArray();
+
+        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','student_progress_category'));
     }
 
 

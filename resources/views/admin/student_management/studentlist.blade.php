@@ -44,7 +44,7 @@
                       Export
                     </a>
                   </div>
-                 
+                  
                 </div>
               </div>
             </div>
@@ -69,6 +69,10 @@
         </thead>
         <tbody class="table-border-bottom-0">
           @foreach($students as $item)
+            @php
+              $current_session = $item->admission?->academicsession?->session_name ?? 'Null';
+            @endphp
+
             <tr> 
               <td>{{ ucwords($item->student_name) }}</td>
               <td>{{ ($item->student_id) }}</td>
@@ -97,6 +101,9 @@
 
                       <a class="dropdown-item" href="{{ route('admin.student.admissionhistory',  $item->id) }}" title="Edit" data-bs-toggle="tooltip">
                           <i class="ri-graduation-cap-line me-1"></i> Admission History
+                      </a>
+                      <a class="dropdown-item" href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}" title="Edit" data-bs-toggle="tooltip">
+                          <i class="ri-graduation-cap-line me-1"></i> Student Progress Marking
                       </a>
                   </div>
                 </div>
