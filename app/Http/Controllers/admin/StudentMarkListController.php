@@ -129,6 +129,7 @@ class StudentMarkListController extends Controller
 
         $admissions = StudentAdmission::with('student')
                         ->where('session_id', $sessionId)
+                        ->whereHas('student')
                         ->get();
 
         $students = $admissions->map(function ($admission) {

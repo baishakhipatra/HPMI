@@ -23,6 +23,12 @@ class StudentListController extends Controller
                         ->orWhere('student_id', 'like', '%'. $keyword . '%')
                         ->orWhere('gender', 'like', '%'. $keyword . '%')
                         ->orWhere('parent_name', 'like', '%'. $keyword . '%')
+                        ->orWhere('father_name', 'like', '%'. $keyword . '%')
+                        ->orWhere('mother_name', 'like', '%'. $keyword . '%')
+                        ->orWhere('aadhar_no', 'like', '%'. $keyword . '%')
+                        ->orWhere('blood_group', 'like', '%'. $keyword . '%')
+                        ->orWhere('height', 'like', '%'. $keyword . '%')
+                        ->orWhere('weight', 'like', '%'. $keyword . '%')
                         ->orWhere('email', 'like', '%'. $keyword . '%')
                         ->orWhere('phone_number', 'like', '%'. $keyword . '%')
                         ->orWhere('address', 'like', '%'. $keyword . '%');
@@ -54,78 +60,172 @@ class StudentListController extends Controller
     }
 
 
+    // public function store(Request $request)
+    // {
+    //     //dd($request->all());
+    //     $request->validate([
+    //         'student_name'  => 'required|string|max:255',
+    //         'gender' => 'required|in:Male,Female,Other',
+    //         'date_of_birth' => 'required|date|before_or_equal:today',
+    //         'phone_number'  => ['required', 'regex:/^[0-9]{10}$/'],
+    //         'parent_name'   => 'required|string|max:255',
+    //         'email' => 'required|string|email',
+    //         'address'       => 'required|string',
+    //         'session_id'    => 'required|exists:academic_sessions,id',
+    //         'class_id'      => 'required|exists:class_lists,id',
+    //         'section_id'    => 'required',
+    //         //'roll_number' => 'required|integer',
+    //         'roll_number'   => [
+    //             'required',
+    //             'integer',
+    //             Rule::unique('student_admissions')->where( function ($query) use ($request) {
+    //                 return $query->where('class_id', $request->class_id)
+    //                             ->where('section', $request->section_id);
+    //             }),
+    //         ],
+    //         'admission_date' => 'required|date',
+    //         // New fields (optional or required as needed)
+    //         'aadhar_no'   => [
+    //             'required',
+    //             'string',
+    //             'max:20',
+    //             Rule::unique('students', 'aadhar_no')->whereNull('deleted_at'),
+    //         ],
+    //         'blood_group' => 'required|string|max:10',
+    //         'height' => 'required|string',
+    //         'weight' => 'required|string',
+    //         'father_name' => 'required|string|max:255',
+    //         'mother_name' => 'required|string|max:255',
+    //         'divyang' => 'required|in:Yes,No',
+    //     ]);
+
+    //     try {
+    //         $student = Student::where('student_name', $request->student_name)
+    //             ->where('date_of_birth', $request->date_of_birth)
+    //             ->first();
+
+    //         if (!$student) {
+    //             $student = new Student();
+    //             $student->student_id = Student::generateStudentUid();
+    //             $student->student_name = $request->student_name;
+    //             $student->gender = $request->gender;
+    //             $student->date_of_birth = $request->date_of_birth;
+    //             $student->phone_number = $request->phone_number;
+    //             $student->parent_name = $request->parent_name;
+    //             $student->email = $request->email;
+    //             //$student->session_id = $request->session_id;
+    //             $student->address = $request->address;
+
+    //             $student->aadhar_no = $request->aadhar_no;
+    //             $student->blood_group = $request->blood_group;
+    //             $student->height = $request->height;
+    //             $student->weight = $request->weight;
+    //             $student->father_name = $request->father_name;
+    //             $student->mother_name = $request->mother_name;
+    //             $student->divyang = $request->divyang;
+    //             $student->save();
+    //         }
+    //         $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
+    //             ->where('session_id', $request->session_id)
+    //             ->exists();
+
+    //         if ($alreadyAdmitted) {
+    //             return back()->with('error', 'This student is already admitted in the selected session.');
+    //         }
+
+    //         $admission = StudentAdmission::create([
+    //             'student_id' => $student->id,
+    //             'session_id' => $request->session_id,
+    //             'class_id'   => $request->class_id,
+    //             'section'    => $request->section_id,
+    //             'roll_number'    => $request->roll_number,
+    //             'admission_date' => $request->admission_date,
+    //         ]);
+    //         // dd($request->session_id);
+
+    //         //Update student with admission ID
+    //         $student->student_admission_id = $admission->id;
+    //         $student->save();
+
+    //         return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
+
+    //     } catch (\Exception $e) {
+    //         //Log::error('Student Admission Error: '.$e->getMessage());
+    //         //dd($e->getMessage());
+    //         return back()->with('error', 'Something went wrong while processing admission.');
+    //     }
+    // }
+
     public function store(Request $request)
     {
         $request->validate([
-            'student_name' => 'required|string|max:255',
-            'gender' => 'required|in:Male,Female,Other',
-            'date_of_birth' => 'required|date|before_or_equal:today',
-            'phone_number' =>  ['required', 'regex:/^[0-9]{10}$/'],
-            'parent_name' => 'required|string|max:255',
-            'email'=> 'required|string',
-            'address' => 'required|string',
-            'session_id'   => 'required|exists:academic_sessions,id',
-            'class_id' => 'required|exists:class_lists,id',
-            'section_id' => 'required',
-            //'roll_number' => 'required|integer',
-            'roll_number'   => [
-                'required',
-                'integer',
-                Rule::unique('student_admissions')->where( function ($query) use ($request) {
-                    return $query->where('class_id', $request->class_id)
-                                ->where('section', $request->section_id);
-                }),
+            'student_name'    => 'required|string|max:255',
+            'date_of_birth'   => 'required|date',
+            'gender'          => 'required|in:Male,Female,Other',
+            'parent_name'     => 'required|string|max:255',
+            'email'           => 'nullable|email',
+            'phone_number'    => 'nullable|string|max:20',
+            'address'         => 'nullable|string|max:255',
+            'admission_date'  => 'required|date',
+            'class_id'        => 'required|exists:class_lists,id',
+            'section_id'      => 'required|string',
+            'roll_number'     => 'nullable|integer',
+            'session_id'      => 'required|exists:academic_sessions,id',
+
+            // Optional fields
+            'aadhar_no'       => [
+                'nullable', 'string', 'max:12',
+                Rule::unique('students')->whereNull('deleted_at'),
             ],
-            'admission_date' => 'required|date',
+            'blood_group'     => 'nullable|string|max:10',
+            'height'          => 'nullable|string',
+            'weight'          => 'nullable|string',
+            'father_name'     => 'nullable|string|max:255',
+            'mother_name'     => 'nullable|string|max:255',
+            'divyang'         => 'required|in:Yes,No',
         ]);
 
         try {
-            $student = Student::where('student_name', $request->student_name)
-                ->where('date_of_birth', $request->date_of_birth)
-                ->first();
+            $generatedId = Student::generateStudentUid(); // Generate unique student_id
 
-            if (!$student) {
-                $student = new Student();
-                $student->student_id = Student::generateStudentUid();
-                $student->student_name = $request->student_name;
-                $student->gender = $request->gender;
-                $student->date_of_birth = $request->date_of_birth;
-                $student->phone_number = $request->phone_number;
-                $student->parent_name = $request->parent_name;
-                $student->email = $request->email;
-                //$student->session_id = $request->session_id;
-                $student->address = $request->address;
-                $student->save();
-            }
-            $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
-                ->where('session_id', $request->session_id)
-                ->exists();
+            $student = Student::create([
+                'student_id'     => $generatedId, // 
+                'student_name'   => $request->student_name,
+                'date_of_birth'  => $request->date_of_birth,
+                'gender'         => $request->gender,
+                'parent_name'    => $request->parent_name,
+                'email'          => $request->email,
+                'phone_number'   => $request->phone_number,
+                'address'        => $request->address,
+                'aadhar_no'      => $request->aadhar_no,
+                'blood_group'    => $request->blood_group,
+                'height'         => $request->height,
+                'weight'         => $request->weight,
+                'father_name'    => $request->father_name,
+                'mother_name'    => $request->mother_name,
+                'divyang'        => $request->divyang,
+            ]);
 
-            if ($alreadyAdmitted) {
-                return back()->with('error', 'This student is already admitted in the selected session.');
-            }
-
+            // Create admission
             $admission = StudentAdmission::create([
-                'student_id' => $student->id,
-                'session_id' => $request->session_id,
-                'class_id' => $request->class_id,
-                'section' => $request->section_id,
-                'roll_number' => $request->roll_number,
+                'student_id'     => $student->id,
+                'session_id'     => $request->session_id,
+                'class_id'       => $request->class_id,
+                'section'        => $request->section_id,
+                'roll_number'    => $request->roll_number,
                 'admission_date' => $request->admission_date,
             ]);
 
-            //Update student with admission ID
-            $student->student_admission_id = $admission->id;
-            $student->save();
+            // Optional: update admission_id in students table
+            $student->update(['student_admission_id' => $admission->id]);
 
-            return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
-
+            return redirect()->route('admin.studentlist')->with('success', 'Student created successfully.');
         } catch (\Exception $e) {
-            //Log::error('Student Admission Error: '.$e->getMessage());
             //dd($e->getMessage());
-            return back()->with('error', 'Something went wrong while processing admission.');
+            return back()->with('error', 'Failed to create student.')->withInput();
         }
     }
+
 
 
     public function edit($id)
@@ -137,59 +237,91 @@ class StudentListController extends Controller
     }
 
    
+
     public function update(Request $request, $id)
     {
+        //dd($request->all());
         $request->validate([
-            'student_name' => 'required|string|max:255',
-            'date_of_birth' => 'required|date',
-            'gender' => 'required',
-            'parent_name' => 'required|string|max:255',
-            'email' => 'nullable|email',
-            'phone_number' => 'nullable|string|max:20',
-            'address' => 'nullable|string|max:255',
-            'admission_date' => 'required|date',
-            'class_id' => 'required|exists:class_lists,id',
-            'section_id' => 'required|string',
-            //'roll_number' => 'required|integer',
-            'roll_number'  => [
-                'required',
+            'student_name'    => 'required|string|max:255',
+            'date_of_birth'   => 'required|date',
+            'gender'          => 'required|in:Male,Female,Other',
+            'parent_name'     => 'required|string|max:255',
+            'email'           => 'nullable|email',
+            'phone_number'    => 'nullable|string|max:20',
+            'address'         => 'nullable|string|max:255',
+            'admission_date'  => 'required|date',
+            'class_id'        => 'required|exists:class_lists,id',
+            'section_id'      => 'required|string',
+            // 'roll_number'     => [
+            //     'required',
+            //     'integer',
+            //     Rule::unique('student_admissions')->ignore($id, 'student_id')->where(function ($query) use ($request) {
+            //         return $query->where('class_id', $request->class_id)
+            //                     ->where('section', $request->section_id);
+            //     }),
+            // ],
+            'roll_number' => [
+                'nullable',
                 'integer',
-                Rule::unique('student_admissions')->where( function ($query) use ($request,$id) {
-                    return $query->where('student_id','!=', $id)->where('class_id', $request->class_id)
-                                ->where('section', $request->section_id);
-                }),
+                Rule::unique('student_admissions')
+                    ->ignore($request->admission_id) 
+                    ->where(function ($query) use ($request) {
+                        return $query->where('class_id', $request->class_id)
+                                    ->where('section', $request->section_id);
+                    }),
             ],
+        
+            'aadhar_no'    => [
+                'nullable',
+                'string',
+                'max:12',
+                Rule::unique('students')->ignore($id)->whereNull('deleted_at'),
+            ],
+            'blood_group'  => 'nullable|string|max:10',
+            'height'       => 'nullable|string',
+            'weight'       => 'nullable|string',
+            'father_name'  => 'nullable|string|max:255',
+            'mother_name'  => 'nullable|string|max:255',
+            'divyang'      => 'required|in:Yes,No',
         ]);
 
         try {
             $student = Student::findOrFail($id);
             $student->update([
-                'student_name' => $request->student_name,
+                'student_name'  => $request->student_name,
                 'date_of_birth' => $request->date_of_birth,
-                'gender' => $request->gender,
-                'parent_name' => $request->parent_name,
-                'email' => $request->email,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
-                'academic_session_id' => $request->session_id,
+                'gender'        => $request->gender,
+                'parent_name'   => $request->parent_name,
+                'email'         => $request->email,
+                'phone_number'  => $request->phone_number,
+                'address'       => $request->address,
+                'aadhar_no'     => $request->aadhar_no,
+                'blood_group'   => $request->blood_group,
+                'height'        => $request->height,
+                'weight'        => $request->weight,
+                'father_name'   => $request->father_name,
+                'mother_name'   => $request->mother_name,
+                'divyang'       => $request->divyang,
             ]);
-            $admission = StudentAdmission::where('student_id', $id)->first();
+
+            //$admission = StudentAdmission::where('student_id', $id);
+           $admission = StudentAdmission::find($request->admission_id);
 
             if ($admission) {
                 $admission->update([
-                    'session_id' => $request->session_id,
-                    'class_id' => $request->class_id,
-                    'section' => $request->section_id,
-                    'roll_number' => $request->roll_number,
+                    'session_id'     => $request->session_id,
+                    'class_id'       => $request->class_id,
+                    'section'        => $request->section_id,
+                    'roll_number'    => $request->roll_number,
                     'admission_date' => $request->admission_date,
                 ]);
             } else {
                 StudentAdmission::create([
-                    'student_id' => $id,
-                    'session_id' => $request->session_id,
-                    'class_id' => $request->class_id,
-                    'section' => $request->section_id,
-                    'roll_number' => $request->roll_number,
+                    'student_id'     => $id,
+                    'session_id'     => $request->session_id,
+                    'class_id'       => $request->class_id,
+                    'section'        => $request->section_id,
+                    'roll_number'    => $request->roll_number,
                     'admission_date' => $request->admission_date,
                 ]);
             }
@@ -197,7 +329,8 @@ class StudentListController extends Controller
             return redirect()->route('admin.studentlist')->with('success', 'Student updated successfully.');
 
         } catch (\Exception $e) {
-           // \Log::error('Student Update Error: ' . $e->getMessage());
+            // \Log::error('Student Update Error: ' . $e->getMessage());
+           //dd($e->getMessage());
             return back()->with('error', 'Something went wrong while updating the student.');
         }
     }
@@ -214,7 +347,6 @@ class StudentListController extends Controller
             'message' => 'Status updated successfully'
         ]);
     }
-
 
 
     public function delete(Request $request)
@@ -344,19 +476,25 @@ class StudentListController extends Controller
         if (!empty($keyword)) {
             $query->where(function ($q) use ($keyword) {
                 $q->where('student_name', 'like', '%' . $keyword . '%')
-                ->orWhere('student_id', 'like', '%' . $keyword . '%')
-                ->orWhere('gender', 'like', '%' . $keyword . '%')
-                ->orWhere('parent_name', 'like', '%' . $keyword . '%')
-                ->orWhere('email', 'like', '%' . $keyword . '%')
-                ->orWhere('phone_number', 'like', '%' . $keyword . '%')
-                ->orWhere('address', 'like', '%' . $keyword . '%');               
+                    ->orWhere('student_id', 'like', '%'. $keyword . '%')
+                    ->orWhere('gender', 'like', '%'. $keyword . '%')
+                    ->orWhere('parent_name', 'like', '%'. $keyword . '%')
+                    ->orWhere('father_name', 'like', '%'. $keyword . '%')
+                    ->orWhere('mother_name', 'like', '%'. $keyword . '%')
+                    ->orWhere('aadhar_no', 'like', '%'. $keyword . '%')
+                    ->orWhere('blood_group', 'like', '%'. $keyword . '%')
+                    ->orWhere('height', 'like', '%'. $keyword . '%')
+                    ->orWhere('weight', 'like', '%'. $keyword . '%')
+                    ->orWhere('email', 'like', '%'. $keyword . '%')
+                    ->orWhere('phone_number', 'like', '%'. $keyword . '%')
+                    ->orWhere('address', 'like', '%'. $keyword . '%');             
              });
             // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
             //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
             // });
         }
 
-        $students = $query->latest()->get();
+        $students = $query->with(['admission.academicsession'])->latest()->get();
 
         if ($students->count() > 0) {
             $delimiter = ",";
@@ -365,7 +503,8 @@ class StudentListController extends Controller
             $f = fopen('php://memory', 'w');
 
             // CSV column headers
-            $headers = ['Student Name', 'Student ID', 'Gender', 'Parent Name', 'Email', 'Phone Number', 'Address', 'Date of Birth', 'Academic Session', 'Created Date'];
+            $headers = ['Student Name', 'Student ID', 'Gender', 'Father Name', 'Mother Name' ,'Parent Name', 'Aadhaar number',
+            'Email', 'Phone Number', 'Address', 'Date of Birth','Academic Session', 'Blood Group', 'Height', 'Weight', ];
             fputcsv($f, $headers, $delimiter);
 
             foreach ($students as $student) {
@@ -373,14 +512,20 @@ class StudentListController extends Controller
                     $student->student_name,
                     $student->student_id,
                     $student->gender,
+                    $student->father_name,
+                    $student->mother_name,
                     $student->parent_name,
+                    $student->aadhar_no,
                     $student->email,
                     $student->phone_number,
                     $student->address,
                     //$student->academic_session_id,
-                    optional($student->date_of_birth)->format('d-m-Y'),
-                    optional($student->session)->session_name, 
-                    optional($student->created_at)->format('d-m-Y h:i A'),
+                    $student->date_of_birth ? date('d-m-Y',strtotime($student->date_of_birth)) : '',
+                    optional($student->admission->academicsession)->session_name, 
+                    $student->blood_group,
+                    $student->height,
+                    $student->weight,
+                    // optional($student->created_at)->format('d-m-Y h:i A'),
                 ];
                 fputcsv($f, $lineData, $delimiter);
             }
@@ -398,26 +543,28 @@ class StudentListController extends Controller
 
     public function studentProgressList($student_id, $current_session){
 
-    $student = Student::with('admissions.session')->find($student_id);
+        $student = Student::with('admissions.session')->find($student_id);
 
-    if (!$student) {
-        abort(404, 'Student not found');
-    }
+        if (!$student) {
+            abort(404, 'Student not found');
+        }
 
-    $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-        ->groupBy('field')
-        ->map(function ($items) {
-            return $items->pluck('value')->toArray(); // get only values per field
-        })
-        ->toArray();
+        $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
+            ->groupBy('field')
+            ->map(function ($items) {
+                return $items->pluck('value')->toArray(); // get only values per field
+            })
+            ->toArray();
 
-    // Create array: session_name => admission_id
-    $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
-        return [$admission->session->session_name ?? 'Unknown' => $admission->id];
-    })->toArray();
+        // Create array: session_name => admission_id
+        $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
+            return [$admission->session->session_name ?? 'Unknown' => $admission->id];
+        })->toArray();
 
         return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','student_progress_category'));
     }
+
+
 
 
 }

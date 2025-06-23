@@ -7,7 +7,12 @@
 <div class="card">
   <div class="card-body">
     <div class="col-12">
-      <h6 class="text-body-secondary">Vertical</h6>
+      <h6 class="text-body-secondary">Learning Perspective Of Conginitive Domain</h6>
+        <div class="text-end">
+            <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
+                <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
+            </a>
+        </div>
       <div class="nav-align-left nav-tabs-shadow">
         <ul class="nav nav-tabs" role="tablist">
             @foreach ($sessionMap as $index=>$session_item)

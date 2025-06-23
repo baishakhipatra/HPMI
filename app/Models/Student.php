@@ -61,4 +61,6 @@ class Student extends Model
     {
         return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
     }
+
+    
 }
