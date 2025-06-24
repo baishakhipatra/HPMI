@@ -177,13 +177,19 @@ Route::prefix('admin')->group(function () {
                 Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
                 Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
                 Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
-                Route::get('/admission-history/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
-                Route::post('/admission-history/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
+                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+            });
+
+            Route::prefix('admission-history')->group(function(){
+                Route::get('/{id}', [StudentListController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
+                Route::post('/update', [StudentListController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
                 Route::get('/re-admission/{id}', [StudentListController::class, 'reAdmissionForm'])->name('admin.student.readmission');
                 Route::post('/re-admission/store/{id}', [StudentListController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
-                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+            });
 
-                Route::get('/student-progress-marking/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist');
+            Route::prefix('student-progress-marking')->group(function(){
+                Route::get('/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist');
+                Route::post('/progress-update-phase', [StudentListController::class, 'ProgressUpdatePhase'])->name('admin.student.progress.update.phase');
             });
 
             Route::prefix('studentmark-list')->group(function(){

@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory};
+use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory,StudentProgressMarking};
 
 class StudentListController extends Controller
 {
@@ -544,27 +544,57 @@ class StudentListController extends Controller
     public function studentProgressList($student_id, $current_session){
 
         $student = Student::with('admissions.session')->find($student_id);
-
-        if (!$student) {
+        $AcademicSession = AcademicSession::where('session_name', $current_session)->first();
+        if (!$student || !$AcademicSession) {
             abort(404, 'Student not found');
         }
-
+        $academic_session_id = $AcademicSession->id;
         $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
             ->groupBy('field')
             ->map(function ($items) {
                 return $items->pluck('value')->toArray(); // get only values per field
             })
             ->toArray();
+            foreach($student_progress_category as $key=>$item){
+                StudentProgressMarking::updateOrCreate([
+                    'student_id' =>$student_id,
+                    'admission_session_id' =>$AcademicSession->id,
+                    'progress_category' => ucwords($key)
+                ],[
+
+                ]);
+            }
+            $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
 
         // Create array: session_name => admission_id
         $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
             return [$admission->session->session_name ?? 'Unknown' => $admission->id];
         })->toArray();
 
-        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','student_progress_category'));
+        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id'));
     }
+    
+    public function ProgressUpdatePhase(Request $request)
+    {
+        $request->validate([
+            'student_id' => 'required|integer',
+            'session_id' => 'required|integer',
+            'category' => 'required|string',
+            'phase' => 'required|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
+            'value' => 'required|string'
+        ]);
 
+        $updated = StudentProgressMarking::where([
+            'student_id' => $request->student_id,
+            'admission_session_id' => $request->session_id,
+            'progress_category' => $request->category,
+        ])->update([
+            $request->phase => $request->value
+        ]);
 
-
+        return response()->json([
+            'success' => $updated ? true : false
+        ]);
+    }
 
 }
