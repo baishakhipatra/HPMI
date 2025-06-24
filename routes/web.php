@@ -5,7 +5,8 @@ use Illuminate\Support\Facades\Route;
 //New Route
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
-                                SubjectListController ,StudentMarkListController, StudentProgressMarkingController};
+                                SubjectListController ,StudentMarkListController, StudentProgressMarkingController,
+                            ClassComparisonController};
 
 //End New Route
 
@@ -210,6 +211,12 @@ Route::prefix('admin')->group(function () {
                 Route::get('/status/{id}', [StudentProgressMarkingController::class, 'studentProgressStatusToggle'])->name('admin.student.progressstatus');
                 Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete');
                
+            });
+
+            Route::prefix('class-wise-comparison')->group(function() {
+                Route::get('/{student_id}', [ClassComparisonController::class, 'index'])->name('admin.student.classcompare');
+                Route::post('/get-class-by-session', [ClassComparisonController::class, 'getClassBySession'])->name('admin.student.getClass');
+                Route::post('/get-subjects-by-class', [ClassComparisonController::class, 'getSubjectsByClass'])->name('admin.student.getSubjects');
             });
             
         });

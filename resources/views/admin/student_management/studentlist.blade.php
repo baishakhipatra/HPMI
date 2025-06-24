@@ -102,8 +102,11 @@
                       <a class="dropdown-item" href="{{ route('admin.student.admissionhistory',  $item->id) }}" title="Edit" data-bs-toggle="tooltip">
                           <i class="ri-graduation-cap-line me-1"></i> Admission History
                       </a>
-                      <a class="dropdown-item" href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}" title="Edit" data-bs-toggle="tooltip">
+                      <a class="dropdown-item" href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}" title="Student Progress Marking" data-bs-toggle="tooltip">
                           <i class="ri-file-list-3-line"></i> Student Progress Marking
+                      </a>
+                      <a class="dropdown-item" href="{{ route('admin.student.classcompare', [$item->id]) }}" title="Class Wise Comparison" data-bs-toggle="tooltip">
+                          <i class="ri-file-list-3-line"></i> Class Wise Comparison
                       </a>
                   </div>
                 </div>
