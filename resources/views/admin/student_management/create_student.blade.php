@@ -202,6 +202,12 @@
       var classId = $(this).val();
       $('#section_id').html('<option value="">Loading...</option>');
 
+      function ucwords(str) {
+        return str. replace(/\b\w/g, function(char) {
+          return char.toUpperCase();
+        });
+      }
+
       if (classId) {
         $.ajax({
             url: "{{ route('admin.student.get-sections') }}",
@@ -210,12 +216,12 @@
             data: { classId: classId },
             success: function(response) {
                 if(response.success){
-                    console.log(response.sections);
+                    //console.log(response.sections);
                     // You can loop here to populate dropdown, etc
                     $('#section_id').empty();
                     $('#section_id').append('<option value="">Select Section</option>');
                     $.each(response.sections, function(key, section) {
-                        $('#section_id').append('<option value="'+section.section+'">'+section.section+'</option>');
+                        $('#section_id').append('<option value="'+section.section+'">'+ucwords(section.section)+'</option>');
                     });
                 }
             },

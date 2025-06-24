@@ -201,7 +201,7 @@
                     <select name="section_id" class="form-select" id="section_id">
                           <option value="" disabled>Select Section</option>
                           @if(optional($student->admission)->section)
-                          <option value="{{optional($student->admission)->section}}" selected>{{optional($student->admission)->section}}</option>
+                          <option value="{{optional($student->admission)->section}}" selected>{{(optional($student->admission)->section)}}</option>
                           @endif
                     </select>
                     <label for="section_id">Section<span class="text-danger">*</span></label>
