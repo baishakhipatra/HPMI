@@ -13,56 +13,7 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 class StudentMarkListController extends Controller
 {
     
-    // public function index(Request $request)
-    // {
-        
-    //     $sessions = StudentAdmission::with('session')
-    //           ->select('session_id')
-    //           ->distinct()
-    //           ->get();
-    //     $classes = ClassList::with('sections')->get();
-    //     $subjects = Subject::all();
 
-    //     $academicSessions = AcademicSession::all();
-
-    //    // $students = [];
-
-    //     $classOptions = $classes->map(function($class){
-    //         $sections = $class->sections->pluck('section')->toArray();
-    //         $sectionList = implode(', ', $sections);
-    //         return [
-    //             'id' => $class->id,
-    //              //'name' => $class->class . ' - ' . $sectionList
-    //             'name' => $class->class
-    //         ];
-    //     });
-        
-    //     $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
-
-    //     if($request->filled('student_name')) {
-    //         $query->whereHas('student', function ($q) use ($request) {
-    //             $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
-    //         });
-    //     }
-
-    //     if($request->filled('class_filter')){
-    //         $query->where('class_id', $request->class_filter);
-    //     }
-
-    //     if($request->filled('subject_filter')){
-    //         $query->where('subject_id', $request->subject_filter);
-    //     }
-
-    //     if ($request->filled('session_filter')) {
-    //         $query->whereHas('studentAdmission', function ($q) use ($request) {
-    //             $q->where('session_id', $request->session_filter);
-    //         });
-    //     }
-
-    //     $marks = $query->paginate(10);
-
-    //     return view('admin.student_marks.index',compact('classes','subjects','classOptions', 'sessions', 'marks', 'academicSessions'));
-    // }
     public function index(Request $request)
     {
         $sessions = StudentAdmission::with('session')
@@ -107,14 +58,17 @@ class StudentMarkListController extends Controller
 
         $marks = $query->paginate(10);
 
-        // Move group + transformation logic from Blade to here
-        $groupedMarks = $marks->getCollection()->groupBy(function($item) {
+        $groupedMarks = $marks->getCollection()
+        ->filter(function ($item) {
+            return $item->studentAdmission !== null;
+        })
+        ->groupBy(function($item) {
             return $item->studentAdmission->student_id . '_' .
                 $item->studentAdmission->session_id . '_' .
                 $item->studentAdmission->class_id;
         });
 
-        // Replace original collection with empty one to avoid double data
+        
         $marks->setCollection(collect());
 
         return view('admin.student_marks.index', compact('classes', 'subjects', 'classOptions', 'sessions',
@@ -302,7 +256,7 @@ class StudentMarkListController extends Controller
                             ->where('session_id', $validated['session_id'])
                             ->first();
 
-       if (!$admission) {
+        if (!$admission) {
             return response()->json([
                 'success' => false,
                 'message' => 'Student admission record not found.'
