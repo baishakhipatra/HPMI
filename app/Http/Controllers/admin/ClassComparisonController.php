@@ -10,40 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 class ClassComparisonController extends Controller
 {
-    //
+   
 
-    // public function classCompare($id) {
-    //     $studentSessions = StudentAdmission::with('session')
-    //                         ->where('student_id', $id)
-    //                         ->get()
-    //                         ->groupBy('session_id');
-    //     return view ('admin.student_management.class_wise_compare', compact('studentSessions', 'id'));
-    // }
-
-    
-    // public function getSessionDetails(Request $request)
-    // {
-    //     $sessionId = $request->session_id;
-    //     $studentId = $request->student_id;
-
-    //     $admissionClasses = StudentAdmission::with('class')
-    //         ->where('student_id', $studentId)
-    //         ->where('session_id', $sessionId)
-    //         ->get();
-
-    //     $classes = $admissionClasses->map(function ($item) {
-    //         return [
-    //             'class_id' => $item->class_id,
-    //             'class_name' => $item->class->class ?? ''
-    //         ];
-    //     })->unique('class_id')->values();
-
-    //     return response()->json(['success' => true, 'classes' => $classes]);
-    // }
-
-//   
-
-public function index($student_id)
+    public function index($student_id)
     {
         $student = Student::with('admissions.session')->findOrFail($student_id);
 
@@ -91,6 +60,5 @@ public function index($student_id)
         return response()->json(['success' => true, 'subjects' => $subjects]);
     }
 
-
-
+    
 }
