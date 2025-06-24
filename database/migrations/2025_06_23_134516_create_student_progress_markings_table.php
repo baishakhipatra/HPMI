@@ -27,7 +27,7 @@ return new class extends Migration
             ->onUpdate('cascade');
 
             $table->foreign('admission_session_id')
-            ->references('id')->on('student_admissions')
+            ->references('id')->on('academic_sessions')
             ->onDelete('cascade')
             ->onUpdate('cascade');
         });

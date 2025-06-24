@@ -53,10 +53,10 @@ class StudentListController extends Controller
     {
         $classId = $request->classId;
         $SectionList = SectionList::where('class_list_id',$classId)->orderBy('section', 'ASC')->get();
-       return response()->json([
-        'success' => true,
-        'sections' => $SectionList
-    ]);
+        return response()->json([
+            'success' => true,
+            'sections' => $SectionList
+        ]);
     }
 
 
@@ -160,7 +160,21 @@ class StudentListController extends Controller
     {
         $request->validate([
             'student_name'    => 'required|string|max:255',
-            'date_of_birth'   => 'required|date',
+            // 'date_of_birth'   => 'required|date',
+            'date_of_birth'   => [
+                'required',
+                'date',
+                'before:today',
+                function($attribute, $value, $fail) use ($request) {
+                    if($request->admission_date) {
+                        $dobTimestamp  = strtotime($value);
+                        $admissionTimestamp = strtotime($request->admission_date);
+                        if($dobTimestamp > $admissionTimestamp) {
+                            $fail('The date of birth can not after the admission date');
+                        }
+                    }
+                },
+            ],
             'gender'          => 'required|in:Male,Female,Other',
             'parent_name'     => 'required|string|max:255',
             'email'           => 'nullable|email',
@@ -243,7 +257,21 @@ class StudentListController extends Controller
         //dd($request->all());
         $request->validate([
             'student_name'    => 'required|string|max:255',
-            'date_of_birth'   => 'required|date',
+            // 'date_of_birth'   => 'required|date',
+            'date_of_birth'   => [
+                'required',
+                'date',
+                'before:today',
+                function($attribute, $value, $fail) use ($request) {
+                    if($request->admission_date) {
+                        $dobTimestamp  = strtotime($value);
+                        $admissionTimestamp = strtotime($request->admission_date);
+                        if($dobTimestamp > $admissionTimestamp) {
+                            $fail('The date of birth can not after the admission date');
+                        }
+                    }
+                },
+            ],
             'gender'          => 'required|in:Male,Female,Other',
             'parent_name'     => 'required|string|max:255',
             'email'           => 'nullable|email',
