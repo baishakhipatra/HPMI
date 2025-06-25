@@ -50,8 +50,21 @@ class ClassComparisonController extends Controller
     public function getSubjectsByClass(Request $request)
     {
         $classId = $request->class_id;
+        $sessionId = $request->session_id;
+        $studentId = $request->student_id;
 
-        $subjectIds = StudentsMark::where('class_id', $classId)
+        // First, find the admission record for this student, session, and class
+        $admission = StudentAdmission::where('student_id', $studentId)
+                        ->where('session_id', $sessionId)
+                        ->where('class_id', $classId)
+                        ->first();
+
+        if (!$admission) {
+            return response()->json(['success' => false, 'subjects' => []]);
+        }
+        
+        // Now get only subjects used in marks table for this exact admission
+        $subjectIds = StudentsMark::where('student_admission_id', $admission->id)
                         ->pluck('subject_id')
                         ->unique();
 

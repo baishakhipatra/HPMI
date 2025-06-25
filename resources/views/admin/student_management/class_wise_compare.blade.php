@@ -15,12 +15,14 @@
 @endif
 
 <div class="container">
-    <h3>Class Wise Comparison: {{ $student->student_name }}</h3>
-    <div class="text-end">
+     <div class="card-header d-flex justify-content-between align-items-center">
+        <h3>Class Wise Comparison: {{ ucwords($student->student_name) }}</h3>
+        <div class="text-end">
             <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
                 <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
             </a>
-    </div>
+        </div>
+     </div>
 
     <div class="row"> 
         <div class="col-md-5">
