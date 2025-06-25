@@ -217,6 +217,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/{student_id}', [ClassComparisonController::class, 'index'])->name('admin.student.classcompare');
                 Route::post('/get-class-by-session', [ClassComparisonController::class, 'getClassBySession'])->name('admin.student.getClass');
                 Route::post('/get-subjects-by-class', [ClassComparisonController::class, 'getSubjectsByClass'])->name('admin.student.getSubjects');
+                Route::post('/compare-marks', [ClassComparisonController::class, 'compareMarks'])->name('admin.student.comparemarks');
             });
             
         });

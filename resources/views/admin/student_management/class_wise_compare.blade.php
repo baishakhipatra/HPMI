@@ -50,6 +50,16 @@
                     <select id="subject1" class="form-control" disabled></select>
                 </div>
             </div>
+            <div class="form-floating form-floating-outline mb-3">
+                <select id="term1" class="form-control">
+                    <option value="">Select Term</option>
+                    <option value="term_one">Term 1</option>
+                    <option value="term_two">Term 2</option>
+                    <option value="mid_term">Mid Term</option>
+                    <option value="final_exam">Final Exam</option>
+                </select>
+                <label>Select Term to Compare</label>
+            </div>
         </div>  
     
         
@@ -77,6 +87,20 @@
                     <select id="subject2" class="form-control" disabled></select>
                 </div>
             </div>
+            <div class="form-floating form-floating-outline mb-3">
+                <select id="term2" class="form-control">
+                    <option value="">Select Term</option>
+                    <option value="term_one">Term 1</option>
+                    <option value="term_two">Term 2</option>
+                    <option value="mid_term">Mid Term</option>
+                    <option value="final_exam">Final Exam</option>
+                </select>
+                <label>Select Term to Compare</label>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="btn btn-primary mt-3" id="compareMarksBtn">Compare Marks</button>
+            <div id="comparison-result" class="mt-4"></div>
         </div>
     </div>
 
@@ -112,7 +136,7 @@
                         classSelect.empty().append(`<option value="${response.class.id}">${response.class.name}</option>`);
                         classSelect.prop('disabled', false);
     
-                        // Load subjects for that class
+                        
                         $.ajax({
                             url: "{{ route('admin.student.getSubjects') }}",
                             type: 'POST',
@@ -166,6 +190,70 @@
             if (this.id === 'comparison2') {
                 loadClassAndSubjects('comparison2', 'class2', 'subject2');
             }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#compareMarksBtn').click(function () {
+            let studentId = {{ $student->id }}
+            let session1 = $('#comparison1').val();
+            let session2 = $('#comparison2').val();
+            let term1 = $('#term1').val();
+            let term2 = $('#term2').val();
+
+            if (!session1 || !session2 || !term1 || !term2) {
+                toastr.error('Please select both sessions.');
+                return;
+            }
+
+            if (session1 === session2) {
+                toastr.error('Both sessions must be different.');
+                return;
+            }
+
+            $.ajax({
+                url: "{{ route('admin.student.comparemarks') }}", 
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    student_id: {{ $student->id }},
+                    session1: session1,
+                    session2: session2,
+                    term1: term1,
+                    term2:term2,
+                },
+                success: function (res) {
+                    if (res.success) {
+                        let table = `<table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Session 1 (${res.session1})</th>
+                                <th>Session 2 (${res.session2})</th>
+                                <th>Improvement (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                        $.each(res.data, function (i, row) {
+                            table += `
+                                <tr>
+                                    <td>${row.subject}</td>
+                                    <td>${row.marks1}</td>
+                                    <td>${row.marks2}</td>
+                                    <td>${row.improvement}</td>
+                                </tr>`;
+                        });
+
+                        table += `</tbody></table>`;
+                        $('#comparison-result').html(table);
+                    } else
+                    {
+                    $('#comparison-result').html(`<div class="alert alert-warning">No data found.</div>`);
+                    }   
+                }
+            });
+
         });
     });
 </script>

@@ -106,7 +106,7 @@
                           <i class="ri-file-list-3-line"></i> Student Progress Marking
                       </a>
                       <a class="dropdown-item" href="{{ route('admin.student.classcompare', [$item->id]) }}" title="Class Wise Comparison" data-bs-toggle="tooltip">
-                          <i class="ri-file-list-3-line"></i> Class Wise Comparison
+                          <i class="ri-bar-chart-grouped-line"></i> Class Wise Comparison
                       </a>
                   </div>
                 </div>

@@ -13,7 +13,7 @@ class ClassList extends Model
     protected $fillable = [
         'class',
         'status'
-    ];
+    ]; 
 
     public function sections()
     {
