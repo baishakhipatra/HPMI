@@ -28,7 +28,7 @@
       <div class="card-header d-flex justify-content-between align-items-center">
         <h3 class="mb-0">User Registration</h3>
         {{-- <a href="{{ route('auth-register-basic') }}" class="btn btn-primary btn-sm">+ Add User</a> --}}
-        <a href="#" class="btn btn-primary btn-sm" style="position: absolute; right: 50px;">
+        <a href="{{route('auth-login-basic')}}" class="btn btn-primary btn-sm" style="position: absolute; right: 50px;">
           <i class="menu-icon tf-icons ri-arrow-left-line"></i>
           Back
         </a>

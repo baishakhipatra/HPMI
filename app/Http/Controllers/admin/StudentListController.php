@@ -512,27 +512,75 @@ class StudentListController extends Controller
         return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id'));
     }
     
-    public function ProgressUpdatePhase(Request $request)
+    // public function ProgressUpdatePhase(Request $request)
+    // {
+    //     $request->validate([
+    //         'student_id' => 'required|integer',
+    //         'session_id' => 'required|integer',
+    //         'category' => 'required|string',
+    //         'phase' => 'required|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
+    //         'value' => 'required|string'
+    //     ]);
+
+    //     $updated = StudentProgressMarking::where([
+    //         'student_id' => $request->student_id,
+    //         'admission_session_id' => $request->session_id,
+    //         'progress_category' => $request->category,
+    //     ])->update([
+    //         $request->phase => $request->value
+    //     ]);
+
+    //     return response()->json([
+    //         'success' => $updated ? true : false
+    //     ]);
+    // }
+
+   public function ProgressUpdatePhase(Request $request)
     {
         $request->validate([
-            'student_id' => 'required|integer',
-            'session_id' => 'required|integer',
-            'category' => 'required|string',
-            'phase' => 'required|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
-            'value' => 'required|string'
+            'student_id'    => 'required|integer',
+            'session_id'    => 'required|integer',
+            'category'  => 'nullable|string', // optional for comments
+            'phase'     => 'nullable|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
+            'value'     => 'nullable|string',
+            'add_comments'  => 'nullable|string',
         ]);
 
-        $updated = StudentProgressMarking::where([
-            'student_id' => $request->student_id,
-            'admission_session_id' => $request->session_id,
-            'progress_category' => $request->category,
-        ])->update([
-            $request->phase => $request->value
-        ]);
+        // Build update data
+        $updateData = [];
+        if ($request->filled('phase') && $request->filled('value')) {
+            $updateData[$request->phase] = $request->value;
+        }
 
-        return response()->json([
-            'success' => $updated ? true : false
-        ]);
+        if (empty($updateData) && !$request->filled('add_comments')) {
+            return response()->json(['success' => false, 'message' => 'No data to update.']);
+        }
+
+        //Case 1: Save/Update Phase Value 
+        // This block executes if a 'phase', 'value', and 'category' are all provided
+        if ($request->filled('phase') && $request->filled('value') && $request->filled('category')) {
+            StudentProgressMarking::updateOrCreate(
+                [
+                    'student_id' => $request->student_id,
+                    'admission_session_id'  => $request->session_id,
+                    'progress_category'     => $request->category,
+                ],
+                $updateData
+            );
+        }
+
+        //Case 2: Save/Update Comment for ALL categories 
+        // This block executes if 'add_comments' is provided
+        if ($request->filled('add_comments')) {
+            // Update the 'add_comments' field for all records matching student and session
+            StudentProgressMarking::where('student_id', $request->student_id)
+                ->where('admission_session_id', $request->session_id)
+                ->update(['add_comments' => $request->add_comments]);
+        }
+
+        return response()->json(['success' => true]);
     }
+
+
 
 }
