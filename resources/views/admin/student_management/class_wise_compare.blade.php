@@ -48,7 +48,7 @@
                     <select id="subject1" class="form-control" disabled></select>
                 </div>
             </div>
-        </div>
+        </div>  
     
         
         <div class="col-md-5 offset-md-1">

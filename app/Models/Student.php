@@ -62,5 +62,17 @@ class Student extends Model
         return $this->belongsTo(StudentAdmission::class, 'student_admission_id');
     }
 
-    
+    // Student.php
+    public function marks()
+    {
+        return $this->hasMany(StudentsMark::class, 'student_id');
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($student) {
+            $student->marks()->delete();
+        });
+    }
+
 }
