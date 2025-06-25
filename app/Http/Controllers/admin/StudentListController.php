@@ -60,102 +60,6 @@ class StudentListController extends Controller
     }
 
 
-    // public function store(Request $request)
-    // {
-    //     //dd($request->all());
-    //     $request->validate([
-    //         'student_name'  => 'required|string|max:255',
-    //         'gender' => 'required|in:Male,Female,Other',
-    //         'date_of_birth' => 'required|date|before_or_equal:today',
-    //         'phone_number'  => ['required', 'regex:/^[0-9]{10}$/'],
-    //         'parent_name'   => 'required|string|max:255',
-    //         'email' => 'required|string|email',
-    //         'address'       => 'required|string',
-    //         'session_id'    => 'required|exists:academic_sessions,id',
-    //         'class_id'      => 'required|exists:class_lists,id',
-    //         'section_id'    => 'required',
-    //         //'roll_number' => 'required|integer',
-    //         'roll_number'   => [
-    //             'required',
-    //             'integer',
-    //             Rule::unique('student_admissions')->where( function ($query) use ($request) {
-    //                 return $query->where('class_id', $request->class_id)
-    //                             ->where('section', $request->section_id);
-    //             }),
-    //         ],
-    //         'admission_date' => 'required|date',
-    //         // New fields (optional or required as needed)
-    //         'aadhar_no'   => [
-    //             'required',
-    //             'string',
-    //             'max:20',
-    //             Rule::unique('students', 'aadhar_no')->whereNull('deleted_at'),
-    //         ],
-    //         'blood_group' => 'required|string|max:10',
-    //         'height' => 'required|string',
-    //         'weight' => 'required|string',
-    //         'father_name' => 'required|string|max:255',
-    //         'mother_name' => 'required|string|max:255',
-    //         'divyang' => 'required|in:Yes,No',
-    //     ]);
-
-    //     try {
-    //         $student = Student::where('student_name', $request->student_name)
-    //             ->where('date_of_birth', $request->date_of_birth)
-    //             ->first();
-
-    //         if (!$student) {
-    //             $student = new Student();
-    //             $student->student_id = Student::generateStudentUid();
-    //             $student->student_name = $request->student_name;
-    //             $student->gender = $request->gender;
-    //             $student->date_of_birth = $request->date_of_birth;
-    //             $student->phone_number = $request->phone_number;
-    //             $student->parent_name = $request->parent_name;
-    //             $student->email = $request->email;
-    //             //$student->session_id = $request->session_id;
-    //             $student->address = $request->address;
-
-    //             $student->aadhar_no = $request->aadhar_no;
-    //             $student->blood_group = $request->blood_group;
-    //             $student->height = $request->height;
-    //             $student->weight = $request->weight;
-    //             $student->father_name = $request->father_name;
-    //             $student->mother_name = $request->mother_name;
-    //             $student->divyang = $request->divyang;
-    //             $student->save();
-    //         }
-    //         $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
-    //             ->where('session_id', $request->session_id)
-    //             ->exists();
-
-    //         if ($alreadyAdmitted) {
-    //             return back()->with('error', 'This student is already admitted in the selected session.');
-    //         }
-
-    //         $admission = StudentAdmission::create([
-    //             'student_id' => $student->id,
-    //             'session_id' => $request->session_id,
-    //             'class_id'   => $request->class_id,
-    //             'section'    => $request->section_id,
-    //             'roll_number'    => $request->roll_number,
-    //             'admission_date' => $request->admission_date,
-    //         ]);
-    //         // dd($request->session_id);
-
-    //         //Update student with admission ID
-    //         $student->student_admission_id = $admission->id;
-    //         $student->save();
-
-    //         return redirect()->route('admin.studentlist')->with('success', 'Student admission successful!');
-
-    //     } catch (\Exception $e) {
-    //         //Log::error('Student Admission Error: '.$e->getMessage());
-    //         //dd($e->getMessage());
-    //         return back()->with('error', 'Something went wrong while processing admission.');
-    //     }
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -178,7 +82,7 @@ class StudentListController extends Controller
             'gender'          => 'required|in:Male,Female,Other',
             'parent_name'     => 'required|string|max:255',
             'email'           => 'nullable|email',
-            'phone_number'    => 'nullable|string|max:20',
+            'phone_number'    => ['nullable', 'regex:/^[0-9]{10}$/'],
             'address'         => 'nullable|string|max:255',
             'admission_date'  => 'required|date',
             'class_id'        => 'required|exists:class_lists,id',
@@ -188,7 +92,8 @@ class StudentListController extends Controller
 
             // Optional fields
             'aadhar_no'       => [
-                'nullable', 'string', 'max:12',
+                'nullable',
+                'regex:/^[0-9]{12}$/',
                 Rule::unique('students')->whereNull('deleted_at'),
             ],
             'blood_group'     => 'nullable|string|max:10',
@@ -197,6 +102,9 @@ class StudentListController extends Controller
             'father_name'     => 'nullable|string|max:255',
             'mother_name'     => 'nullable|string|max:255',
             'divyang'         => 'required|in:Yes,No',
+        ],[
+            'phone_number.regex' => 'Phone number should be exactly 10 digits.',
+            'aadhar_no.regex'    => 'Aadhaar number should be exactly 12 digits.',
         ]);
 
         try {
@@ -275,7 +183,7 @@ class StudentListController extends Controller
             'gender'          => 'required|in:Male,Female,Other',
             'parent_name'     => 'required|string|max:255',
             'email'           => 'nullable|email',
-            'phone_number'    => 'nullable|string|max:20',
+            'phone_number'    => ['nullable', 'regex:/^[0-9]{10}$/'],
             'address'         => 'nullable|string|max:255',
             'admission_date'  => 'required|date',
             'class_id'        => 'required|exists:class_lists,id',
@@ -301,8 +209,7 @@ class StudentListController extends Controller
         
             'aadhar_no'    => [
                 'nullable',
-                'string',
-                'max:12',
+                'regex:/^[0-9]{12}$/',
                 Rule::unique('students')->ignore($id)->whereNull('deleted_at'),
             ],
             'blood_group'  => 'nullable|string|max:10',
@@ -311,6 +218,9 @@ class StudentListController extends Controller
             'father_name'  => 'nullable|string|max:255',
             'mother_name'  => 'nullable|string|max:255',
             'divyang'      => 'required|in:Yes,No',
+        ],[
+            'phone_number.regex' => 'Phone number should be exactly 10 digits.',
+            'aadhar_no.regex'    => 'Aadhaar number should be exactly 12 digits.',
         ]);
 
         try {
