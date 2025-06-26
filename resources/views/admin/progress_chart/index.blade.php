@@ -166,7 +166,7 @@
                 type: 'GET',
                 data: { sessionId },
                 success: function (res) {
-                    $('#student_id').empty().append('<option value="">Select Student</option>');
+                    $('#student_id').empty().append(`<option value="">Select Student</option>`);
                     if (res.success) {
                         res.students.forEach(stu => {
                             $('#student_id').append(`<option value="${stu.id}">${stu.name}</option>`);
