@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
                                 SubjectListController ,StudentMarkListController, StudentProgressMarkingController,
-                            ClassComparisonController};
+                                ClassComparisonController ,ProgressChartController };
 
 //End New Route
 
@@ -247,6 +247,11 @@ Route::prefix('admin')->group(function () {
                 Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
                 Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
                 Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');
+            });
+
+            Route::prefix('progress-chart')->group(function(){
+                Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart');
+                Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
             });
         });
 

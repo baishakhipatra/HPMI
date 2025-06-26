@@ -35,9 +35,9 @@
                     {{-- Table header --}}
                   <div class="row fw-bold text-center mb-2">
                   <div class="col">Progress Category</div>
-                  <div class="col">First Phase</div>
-                  <div class="col">Second Phase</div>
-                  <div class="col">Third Phase</div>
+                  <div class="col">Phase</div>
+                  {{-- <div class="col">Second Phase</div>
+                  <div class="col">Third Phase</div> --}}
                   </div>
 
                   @foreach ($getDetails as $item_detail)
@@ -59,7 +59,7 @@
                         </select>
                       </div>
 
-                      <div class="col">
+                      {{-- <div class="col">
                         <select name="formative_second_phase" class="form-select progress-value"
                             data-phase="formative_second_phase"
                             data-student="{{ $student->id }}"
@@ -70,9 +70,9 @@
                             <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_second_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
                           @endforeach
                         </select>
-                      </div>
+                      </div> --}}
 
-                      <div class="col">
+                      {{-- <div class="col">
                         <select name="formative_third_phase" class="form-select progress-value"
                             data-phase="formative_third_phase"
                             data-student="{{ $student->id }}"
@@ -83,7 +83,7 @@
                             <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_third_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
                           @endforeach
                         </select>
-                      </div>
+                      </div> --}}
                     </div>
                   @endforeach
                 </div>
@@ -107,7 +107,7 @@
 @section('page-script')
 <script>
 
-// for save fields and values
+  // for save fields and values
     $(document).on('change', '.progress-value', function () {
       let phase = $(this).data('phase');
       let value = $(this).val();

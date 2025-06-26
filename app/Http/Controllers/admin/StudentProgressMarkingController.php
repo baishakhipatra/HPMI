@@ -101,12 +101,23 @@ class StudentProgressMarkingController extends Controller
         return response()->json(['status' => 200, 'message' => 'Status updated successfully']);
     }
 
+    // public function studentProgressDelete(Request $request)
+    // {
+    //     $item = StudentProgressCategory::findOrFail($request->id);
+    //     StudentProgressCategory::where('field', $item->field)->delete();
+
+    //     return response()->json(['status' => 200, 'message' => 'Field and its values deleted']);
+    // }
     public function studentProgressDelete(Request $request)
     {
         $item = StudentProgressCategory::findOrFail($request->id);
+
+        DB::table('student_progress_markings')->where('progress_category', $item->field)->delete();
+
         StudentProgressCategory::where('field', $item->field)->delete();
 
-        return response()->json(['status' => 200, 'message' => 'Field and its values deleted']);
+        return response()->json(['status' => 200, 'message' => 'Field and its values deleted from both categories and markings']);
     }
+
 
 }

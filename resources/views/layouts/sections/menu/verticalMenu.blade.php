@@ -97,6 +97,11 @@
                 <div>Class List</div>
               </a>
             </li>
+             <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
+              <a href="{{route('admin.progresschart')}}" class="menu-link">
+                <div>Progress Chart</div>
+              </a>
+            </li>
           </ul>
         </li>
       {{-- @endif
