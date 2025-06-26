@@ -552,6 +552,7 @@ class StudentMarkListController extends Controller
     }
 
 
+
     public function export(Request $request)
     {
         $studentName = $request->input('student_name');
@@ -588,40 +589,34 @@ class StudentMarkListController extends Controller
             });
         }
 
-        // Group by student ID and session (multiple sessions per student)
-        $marks = $query->get()->groupBy(function ($item) {
-            return $item->student_id . '-' . $item->studentAdmission->session_id;
-        });
+        $allMarks = $query->get();
 
-        if ($marks->isEmpty()) {
+        if ($allMarks->isEmpty()) {
             return redirect()->back()->with('error', 'No records found to export.');
         }
+
+        // Get unique subject names dynamically
+        $allSubjects = $allMarks->pluck('subjectlist.sub_name')->filter()->unique()->map(function ($item) {
+            return strtoupper($item);
+        })->sort()->values()->toArray(); // Sorted for consistency
+
+        // Group by student ID and session
+        $grouped = $allMarks->groupBy(function ($item) {
+            return $item->student_id . '-' . $item->studentAdmission->session_id;
+        });
 
         $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
         $delimiter = ",";
         $f = fopen('php://memory', 'w');
 
         // Header row
-        fputcsv($f, [
-            'NAME',
-            'STUDENT ID',
-            'CLASS',
-            'SESSION',
-            'ENG LIT',
-            'ENG LANG',
-            'BENG/ HINDI',
-            'MATH',
-            'PHY SC',
-            'LIFE SCIENCE',
-            'HIST',
-            'GEOG',
-            'TOTAL',
-            'Academic %'
-        ], $delimiter);
+        $header = ['NAME', 'STUDENT ID', 'CLASS', 'SESSION'];
+        $header = array_merge($header, $allSubjects, ['TOTAL', 'Academic %']);
+        fputcsv($f, $header, $delimiter);
 
-        $printedStudentIds = []; // to track if student name/id was already printed
+        $printedStudentIds = [];
 
-        foreach ($marks as $groupKey => $studentMarks) {
+        foreach ($grouped as $groupKey => $studentMarks) {
             $firstMark = $studentMarks->first();
             $studentObj = $firstMark->student;
             $sessionObj = $firstMark->studentAdmission->academicsession;
@@ -632,54 +627,40 @@ class StudentMarkListController extends Controller
             $className = $classObj->class ?? '';
             $sessionName = $sessionObj->session_name ?? '';
 
-            // Initialize subject totals
-            $subjectTotals = [
-                'ENG LIT' => 0,
-                'ENG LANG' => 0,
-                'BENG/ HINDI' => 0,
-                'MATH' => 0,
-                'PHY SC' => 0,
-                'LIFE SCIENCE' => 0,
-                'HIST' => 0,
-                'GEOG' => 0,
-            ];
+            // Subject totals
+            $subjectTotals = [];
 
-            foreach ($studentMarks as $mark) {
-                $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
-                $total = ($mark->term_one_stu_marks ?? 0) +
-                        ($mark->term_two_stu_marks ?? 0) +
-                        ($mark->mid_term_stu_marks ?? 0) +
-                        ($mark->final_exam_stu_marks ?? 0);
-
-                // Normalize subject name key
-                if (array_key_exists($subjectName, $subjectTotals)) {
-                    $subjectTotals[$subjectName] = $total;
-                }
+            foreach ($allSubjects as $subjectName) {
+                $subjectTotals[$subjectName] = 0;
             }
 
-            // $grandTotal = array_sum($subjectTotals);
-            // $subjectCount = count(array_filter($subjectTotals, fn($val) => $val > 0));
-            // $academicPercentage = ($totalObtained / $totalOutOf) * 100;
-
+            // Total marks
             $totalObtained = 0;
             $totalOutOf = 0;
 
-            foreach($studentMarks  as $mark) {
-                $totalObtained += ($mark->term_one_stu_marks ?? 0)
-                               + ($mark->term_two_stu_marks ?? 0)
-                               + ($mark->mid_term_stu_marks ?? 0)
-                               + ($mark->final_exam_stu_marks  ?? 0);
+            foreach ($studentMarks as $mark) {
+                $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
 
-                $totalOutOf += ($mark->term_one_out_off ?? 0)
-                            + ($mark->term_two_out_off ?? 0)
-                            + ($mark->mid_term_out_off ?? 0)
-                            + ($mark->final_exam_out_off ?? 0);
+                $obtained = ($mark->term_one_stu_marks ?? 0) +
+                            ($mark->term_two_stu_marks ?? 0) +
+                            ($mark->mid_term_stu_marks ?? 0) +
+                            ($mark->final_exam_stu_marks ?? 0);
+
+                $outOf = ($mark->term_one_out_off ?? 0) +
+                        ($mark->term_two_out_off ?? 0) +
+                        ($mark->mid_term_out_off ?? 0) +
+                        ($mark->final_exam_out_off ?? 0);
+
+                if (isset($subjectTotals[$subjectName])) {
+                    $subjectTotals[$subjectName] = $obtained;
+                }
+
+                $totalObtained += $obtained;
+                $totalOutOf += $outOf;
             }
 
-            $grandTotal = $totalObtained;
             $academicPercentage = $totalOutOf > 0 ? round(($totalObtained / $totalOutOf) * 100, 2) : 0;
 
-            // Determine whether to show student name/id (only once)
             $showName = !in_array($stuId, $printedStudentIds);
             if ($showName) {
                 $printedStudentIds[] = $stuId;
@@ -688,22 +669,17 @@ class StudentMarkListController extends Controller
                 $stuId = '';
             }
 
-            fputcsv($f, [
-                $stuName,
-                $stuId,
-                $className,
-                $sessionName,
-                $subjectTotals['ENG LIT'],
-                $subjectTotals['ENG LANG'],
-                $subjectTotals['BENG/ HINDI'],
-                $subjectTotals['MATH'],
-                $subjectTotals['PHY SC'],
-                $subjectTotals['LIFE SCIENCE'],
-                $subjectTotals['HIST'],
-                $subjectTotals['GEOG'],
-                $grandTotal,
-                $academicPercentage . '%'
-            ], $delimiter);
+            $row = [$stuName, $stuId, $className, $sessionName];
+
+            // Add subject marks in dynamic order
+            foreach ($allSubjects as $sub) {
+                $row[] = $subjectTotals[$sub] ?? 0;
+            }
+
+            $row[] = $totalObtained;
+            $row[] = $academicPercentage . '%';
+
+            fputcsv($f, $row, $delimiter);
         }
 
         fseek($f, 0);
@@ -712,6 +688,7 @@ class StudentMarkListController extends Controller
         fpassthru($f);
         exit;
     }
+
 
 
 

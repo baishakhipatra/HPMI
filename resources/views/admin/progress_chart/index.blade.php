@@ -6,65 +6,27 @@
 @section('title', 'Progress Chart')
 
 @section('content')
+
+
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h3 class="mb-0">Progress Charts</h3>
             <small class="text-muted">Visual representation of student performance trends</small>
         </div>
-        <div>
-            <a href="" 
-                class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                data-toggle="tooltip" title="Export Data">
-                    Export
-            </a>
-        </div>
+
     </div>
-    {{-- <div class="row mb-4">
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="session_id" class="form-select">
-                <option value="">All Sessions</option>
-                @foreach($sessions as $session)
-                    <option value="{{ $session->id }}">{{ $session->session_name }}</option>
-                @endforeach
-            </select>
-            <label for="session_id">Session</label>
-        </div>
-
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="class_id" class="form-select">
-                <option value="">All Classes</option>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}">{{ $class->class }}</option>
-                @endforeach
-            </select>
-            <label for="class_id">Class</label>
-        </div>
-
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="subject_id" class="form-select">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                @endforeach
-            </select>
-            <label for="subject_id">Subject</label>
-        </div>
-
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="student_id" class="form-select">
-                <option value="">All Students</option>
-                @foreach($students as $student)
-                    <option value="{{ $student->id }}">{{ $student->student_name }}</option>
-                @endforeach
-            </select>
-            <label for="student_id">Student</label>
-        </div>
-    </div> --}}
-
     <div class="row mb-4">
-        {{-- Session Dropdown --}}
         <div class="form-floating form-floating-outline col-md-3">
+            <select id="chart_type" class="form-select">
+                <option value="academic">Academic Performance</option>
+                <option value="qualitative">Qualitative Progress</option>
+            </select>
+            <label for="chart_type">Chart Type</label>
+        </div>
+        {{-- Session Dropdown --}}
+        <div class="form-floating form-floating-outline col-md-2">
+
             <select id="session_id" class="form-select">
                 <option value="">Select Session</option>
                 @foreach($sessions as $session)
@@ -75,7 +37,7 @@
         </div>
 
         {{-- Student Dropdown (loaded via AJAX) --}}
-        <div class="form-floating form-floating-outline col-md-3">
+        <div class="form-floating form-floating-outline col-md-2">
             <select id="student_id" class="form-select">
                 <option value="">Select Student</option>
             </select>
@@ -83,7 +45,7 @@
         </div>
 
         {{-- Class Dropdown (based on student + session) --}}
-        <div class="form-floating form-floating-outline col-md-3">
+        <div class="form-floating form-floating-outline col-md-2">
             <select id="class_id" class="form-select">
                 <option value="">Select Class</option>
             </select>
@@ -91,30 +53,45 @@
         </div>
 
         {{-- Subject Dropdown (based on class) --}}
-        <div class="form-floating form-floating-outline col-md-3">
+        <div class="form-floating form-floating-outline col-md-2">
             <select id="subject_id" class="form-select">
                 <option value="">Select Subject</option>
             </select>
             <label for="subject_id">Subject</label>
         </div>
+
     </div>
 
-    <div class="row mb-4">
+    <div id="academicCharts" class="row mb-4">
         <div class="col-md-6">
             <div class="card p-3 shadow-sm">
-                <h5 class="mb-3"> Academic Performance Trend</h5>
+                <h5 class="mb-3">Academic Performance Trend</h5>
                 <canvas id="lineChart" height="200"></canvas>
             </div>
         </div>
         <div class="col-md-6">
             <div class="card p-3 shadow-sm">
-                <h5 class="mb-3"> Subject-wise Performance</h5>
+                <h5 class="mb-3">Subject-wise Performance</h5>
                 <canvas id="barChart" height="200"></canvas>
             </div>
         </div>
     </div>
 
-    {{-- Summary Stats --}}
+    <div id="qualitativeCharts" class="row mb-4 d-none">
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5 class="mb-3">Qualitative Progress Trend</h5>
+                <canvas id="qualLineChart" height="200"></canvas>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5 class="mb-3">Current Progress Assessment</h5>
+                <canvas id="radarChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-3">
             <div class="card text-center p-3 shadow-sm">
@@ -146,8 +123,6 @@
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
-
     //for fetch session,student, subject, class
     $(document).ready(function () {
         //  Load students when session changes
@@ -210,22 +185,39 @@
             });
         });
     });
-
-
-    // for chart
-    let lineChart, barChart;
+    let lineChart, barChart, qualLineChart, radarChart;
 
     function fetchChartData() {
-        $.get("{{ route('admin.fetchchartdata') }}", {
-            session_id: $('#session_id').val(),
-            class_id: $('#class_id').val(),
-            subject_id: $('#subject_id').val(),
-            student_id: $('#student_id').val(),
-            time_period: 'last_6_months'
-        }, function(response) {
-            updateLineChart(response.trend);
-            updateBarChart(response.subjectPerformance);
-            updateStats(response.stats);
+        const chartType = $('#chart_type').val();
+
+        $.ajax({
+            url: "{{ route('admin.fetchchartdata') }}",
+            type: "GET",
+            data: {
+                chart_type: chartType,
+                session_id: $('#session_id').val(),
+                class_id: $('#class_id').val(),
+                subject_id: $('#subject_id').val(),
+                student_id: $('#student_id').val(),
+                time_period: 'last_6_months'
+            },
+            success: function(response) {
+                if (chartType === 'academic') {
+                    $('#academicCharts').removeClass('d-none');
+                    $('#qualitativeCharts').addClass('d-none');
+                    updateLineChart(response.trend);
+                    updateBarChart(response.subjectPerformance);
+                } else {
+                    $('#qualitativeCharts').removeClass('d-none');
+                    $('#academicCharts').addClass('d-none');
+                    updateQualitativeLineChart(response.qualitativeTrend);
+                    updateRadarChart(response.assessment);
+                }
+                updateStats(response.stats);
+            },
+            error: function(err) {
+                console.log("Error loading data", err);
+            }
         });
     }
 
@@ -262,6 +254,48 @@
         });
     }
 
+    function updateQualitativeLineChart(data) {
+        if (qualLineChart) qualLineChart.destroy();
+        qualLineChart = new Chart(document.getElementById('qualLineChart'), {
+            type: 'line',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: 'Qualitative Score',
+                    data: Object.values(data),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            }
+        });
+    }
+
+    function updateRadarChart(data) {
+        if (radarChart) radarChart.destroy();
+        radarChart = new Chart(document.getElementById('radarChart'), {
+            type: 'radar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    label: 'Current Assessment',
+                    data: Object.values(data),
+                    backgroundColor: 'rgba(251, 191, 36, 0.3)',
+                    borderColor: '#f59e0b'
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        suggestedMin: 0,
+                        suggestedMax: 10
+                    }
+                }
+            }
+        });
+    }
+
     function updateStats(stats) {
         $('#studentsTracked').text(stats.students_tracked);
         $('#subjectsMonitored').text(stats.subjects_monitored);
@@ -271,6 +305,6 @@
 
     $(document).ready(function () {
         fetchChartData();
-        $('#session_id, #class_id, #subject_id, #student_id').on('change', fetchChartData);
+        $('#session_id, #class_id, #subject_id, #student_id, #chart_type').on('change', fetchChartData);
     });
 </script>
