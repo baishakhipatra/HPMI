@@ -36,7 +36,7 @@
               <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td class="text-center">
-                  <p class="text-muted mb-0">{{ ucwords($class->class) }}</p>
+                  <p class="text-muted mb-0">{{ strtoupper($class->class) }}</p>
                 </td>
                 <td class="text-center">
                   <div class="d-flex flex-column align-items-center">

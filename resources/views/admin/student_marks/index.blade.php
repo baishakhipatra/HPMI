@@ -153,7 +153,7 @@
 
               <div class="student-section mb-3">
                 <div class="session-header fw-bold">
-                  Session: {{ $session }} | Class: {{ $class }} | Student: {{ ucwords($student) }}
+                  Session: {{ $session }} | Class: {{ strtoupper($class) }} | Student: {{ ucwords($student) }}
                 </div>
 
                 <div class="table-responsive">
