@@ -20,7 +20,7 @@
             </a>
         </div>
     </div>
-    <div class="row mb-4">
+    {{-- <div class="row mb-4">
         <div class="form-floating form-floating-outline col-md-3">
             <select id="session_id" class="form-select">
                 <option value="">All Sessions</option>
@@ -60,7 +60,45 @@
             </select>
             <label for="student_id">Student</label>
         </div>
+    </div> --}}
+
+    <div class="row mb-4">
+        {{-- Session Dropdown --}}
+        <div class="form-floating form-floating-outline col-md-3">
+            <select id="session_id" class="form-select">
+                <option value="">Select Session</option>
+                @foreach($sessions as $session)
+                    <option value="{{ $session['id'] }}">{{ $session['name'] }}</option>
+                @endforeach
+            </select>
+            <label for="session_id">Session</label>
+        </div>
+
+        {{-- Student Dropdown (loaded via AJAX) --}}
+        <div class="form-floating form-floating-outline col-md-3">
+            <select id="student_id" class="form-select">
+                <option value="">Select Student</option>
+            </select>
+            <label for="student_id">Student</label>
+        </div>
+
+        {{-- Class Dropdown (based on student + session) --}}
+        <div class="form-floating form-floating-outline col-md-3">
+            <select id="class_id" class="form-select">
+                <option value="">Select Class</option>
+            </select>
+            <label for="class_id">Class</label>
+        </div>
+
+        {{-- Subject Dropdown (based on class) --}}
+        <div class="form-floating form-floating-outline col-md-3">
+            <select id="subject_id" class="form-select">
+                <option value="">Select Subject</option>
+            </select>
+            <label for="subject_id">Subject</label>
+        </div>
     </div>
+
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card p-3 shadow-sm">
@@ -108,6 +146,73 @@
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+
+
+    //for fetch session,student, subject, class
+    $(document).ready(function () {
+        //  Load students when session changes
+        $('#session_id').change(function () {
+            const sessionId = $(this).val();
+
+            // Clear and disable dependent dropdowns
+            $('#student_id').empty().append('<option value="">Loading...</option>');
+            $('#class_id').empty().append('<option value="">Select Class</option>').prop('disabled', false);
+            $('#subject_id').empty().append('<option value="">Select Subject</option>').prop('disabled', false);
+
+            if (!sessionId) return;
+
+            $.ajax({
+                url: '{{ route("admin.getStudentsBySession") }}',
+                type: 'GET',
+                data: { sessionId },
+                success: function (res) {
+                    $('#student_id').empty().append('<option value="">Select Student</option>');
+                    if (res.success) {
+                        res.students.forEach(stu => {
+                            $('#student_id').append(`<option value="${stu.id}">${stu.name}</option>`);
+                        });
+                    }
+                }
+            });
+        });
+
+        //  Load class + subjects when student changes
+        $('#student_id').change(function () {
+            const sessionId = $('#session_id').val();
+            const studentId = $(this).val();
+
+            $('#class_id').empty().append('<option value="">Loading...</option>');
+            $('#subject_id').empty().append('<option value="">Loading...</option>');
+
+            if (!sessionId || !studentId) return;
+
+            $.ajax({
+                url: '{{ route("admin.getClassBySessionAndStudent") }}',
+                type: 'GET',
+                data: {
+                    session_id: sessionId,
+                    student_id: studentId
+                },
+                success: function (res) {
+                    $('#class_id').empty().append('<option value="">Select Class</option>').prop('disabled', false);
+                    $('#subject_id').empty().append('<option value="">Select Subject</option>').prop('disabled', false);
+
+                    if (res.success) {
+                        res.classes.forEach(cls => {
+                            $('#class_id').append(`<option value="${cls.id}">${cls.name}</option>`);
+                        });
+
+                        res.subjects.forEach(sub => {
+                            $('#subject_id').append(`<option value="${sub.id}">${sub.name}</option>`);
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+
+    // for chart
     let lineChart, barChart;
 
     function fetchChartData() {

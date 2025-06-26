@@ -4,19 +4,103 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{AcademicSession,ClassList,Subject,Student,StudentsMark};
+use App\Models\{AcademicSession,ClassList,Subject,Student,StudentsMark, StudentAdmission, ClassWiseSubject};
 
 class ProgressChartController extends Controller
 {
-    public function index(){
+    // public function index(){
 
-        $sessions = AcademicSession::all();
-        $classes = ClassList::all();
-        $subjects = Subject::all();
-        $students = Student::all();
+    //     $sessions = AcademicSession::all();
+    //     $classes = ClassList::all();
+    //     $subjects = Subject::all();
+    //     $students = Student::all();
 
-        return view('admin.progress_chart.index', compact('sessions','classes','subjects','students'));
+    //     return view('admin.progress_chart.index', compact('sessions','classes','subjects','students'));
+    // }
+
+    public function index() {
+        $sessions = StudentAdmission::with('session')
+            ->select('session_id')
+            ->distinct()
+            ->get()
+            ->map( function ($item) {
+                return [
+                    'id' => $item->session_id,
+                    'name'  => $item->session->session_name ?? 'N/A',
+                ];
+            });
+
+        $classes    = ClassList::with('sections')->get();
+        $subjects   = Subject::all();
+        return view ('admin.progress_chart.index', compact('sessions', 'classes', 'subjects'));
     }
+
+    public function getStudentsBySession(Request $request) {
+        $sessionId = $request->sessionId;
+
+        $admissions = StudentAdmission::with('student')
+                        ->where('session_id', $sessionId)
+                        ->whereHas('student')
+                        ->get();
+
+        $students = $admissions->map( function ($admission) {
+            return [
+                'id' => $admission->student->id,
+                'name' => ucwords($admission->student->student_name),
+            ];
+        });
+
+        return response()->json([
+            'success'   => true,
+            'students'  => $students,
+        ]);
+    }
+
+
+    public function getClassBySessionAndStudent(Request $request)
+    {
+        $session_id = $request->session_id;
+        $student_id = $request->student_id;
+
+        // Get the admission record for the given session and student
+        $admission = StudentAdmission::with('class')
+                        ->where('session_id', $session_id)
+                        ->where('student_id', $student_id)
+                        ->first();
+
+        if ($admission) {
+            $class = $admission->class;
+
+            // Fetch subjects only from the students_marks table for this admission
+            $subjects = StudentsMark::with('subjectlist')
+                            ->where('student_id', $student_id)
+                            ->where('student_admission_id', $admission->id)
+                            ->get()
+                            ->unique('subject_id') // Keep only unique subjects
+                            ->map(function ($mark) {
+                                return [
+                                    'id'   => $mark->subjectlist->id,
+                                    'name' => ucwords($mark->subjectlist->sub_name),
+                                ];
+                            });
+
+            return response()->json([
+                'success' => true,
+                'classes' => [[
+                    'id'   => $class->id,
+                    'name' => ucwords($class->class) . ' (' . ($admission->section ?? '-') . ')',
+                ]],
+                'subjects' => $subjects,
+            ]);
+        } else {
+            return response()->json([
+                'success'  => true,
+                'classes'  => [],
+                'subjects' => [],
+            ]);
+        }
+    }
+
 
     public function fetchChartData(Request $request)
     {

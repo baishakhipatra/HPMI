@@ -251,6 +251,8 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('progress-chart')->group(function(){
                 Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart');
+                Route::get('get-students-by-session', [ProgressChartController::class, 'getStudentsBySession'])->name('admin.getStudentsBySession');
+                Route::get('get-class-subject-by-student', [ProgressChartController::class, 'getClassBySessionAndStudent'])->name('admin.getClassBySessionAndStudent');
                 Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
             });
         });
