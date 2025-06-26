@@ -551,6 +551,7 @@ class StudentMarkListController extends Controller
         ]);
     }
 
+
     public function export(Request $request)
     {
         $studentName = $request->input('student_name');
@@ -566,31 +567,31 @@ class StudentMarkListController extends Controller
             'studentAdmission.academicsession'
         ]);
 
-        // Join with student name if filter is applied
+        // Apply filters
         if (!empty($studentName)) {
             $query->whereHas('student', function ($q) use ($studentName) {
                 $q->where('student_name', 'like', '%' . $studentName . '%');
             });
         }
 
-        // Filter by class
         if (!empty($classId)) {
             $query->where('class_id', $classId);
         }
 
-        // Filter by subject
         if (!empty($subjectId)) {
             $query->where('subject_id', $subjectId);
         }
 
-        //Filter by session
         if (!empty($sessionId)) {
             $query->whereHas('studentAdmission', function ($q) use ($sessionId) {
                 $q->where('session_id', $sessionId);
             });
         }
 
-        $marks = $query->latest()->get();
+        // Group by student ID and session (multiple sessions per student)
+        $marks = $query->get()->groupBy(function ($item) {
+            return $item->student_id . '-' . $item->studentAdmission->session_id;
+        });
 
         if ($marks->isEmpty()) {
             return redirect()->back()->with('error', 'No records found to export.');
@@ -602,48 +603,116 @@ class StudentMarkListController extends Controller
 
         // Header row
         fputcsv($f, [
-            'Student Name',
-            'Student ID',
-            'Class',
-            'Subject',
-            'Academic Session',
-            'Term One Marks',
-            'Term One Out Of',
-            'Term Two Marks',
-            'Term Two Out Of',
-            'Mid Term Marks',
-            'Mid Term Out Of',
-            // 'Final Exam Marks',
-            // 'Final Exam Out Of',
-            // 'Created Date'
+            'NAME',
+            'STUDENT ID',
+            'CLASS',
+            'SESSION',
+            'ENG LIT',
+            'ENG LANG',
+            'BENG/ HINDI',
+            'MATH',
+            'PHY SC',
+            'LIFE SCIENCE',
+            'HIST',
+            'GEOG',
+            'TOTAL',
+            'Academic %'
         ], $delimiter);
 
-        foreach ($marks as $mark) {
+        $printedStudentIds = []; // to track if student name/id was already printed
+
+        foreach ($marks as $groupKey => $studentMarks) {
+            $firstMark = $studentMarks->first();
+            $studentObj = $firstMark->student;
+            $sessionObj = $firstMark->studentAdmission->academicsession;
+            $classObj = $firstMark->studentAdmission->class;
+
+            $stuId = $studentObj->student_id ?? '';
+            $stuName = $studentObj->student_name ?? '';
+            $className = $classObj->class ?? '';
+            $sessionName = $sessionObj->session_name ?? '';
+
+            // Initialize subject totals
+            $subjectTotals = [
+                'ENG LIT' => 0,
+                'ENG LANG' => 0,
+                'BENG/ HINDI' => 0,
+                'MATH' => 0,
+                'PHY SC' => 0,
+                'LIFE SCIENCE' => 0,
+                'HIST' => 0,
+                'GEOG' => 0,
+            ];
+
+            foreach ($studentMarks as $mark) {
+                $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
+                $total = ($mark->term_one_stu_marks ?? 0) +
+                        ($mark->term_two_stu_marks ?? 0) +
+                        ($mark->mid_term_stu_marks ?? 0) +
+                        ($mark->final_exam_stu_marks ?? 0);
+
+                // Normalize subject name key
+                if (array_key_exists($subjectName, $subjectTotals)) {
+                    $subjectTotals[$subjectName] = $total;
+                }
+            }
+
+            // $grandTotal = array_sum($subjectTotals);
+            // $subjectCount = count(array_filter($subjectTotals, fn($val) => $val > 0));
+            // $academicPercentage = ($totalObtained / $totalOutOf) * 100;
+
+            $totalObtained = 0;
+            $totalOutOf = 0;
+
+            foreach($studentMarks  as $mark) {
+                $totalObtained += ($mark->term_one_stu_marks ?? 0)
+                               + ($mark->term_two_stu_marks ?? 0)
+                               + ($mark->mid_term_stu_marks ?? 0)
+                               + ($mark->final_exam_stu_marks  ?? 0);
+
+                $totalOutOf += ($mark->term_one_out_off ?? 0)
+                            + ($mark->term_two_out_off ?? 0)
+                            + ($mark->mid_term_out_off ?? 0)
+                            + ($mark->final_exam_out_off ?? 0);
+            }
+
+            $grandTotal = $totalObtained;
+            $academicPercentage = $totalOutOf > 0 ? round(($totalObtained / $totalOutOf) * 100, 2) : 0;
+
+            // Determine whether to show student name/id (only once)
+            $showName = !in_array($stuId, $printedStudentIds);
+            if ($showName) {
+                $printedStudentIds[] = $stuId;
+            } else {
+                $stuName = '';
+                $stuId = '';
+            }
+
             fputcsv($f, [
-                $mark->student->student_name ?? '',
-                $mark->student->student_id ?? '',
-                $mark->class->class ?? '',
-                $mark->subjectlist->sub_name ?? '',
-                $mark->studentAdmission->academicsession->session_name ?? '',
-                $mark->term_one_stu_marks,
-                $mark->term_one_out_off,
-                $mark->term_two_stu_marks,
-                $mark->term_two_out_off,
-                $mark->mid_term_stu_marks,
-                $mark->mid_term_out_off,
-                // $mark->final_exam_stu_marks ?? '',
-                // $mark->final_exam_out_off ?? '', 
-                // optional($mark->created_at)->format('d-m-Y h:i A')
+                $stuName,
+                $stuId,
+                $className,
+                $sessionName,
+                $subjectTotals['ENG LIT'],
+                $subjectTotals['ENG LANG'],
+                $subjectTotals['BENG/ HINDI'],
+                $subjectTotals['MATH'],
+                $subjectTotals['PHY SC'],
+                $subjectTotals['LIFE SCIENCE'],
+                $subjectTotals['HIST'],
+                $subjectTotals['GEOG'],
+                $grandTotal,
+                $academicPercentage . '%'
             ], $delimiter);
         }
 
-        // Output file
         fseek($f, 0);
         header('Content-Type: text/csv');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         fpassthru($f);
         exit;
     }
+
 
 
 }
