@@ -4,86 +4,106 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{AcademicSession,ClassList,Subject,Student,StudentsMark,StudentProgressMarking,StudentProgressCategory};
+use App\Models\{AcademicSession,ClassList,Subject,Student,StudentsMark,
+                StudentProgressMarking,StudentProgressCategory, StudentAdmission, ClassWiseSubject};
+
 
 class ProgressChartController extends Controller
 {
-    public function index(){
+    // public function index(){
 
-        $sessions = AcademicSession::all();
-        $classes = ClassList::all();
-        $subjects = Subject::all();
-        $students = Student::all();
+    //     $sessions = AcademicSession::all();
+    //     $classes = ClassList::all();
+    //     $subjects = Subject::all();
+    //     $students = Student::all();
 
-        return view('admin.progress_chart.index', compact('sessions','classes','subjects','students'));
+    //     return view('admin.progress_chart.index', compact('sessions','classes','subjects','students'));
+    // }
+
+    public function index() {
+        $sessions = StudentAdmission::with('session')
+            ->select('session_id')
+            ->distinct()
+            ->get()
+            ->map( function ($item) {
+                return [
+                    'id' => $item->session_id,
+                    'name'  => $item->session->session_name ?? 'N/A',
+                ];
+            });
+
+        $classes    = ClassList::with('sections')->get();
+        $subjects   = Subject::all();
+        return view ('admin.progress_chart.index', compact('sessions', 'classes', 'subjects'));
     }
 
-    // public function fetchChartData(Request $request)
-    // {
-    //     $query = StudentsMark::with('subjectlist');
+    public function getStudentsBySession(Request $request) {
+        $sessionId = $request->sessionId;
 
-    //     if ($request->session_id) {
-    //         $query->whereHas('studentAdmission', fn($q) => $q->where('session_id', $request->session_id));
-    //     }
+        $admissions = StudentAdmission::with('student')
+                        ->where('session_id', $sessionId)
+                        ->whereHas('student')
+                        ->get();
 
-    //     if ($request->class_id) {
-    //         $query->where('class_id', $request->class_id);
-    //     }
+        $students = $admissions->map( function ($admission) {
+            return [
+                'id' => $admission->student->id,
+                'name' => ucwords($admission->student->student_name),
+            ];
+        });
 
-    //     if ($request->subject_id) {
-    //         $query->where('subject_id', $request->subject_id);
-    //     }
-
-    //     if ($request->student_id) {
-    //         $query->where('student_id', $request->student_id);
-    //     }
-
-    //     if ($request->time_period == 'last_6_months') {
-    //         $query->where('created_at', '>=', now()->subMonths(6));
-    //     }
-
-    //     $marks = $query->get();
+        return response()->json([
+            'success'   => true,
+            'students'  => $students,
+        ]);
+    }
 
 
-    //     $trend = [
-    //         'Term 1' => round($marks->avg('term_one_stu_marks'), 2),
-    //         'Term 2' => round($marks->avg('term_two_stu_marks'), 2),
-    //         'Midterm' => round($marks->avg('mid_term_stu_marks'), 2),
-    //         'Final Exam' => round($marks->avg('final_exam_stu_marks'), 2),
-    //     ];
+    public function getClassBySessionAndStudent(Request $request)
+    {
+        $session_id = $request->session_id;
+        $student_id = $request->student_id;
 
-    
-    //     $subjectPerformance = $marks->groupBy('subjectlist.sub_name')->map(function ($items) {
-    //         return round($items->avg(function ($item) {
-    //             return (
-    //                 ($item->term_one_stu_marks ?? 0) +
-    //                 ($item->term_two_stu_marks ?? 0) +
-    //                 ($item->mid_term_stu_marks ?? 0) +
-    //                 ($item->final_exam_stu_marks ?? 0)
-    //             ) / 4;
-    //         }), 2);
-    //     });
+        // Get the admission record for the given session and student
+        $admission = StudentAdmission::with('class')
+                        ->where('session_id', $session_id)
+                        ->where('student_id', $student_id)
+                        ->first();
 
-    //     $stats = [
-    //         'students_tracked' => $marks->unique('student_id')->count(),
-    //         'subjects_monitored' => $marks->unique('subject_id')->count(),
-    //         'avg_performance' => round($marks->avg(function ($item) {
-    //             return (
-    //                 ($item->term_one_stu_marks ?? 0) +
-    //                  ($item->term_two_stu_marks ?? 0) +
-    //                 ($item->mid_term_stu_marks ?? 0) +
-    //                 ($item->final_exam_stu_marks ?? 0)
-    //             ) / 4;
-    //         }), 2),
-    //         'avg_progress' => 0, 
-    //     ];
+        if ($admission) {
+            $class = $admission->class;
 
-    //     return response()->json([
-    //         'trend' => $trend,
-    //         'subjectPerformance' => $subjectPerformance,
-    //         'stats' => $stats,
-    //     ]);
-    // }
+            // Fetch subjects only from the students_marks table for this admission
+            $subjects = StudentsMark::with('subjectlist')
+                            ->where('student_id', $student_id)
+                            ->where('student_admission_id', $admission->id)
+                            ->get()
+                            ->unique('subject_id') // Keep only unique subjects
+                            ->map(function ($mark) {
+                                return [
+                                    'id'   => $mark->subjectlist->id,
+                                    'name' => ucwords($mark->subjectlist->sub_name),
+                                ];
+                            });
+
+            return response()->json([
+                'success' => true,
+                'classes' => [[
+                    'id'   => $class->id,
+                    'name' => ucwords($class->class) . ' (' . ($admission->section ?? '-') . ')',
+                ]],
+                'subjects' => $subjects,
+            ]);
+        } else {
+            return response()->json([
+                'success'  => true,
+                'classes'  => [],
+                'subjects' => [],
+            ]);
+        }
+    }
+
+
     public function fetchChartData(Request $request)
     {
         if ($request->chart_type === 'qualitative') {
@@ -151,7 +171,7 @@ class ProgressChartController extends Controller
             'Final Exam' => round($marks->avg('final_exam_stu_marks'), 2),
         ];
 
-        
+
         $subjectPerformance = $marks->groupBy('subjectlist.sub_name')->map(function ($items) {
             return round($items->avg(function ($item) {
                 return (

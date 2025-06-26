@@ -6,110 +6,7 @@
 @section('title', 'Progress Chart')
 
 @section('content')
-{{-- <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="mb-0">Progress Charts</h3>
-            <small class="text-muted">Visual representation of student performance trends</small>
-        </div>
-        <div>
-            <a href="" 
-                class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                data-toggle="tooltip" title="Export Data">
-                    Export
-            </a>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="chart_type" class="form-select">
-                <option value="academic">Academic Performance</option>
-                <option value="qualitative">Qualitative Progress</option>
-            </select>
-            <label for="chart_type">Chart Type</label>
-        </div>
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="session_id" class="form-select">
-                <option value="">All Sessions</option>
-                @foreach($sessions as $session)
-                    <option value="{{ $session->id }}">{{ $session->session_name }}</option>
-                @endforeach
-            </select>
-            <label for="session_id">Session</label>
-        </div>
 
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="class_id" class="form-select">
-                <option value="">All Classes</option>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}">{{ $class->class }}</option>
-                @endforeach
-            </select>
-            <label for="class_id">Class</label>
-        </div>
-
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="subject_id" class="form-select">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                @endforeach
-            </select>
-            <label for="subject_id">Subject</label>
-        </div>
-
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="student_id" class="form-select">
-                <option value="">All Students</option>
-                @foreach($students as $student)
-                    <option value="{{ $student->id }}">{{ $student->student_name }}</option>
-                @endforeach
-            </select>
-            <label for="student_id">Student</label>
-        </div>
-    </div>
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="mb-3"> Academic Performance Trend</h5>
-                <canvas id="lineChart" height="200"></canvas>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="mb-3"> Subject-wise Performance</h5>
-                <canvas id="barChart" height="200"></canvas>
-            </div>
-        </div>
-    </div>
-  
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Students Tracked</p>
-                <h4 id="studentsTracked">0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Subjects Monitored</p>
-                <h4 id="subjectsMonitored">0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Avg Performance</p>
-                <h4 id="avgPerformance">0%</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Avg Progress</p>
-                <h4 id="avgProgress">0%</h4>
-            </div>
-        </div>
-    </div>
-</div> --}}
 
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -117,6 +14,7 @@
             <h3 class="mb-0">Progress Charts</h3>
             <small class="text-muted">Visual representation of student performance trends</small>
         </div>
+
     </div>
     <div class="row mb-4">
         <div class="form-floating form-floating-outline col-md-3">
@@ -126,42 +24,42 @@
             </select>
             <label for="chart_type">Chart Type</label>
         </div>
+        {{-- Session Dropdown --}}
         <div class="form-floating form-floating-outline col-md-2">
+
             <select id="session_id" class="form-select">
-                <option value="">All Sessions</option>
+                <option value="">Select Session</option>
                 @foreach($sessions as $session)
-                    <option value="{{ $session->id }}">{{ $session->session_name }}</option>
+                    <option value="{{ $session['id'] }}">{{ $session['name'] }}</option>
                 @endforeach
             </select>
             <label for="session_id">Session</label>
         </div>
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="class_id" class="form-select">
-                <option value="">All Classes</option>
-                @foreach($classes as $class)
-                    <option value="{{ $class->id }}">{{ $class->class }}</option>
-                @endforeach
-            </select>
-            <label for="class_id">Class</label>
-        </div>
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="subject_id" class="form-select">
-                <option value="">All Subjects</option>
-                @foreach($subjects as $subject)
-                    <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                @endforeach
-            </select>
-            <label for="subject_id">Subject</label>
-        </div>
+
+        {{-- Student Dropdown (loaded via AJAX) --}}
         <div class="form-floating form-floating-outline col-md-2">
             <select id="student_id" class="form-select">
-                <option value="">All Students</option>
-                @foreach($students as $student)
-                    <option value="{{ $student->id }}">{{ $student->student_name }}</option>
-                @endforeach
+                <option value="">Select Student</option>
             </select>
             <label for="student_id">Student</label>
         </div>
+
+        {{-- Class Dropdown (based on student + session) --}}
+        <div class="form-floating form-floating-outline col-md-2">
+            <select id="class_id" class="form-select">
+                <option value="">Select Class</option>
+            </select>
+            <label for="class_id">Class</label>
+        </div>
+
+        {{-- Subject Dropdown (based on class) --}}
+        <div class="form-floating form-floating-outline col-md-2">
+            <select id="subject_id" class="form-select">
+                <option value="">Select Subject</option>
+            </select>
+            <label for="subject_id">Subject</label>
+        </div>
+
     </div>
 
     <div id="academicCharts" class="row mb-4">
@@ -225,6 +123,68 @@
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    //for fetch session,student, subject, class
+    $(document).ready(function () {
+        //  Load students when session changes
+        $('#session_id').change(function () {
+            const sessionId = $(this).val();
+
+            // Clear and disable dependent dropdowns
+            $('#student_id').empty().append('<option value="">Loading...</option>');
+            $('#class_id').empty().append('<option value="">Select Class</option>').prop('disabled', false);
+            $('#subject_id').empty().append('<option value="">Select Subject</option>').prop('disabled', false);
+
+            if (!sessionId) return;
+
+            $.ajax({
+                url: '{{ route("admin.getStudentsBySession") }}',
+                type: 'GET',
+                data: { sessionId },
+                success: function (res) {
+                    $('#student_id').empty().append('<option value="">Select Student</option>');
+                    if (res.success) {
+                        res.students.forEach(stu => {
+                            $('#student_id').append(`<option value="${stu.id}">${stu.name}</option>`);
+                        });
+                    }
+                }
+            });
+        });
+
+        //  Load class + subjects when student changes
+        $('#student_id').change(function () {
+            const sessionId = $('#session_id').val();
+            const studentId = $(this).val();
+
+            $('#class_id').empty().append('<option value="">Loading...</option>');
+            $('#subject_id').empty().append('<option value="">Loading...</option>');
+
+            if (!sessionId || !studentId) return;
+
+            $.ajax({
+                url: '{{ route("admin.getClassBySessionAndStudent") }}',
+                type: 'GET',
+                data: {
+                    session_id: sessionId,
+                    student_id: studentId
+                },
+                success: function (res) {
+                    $('#class_id').empty().append('<option value="">Select Class</option>').prop('disabled', false);
+                    $('#subject_id').empty().append('<option value="">Select Subject</option>').prop('disabled', false);
+
+                    if (res.success) {
+                        res.classes.forEach(cls => {
+                            $('#class_id').append(`<option value="${cls.id}">${cls.name}</option>`);
+                        });
+
+                        res.subjects.forEach(sub => {
+                            $('#subject_id').append(`<option value="${sub.id}">${sub.name}</option>`);
+                        });
+                    }
+                }
+            });
+        });
+    });
     let lineChart, barChart, qualLineChart, radarChart;
 
     function fetchChartData() {
