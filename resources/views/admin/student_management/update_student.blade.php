@@ -28,7 +28,7 @@
 
           <!-- Card Body -->
           <div class="card-body">
-            <form action="{{ route('admin.studentupdate', $student->id) }}" method="POST">
+            <form action="{{ route('admin.studentupdate', $student->id) }}" method="POST" enctype="multipart/form-data">
               @csrf
               @method('POST')
 

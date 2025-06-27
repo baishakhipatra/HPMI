@@ -168,24 +168,21 @@ class StudentListController extends Controller
         return view('admin.student_management.update_student', compact('student','classrooms','sessions'));
     }
 
-   
-
-    public function update(Request $request, $id)
+  
+   public function update(Request $request, $id)
     {
-        //dd($request->all());
         $request->validate([
             'student_name'    => 'required|string|max:255',
-            // 'date_of_birth'   => 'required|date',
             'date_of_birth'   => [
                 'required',
                 'date',
                 'before:today',
                 function($attribute, $value, $fail) use ($request) {
-                    if($request->admission_date) {
-                        $dobTimestamp  = strtotime($value);
+                    if ($request->admission_date) {
+                        $dobTimestamp = strtotime($value);
                         $admissionTimestamp = strtotime($request->admission_date);
-                        if($dobTimestamp > $admissionTimestamp) {
-                            $fail('The date of birth can not after the admission date');
+                        if ($dobTimestamp > $admissionTimestamp) {
+                            $fail('The date of birth cannot be after the admission date.');
                         }
                     }
                 },
@@ -198,26 +195,17 @@ class StudentListController extends Controller
             'admission_date'  => 'required|date',
             'class_id'        => 'required|exists:class_lists,id',
             'section_id'      => 'required|string',
-            // 'roll_number'     => [
-            //     'required',
-            //     'integer',
-            //     Rule::unique('student_admissions')->ignore($id, 'student_id')->where(function ($query) use ($request) {
-            //         return $query->where('class_id', $request->class_id)
-            //                     ->where('section', $request->section_id);
-            //     }),
-            // ],
-            'roll_number' => [
+            'roll_number'     => [
                 'nullable',
                 'integer',
                 Rule::unique('student_admissions')
-                    ->ignore($request->admission_id) 
+                    ->ignore($request->admission_id)
                     ->where(function ($query) use ($request) {
                         return $query->where('class_id', $request->class_id)
                                     ->where('section', $request->section_id);
                     }),
             ],
-        
-            'aadhar_no'    => [
+            'aadhar_no' => [
                 'nullable',
                 'regex:/^[0-9]{12}$/',
                 Rule::unique('students')->ignore($id)->whereNull('deleted_at'),
@@ -228,18 +216,17 @@ class StudentListController extends Controller
             'father_name'  => 'nullable|string|max:255',
             'mother_name'  => 'nullable|string|max:255',
             'divyang'      => 'required|in:Yes,No',
-        ],[
+            'image'        => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+        ], [
             'phone_number.regex' => 'Phone number should be exactly 10 digits.',
             'aadhar_no.regex'    => 'Aadhaar number should be exactly 12 digits.',
         ]);
 
         try {
             $student = Student::findOrFail($id);
-            $imagePath = $student->image; // get old image path
+            $imagePath = $student->image;
 
-            // If new image is uploaded and valid
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old image if exists
                 if (!empty($imagePath) && file_exists(public_path($imagePath))) {
                     unlink(public_path($imagePath));
                 }
@@ -249,11 +236,10 @@ class StudentListController extends Controller
                 $filename  = time() . rand(10000, 99999) . '.' . $extension;
                 $filePath  = 'uploads/students/' . $filename;
                 $file->move(public_path('uploads/students'), $filename);
-
-                // Assign new image path
                 $imagePath = $filePath;
             }
 
+            // Update all fields including image
             $student->update([
                 'student_name'  => $request->student_name,
                 'date_of_birth' => $request->date_of_birth,
@@ -269,12 +255,10 @@ class StudentListController extends Controller
                 'father_name'   => $request->father_name,
                 'mother_name'   => $request->mother_name,
                 'divyang'       => $request->divyang,
-                'image'         => $imagePath,
+                'image'         => $imagePath, // include updated path
             ]);
 
-            //$admission = StudentAdmission::where('student_id', $id);
-           $admission = StudentAdmission::find($request->admission_id);
-
+            $admission = StudentAdmission::find($request->admission_id);
             if ($admission) {
                 $admission->update([
                     'session_id'     => $request->session_id,
@@ -295,10 +279,7 @@ class StudentListController extends Controller
             }
 
             return redirect()->route('admin.studentlist')->with('success', 'Student updated successfully.');
-
         } catch (\Exception $e) {
-            // \Log::error('Student Update Error: ' . $e->getMessage());
-           //dd($e->getMessage());
             return back()->with('error', 'Something went wrong while updating the student.');
         }
     }
@@ -629,52 +610,6 @@ class StudentListController extends Controller
         return response()->json(['success' => true]);
     }
 
-
-    // public function ProgressUpdatePhase(Request $request)
-    // {
-    //     $request->validate([
-    //         'student_id'    => 'required|integer',
-    //         'session_id'    => 'required|integer',
-    //         'category'  => 'nullable|string', 
-    //         'phase'     => 'nullable|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
-    //         'value'     => 'nullable|string',
-    //         'add_comments'  => 'nullable|string',
-    //     ]);
-
-        
-    //     $updateData = [];
-    //     if ($request->filled('phase') && $request->filled('value')) {
-    //         $updateData[$request->phase] = $request->value;
-    //     }
-
-    //     if (empty($updateData) && !$request->filled('add_comments')) {
-    //         return response()->json(['success' => false, 'message' => 'No data to update.']);
-    //     }
-
-
-        
-    //     if ($request->filled('phase') && $request->filled('value') && $request->filled('category')) {
-    //         StudentProgressMarking::updateOrCreate(
-    //             [
-    //                 'student_id' => $request->student_id,
-    //                 'admission_session_id'  => $request->session_id,
-    //                 'progress_category'     => $request->category,
-    //             ],
-    //             $updateData
-    //         );
-    //     }
-
-
-    //     // This block executes if 'add_comments' is provided
-    //     if ($request->filled('add_comments')) {
-    //         // Update the 'add_comments' field for all records matching student and session
-    //         StudentProgressMarking::where('student_id', $request->student_id)
-    //             ->where('admission_session_id', $request->session_id)
-    //             ->update(['add_comments' => $request->add_comments]);
-    //     }
-
-    //     return response()->json(['success' => true]);
-    // }
 
 
 
