@@ -186,19 +186,21 @@
                         <td><strong>{{ $total }}</strong></td>
                         <td><span class="grade">{{ $grade }}</span></td>
                         <td class="actions-cell">
-                          <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                              <i class="ri-more-2-line"></i>
+                          <div class="btn-group" role="group" aria-label="Mark Actions">
+                            {{-- Edit Button --}}
+                            <button type="button"
+                              class="btn btn-sm btn-icon btn-outline-dark editMarksBtn"
+                              data-url="{{ route('admin.student-marks.getData', $mark->id) }}"
+                              data-bs-toggle="tooltip"  title="Edit">                                 
+                              <i class="ri-pencil-line"></i>
                             </button>
-                            <div class="dropdown-menu">
-                              <button type="button" class="dropdown-item editMarksBtn" data-url="{{ route('admin.student-marks.getData', $mark->id) }}">
-                                <i class="ri-pencil-line me-1"></i> Edit
-                              </button>
 
-                              <a class="dropdown-item" href="javascript:void(0);" onclick="deleteMark({{ $mark->id }})">
-                                <i class="ri-delete-bin-6-line me-1"></i> Delete
-                              </a>
-                            </div>
+                            {{-- Delete Button --}}
+                            <button type="button"
+                              class="btn btn-sm btn-icon btn-outline-danger"
+                              onclick="deleteMark({{ $mark->id }})" data-bs-toggle="tooltip" title="Delete">
+                              <i class="ri-delete-bin-6-line"></i>
+                            </button>
                           </div>
                         </td>
                       </tr>

@@ -141,14 +141,12 @@
                         <input type="hidden" name="classId" value="{{$classData->id}}" />
                         <div class="mb-3">
                             <div class="form-floating form-floating-outline">
-                                <select class="form-control" name="subjectId" required>
-                                    <option>Select subject</option>
+                                <select class="form-control" name="subjectId[]" multiple required>
                                     @foreach($allSubjects as $subject)
-                                    <option value="{{$subject->id}}">{{$subject->sub_name}}</option>
+                                        <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
                                     @endforeach
                                 </select>
-                            
-                            @error('subject_name') <p class="text-danger small">{{ $message }}</p> @enderror
+                                @error('subjectId') <p class="text-danger small">{{ $message }}</p> @enderror
                             </div>
                         </div>
 
@@ -213,5 +211,12 @@
             }
         });
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        $('select[name="subjectId[]"]').select2({
+            placeholder: 'Select subject(s)',
+            width: '100%'
+        });
+    });
 
 </script>

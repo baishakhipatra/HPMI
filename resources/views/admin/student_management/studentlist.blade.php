@@ -87,7 +87,7 @@
                   </div>
               </td>
               <td>
-                <div class="dropdown">
+                {{-- <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                       <i class="ri-more-2-line"></i>
                   </button >
@@ -109,6 +109,48 @@
                           <i class="ri-bar-chart-grouped-line"></i> Class Wise Comparison
                       </a>
                   </div>
+                </div> --}}
+                <div class="btn-group" role="group" aria-label="Action Buttons">
+                    {{-- Edit --}}
+                    <a href="{{ route('admin.studentedit', $item->id) }}"
+                      class="btn btn-sm btn-icon btn-outline-dark"
+                      data-bs-toggle="tooltip"
+                      title="Edit">
+                        <i class="ri-pencil-line"></i>
+                    </a>
+
+                    {{-- Delete --}}
+                    <a href="javascript:void(0);"
+                      class="btn btn-sm btn-icon btn-outline-danger"
+                      onclick="deleteStudent({{ $item->id }})"
+                      data-bs-toggle="tooltip"
+                      title="Delete">
+                        <i class="ri-delete-bin-6-line"></i>
+                    </a>
+
+                    {{-- Admission History --}}
+                    <a href="{{ route('admin.student.admissionhistory', $item->id) }}"
+                      class="btn btn-sm btn-icon btn-outline-info"
+                      data-bs-toggle="tooltip"
+                      title="Admission History">
+                        <i class="ri-graduation-cap-line"></i>
+                    </a>
+
+                    {{-- Progress Marking --}}
+                    <a href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}"
+                      class="btn btn-sm btn-icon btn-outline-warning"
+                      data-bs-toggle="tooltip"
+                      title="Student Progress Marking">
+                        <i class="ri-file-list-3-line"></i>
+                    </a>
+
+                    {{-- Classwise Comparison --}}
+                    <a href="{{ route('admin.student.classcompare', $item->id) }}"
+                      class="btn btn-sm btn-icon btn-outline-primary"
+                      data-bs-toggle="tooltip"
+                      title="Class Wise Comparison">
+                        <i class="ri-bar-chart-grouped-line"></i>
+                    </a>
                 </div>
               </td>
             </tr>

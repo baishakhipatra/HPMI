@@ -37,6 +37,13 @@
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
+                  <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                    <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 
+                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                      data-toggle="tooltip" title="Export Data">
+                      Export
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -50,11 +57,13 @@
       <table class="table">
         <thead>
           <tr>
+            <th>Teacher ID</th>
             <th width="20%">Name</th>
             <th width="10%">Email</th>
             <th width="10%">Mobile</th>
-            <th width="15%">Classes</th>
-            <th width="40%">Subjects</th>
+            <th>Date of Joining</th>
+            {{-- <th width="15%">Classes</th>
+            <th width="40%">Subjects</th> --}}
             <th width="5%">Status</th>
             <th width="10%">Actions</th>
           </tr>
@@ -76,10 +85,12 @@
               // dd($subjects);
             @endphp
             <tr>
+              <td>{{ $item->user_id}}</td>
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              <td>
+              <td>{{ $item->date_of_joining}}</td>
+              {{-- <td>
                 @if(count($classes) > 0)
                   <ul class="mb-0">
                       @foreach($classes as $eachClassItem)
@@ -103,7 +114,7 @@
                 @else
                     -
                 @endif
-              </td>
+              </td> --}}
 
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
@@ -114,30 +125,21 @@
               </td>
               {{-- Edit and delete --}}
               <td>
-                <div class="dropdown">
-                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                    <i class="ri-more-2-line"></i>
-                  </button>
-                  <div class="dropdown-menu">
-                    {{-- Show --}}
-                    <a class="dropdown-item" href="{{ route('admin.teacher.show', $item->id) }}" title="View" data-bs-toggle="tooltip">
-                      <i class="ri-eye-line me-1"></i> View
-                    </a>
-
-                    {{-- Edit --}}
-                    <a class="dropdown-item" href="{{ route('admin.teacher.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
-                      <i class="ri-pencil-line me-1"></i> Edit
-                    </a>
-
-                    {{-- Delete --}}
-                    <a class="dropdown-item" href="javascript:void(0);" title="Delete" data-bs-toggle="tooltip" onclick="deleteTeacher({{ $item->id }})">
-                      <i class="ri-delete-bin-6-line me-1"></i> Delete
-                    </a>
-                  </div>
+                <div class="btn-group" role="group" aria-label="Action Buttons">
+                  <a href="{{ route('admin.teacher.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                    data-bs-toggle="tooltip" title="View">                  
+                    <i class="ri-eye-line"></i>
+                  </a>
+                  <a href="{{ route('admin.teacher.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
+                    data-bs-toggle="tooltip"  title="Edit">
+                    <i class="ri-pencil-line"></i>
+                  </a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteTeacher({{ $item->id }})"     
+                    data-bs-toggle="tooltip" title="Delete">
+                    <i class="ri-delete-bin-6-line"></i>
+                  </a>
                 </div>
-              </td>
-
-              
+              </td> 
             </tr>
           @endforeach         
         </tbody>

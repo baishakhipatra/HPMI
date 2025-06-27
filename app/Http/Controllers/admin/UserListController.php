@@ -27,8 +27,10 @@ class UserListController extends Controller
             $q->where(function($subQuery) use ($keyword) {
                 $subQuery->where('name', 'like', '%'. $keyword . '%')
                             ->orWhere('email', 'like', '%'. $keyword . '%')
+                            ->orWhere('mobile', 'like', '%'. $keyword . '%')
                             ->orWhere('qualifications', 'like', '%' . $keyword . '%')
-                            ->orWhere('address', 'like', '%' . $keyword . '%');                           
+                            ->orWhere('address', 'like', '%' . $keyword . '%')  
+                            ->orWhere('user_id', 'like', '%' . $keyword .  '%');                         
             });
         });
         
@@ -97,6 +99,11 @@ class UserListController extends Controller
         return redirect()->route('admin.employee.index')->with('success', 'Employee created successfully');
     }
 
+
+    public function show($id) {
+        $employee = Admin::findOrFail($id);
+        return view('admin.user_management.show', compact('employee'));
+    }
 
     public function edit($id) {
         $data = Admin::findOrFail($id);
@@ -176,5 +183,69 @@ class UserListController extends Controller
             'status'    => 200,
             'message'   => 'user deleted successfully.',
         ]);
+    }
+
+    public function export(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $query = Admin::where('user_type', 'Employee');
+
+        // Filter by keyword
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('user_id', 'like', '%' . $keyword . '%')
+                ->orWhere('name', 'like', '%' . $keyword . '%')
+                ->orWhere('email', 'like', '%' . $keyword . '%')
+                ->orWhere('mobile', 'like', '%' . $keyword . '%')
+                ->orWhere('qualifications', 'like', '%' . $keyword . '%')
+                ->orWhere('address', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        $employees = $query->get();
+
+        if ($employees->count() > 0) {
+            $delimiter = ",";
+            $filename = "employees_export_" . date('Y-m-d') . ".csv";
+            $f = fopen('php://memory', 'w');
+
+            // CSV Header
+            $headers = [
+                'Employee ID',
+                'Name',
+                'Email',
+                'Phone',
+                'Date of Birth',
+                'Date of Joining',
+                'address',
+                'Qualification',
+            ];
+            fputcsv($f, $headers, $delimiter);
+
+            foreach ($employees as $employee) {
+               
+                $lineData = [
+                    $employee->user_id,
+                    $employee->name,
+                    $employee->email,
+                    $employee->mobile,
+                    $employee->date_of_birth,
+                    $employee->date_of_joining,
+                    $employee->address,
+                    $employee->qualifications,
+                ];
+
+                fputcsv($f, $lineData, $delimiter);
+            }
+
+            fseek($f, 0);
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '";');
+            fpassthru($f);
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'No records found to export.');
+        }
     }
 }

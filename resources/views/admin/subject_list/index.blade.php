@@ -76,25 +76,27 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="dropdown">
-                                        <button class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                            <i class="ri-more-2-line"></i>
-                                        </button>
-                                        <div class="dropdown-menu">
+                                        <div class="btn-group" role="group" aria-label="Subject Actions">
                                             @php
                                                 $edit_link = route('admin.subjectlist.index') . '?';
-                                                if(request()->input('keyword')) {
+                                                if (request()->input('keyword')) {
                                                     $edit_link .= 'keyword=' . request()->input('keyword') . '&';
                                                 }
                                                 $edit_link .= 'edit_subject=' . $subject->id;
                                             @endphp
-                                            <a class="dropdown-item" href="{{$edit_link}}">
-                                                <i class="ri-pencil-line me-1"></i> Edit
+
+                                            {{-- Edit Button --}}
+                                            <a href="{{ $edit_link }}" class="btn btn-sm btn-icon btn-outline-dark"                                            
+                                            data-bs-toggle="tooltip"  title="Edit">                                           
+                                            <i class="ri-pencil-line"></i>
                                             </a>
-                                            <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteSubject({{ $subject->id }})">
-                                                <i class="ri-delete-bin-6-line me-1"></i> Delete
-                                            </a>
-                                        </div>
+
+                                            {{-- Delete Button --}}
+                                            <button type="button"
+                                                class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteSubject({{ $subject->id }})"                        
+                                                data-bs-toggle="tooltip" title="Delete">                       
+                                                <i class="ri-delete-bin-6-line"></i>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>

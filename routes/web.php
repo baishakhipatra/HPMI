@@ -147,10 +147,12 @@ Route::prefix('admin')->group(function () {
             Route::get('/', [UserListController::class, 'index'])->name('admin.employee.index');
             Route::get('/create', [UserListController::class, 'create'])->name('admin.employee.create');
             Route::post('/store', [UserListController::class, 'store'])->name('admin.employee.store');
+            Route::get('/show/{id}', [UserListController::class, 'show'])->name('admin.employee.show');
             Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.employee.edit');
             Route::post('/update', [UserListController::class, 'update'])->name('admin.employee.update');
             Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.employee.status');
             Route::post('/delete', [UserListController::class, 'delete'])->name('admin.employee.delete');
+            Route::get('/export', [UserListController::class, 'export'])->name('admin.employee.export');
         });
 
         //teachermanagement/teacherlist
@@ -163,6 +165,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/update', [TeacherListController::class, 'update'])->name('admin.teacher.update');
             Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacher.status');
             Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
+            Route::get('/export', [TeacherListController::class, 'export'])->name('admin.teacher.export');
 
             //get class and subject
             Route::post('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');

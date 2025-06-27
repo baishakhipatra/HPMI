@@ -102,6 +102,7 @@ class StudentListController extends Controller
             'father_name'     => 'nullable|string|max:255',
             'mother_name'     => 'nullable|string|max:255',
             'divyang'         => 'required|in:Yes,No',
+            'image'           => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
         ],[
             'phone_number.regex' => 'Phone number should be exactly 10 digits.',
             'aadhar_no.regex'    => 'Aadhaar number should be exactly 12 digits.',
@@ -110,6 +111,14 @@ class StudentListController extends Controller
         try {
             $generatedId = Student::generateStudentUid(); // Generate unique student_id
 
+            $imagePath = null;
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $file      = $request->file('image');
+                $fileName  = time() . rand(10000, 99999) . '.' . $file->extension();
+                $filePath  = 'uploads/students/' . $fileName;
+                $file->move(public_path('uploads/students'), $fileName);
+                $imagePath = $filePath;
+            }
             $student = Student::create([
                 'student_id'     => $generatedId, // 
                 'student_name'   => $request->student_name,
@@ -126,6 +135,7 @@ class StudentListController extends Controller
                 'father_name'    => $request->father_name,
                 'mother_name'    => $request->mother_name,
                 'divyang'        => $request->divyang,
+                'image'          => $imagePath, // Store image path if exists
             ]);
 
             // Create admission
@@ -225,6 +235,25 @@ class StudentListController extends Controller
 
         try {
             $student = Student::findOrFail($id);
+            $imagePath = $student->image; // get old image path
+
+            // If new image is uploaded and valid
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Delete old image if exists
+                if (!empty($imagePath) && file_exists(public_path($imagePath))) {
+                    unlink(public_path($imagePath));
+                }
+
+                $file      = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename  = time() . rand(10000, 99999) . '.' . $extension;
+                $filePath  = 'uploads/students/' . $filename;
+                $file->move(public_path('uploads/students'), $filename);
+
+                // Assign new image path
+                $imagePath = $filePath;
+            }
+
             $student->update([
                 'student_name'  => $request->student_name,
                 'date_of_birth' => $request->date_of_birth,
@@ -240,6 +269,7 @@ class StudentListController extends Controller
                 'father_name'   => $request->father_name,
                 'mother_name'   => $request->mother_name,
                 'divyang'       => $request->divyang,
+                'image'         => $imagePath,
             ]);
 
             //$admission = StudentAdmission::where('student_id', $id);
@@ -297,11 +327,18 @@ class StudentListController extends Controller
                 'message'   => 'user not found.',
             ]);
         }
+
+        $imagePath = $student->image;
     
         $student->delete(); 
+
+        // Delete image from public directory if it exists
+        if (!empty($imagePath) && file_exists(public_path($imagePath))) {
+            unlink(public_path($imagePath));
+        }
         return response()->json([
             'status'    => 200,
-            'message'   => 'user deleted successfully.',
+            'message'   => 'Studentlist deleted successfully.',
         ]);
     }
 

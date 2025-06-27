@@ -210,8 +210,9 @@ class ClassListController extends Controller
     public function addSubjectToclass(Request $request) {
        // dd($request->all());
         $request->validate([
-            'subjectId' => 'required|numeric|min:1',
-            'classId' => 'required|numeric|min:1'
+            'subjectId'     => 'required|array|min:1',
+            'subjectId.*'   => 'numeric|min:1',
+            'classId'       => 'required|numeric|min:1'
         ], [
             // 'subjectId.required' => 'Please select a subject',
             'subjectId.numeric' => 'Please select a subject',
@@ -221,19 +222,29 @@ class ClassListController extends Controller
             // 'classId.min' => 'Invalid class reference'
         ]);
         
-        $checkIfExists = ClassWiseSubject::where([
-                'subject_id' => $request->subjectId,
+        $added = 0;
+        foreach($request->subjectId as $subjectId) {
+            $checkIfExists = ClassWiseSubject::where([
+                'subject_id' => $subjectId,
                 'class_id' => $request->classId,
-        ])->first();
+            ])->exists();
 
-        if ($checkIfExists) {
-            return redirect()->route('admin.class.subjects', $request->classId)->with('error', 'Selected subject is already added to the class.');
+            if(!$checkIfExists) {
+                ClassWiseSubject::create([
+                    'subject_id' => $subjectId,
+                    'class_id' => $request->classId,
+                ]);
+                $added++;
+            }
         }
-        ClassWiseSubject::create([
-            'subject_id' => $request->subjectId,
-            'class_id' => $request->classId,
-        ]);
-        return redirect()->route('admin.class.subjects', $request->classId)->with('success', 'Selected subject is successfully added to the class.');
+       
+
+        // if ($checkIfExists) {
+        //     return redirect()->route('admin.class.subjects', $request->classId)->with('error', 'Selected subject is already added to the class.');
+        // }
+      
+        return redirect()->route('admin.class.subjects', $request->classId)
+                            ->with('success', '$added subject(s) successfully added to the class.');
     }
     
     public function deleteSubjectToclass(Request $request) {

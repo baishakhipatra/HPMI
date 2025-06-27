@@ -56,22 +56,31 @@
                   </div>
                 </td>
                 <td>
-                  <div class="dropdown">
-                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
-                    </button>
-                    <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.class.subjects', ['id'=> $class->id]) }}" title="Edit">
-                          <i class="ri-book-2-line"></i> Subject
+                  <div class="btn-group" role="group" aria-label="Class Actions">
+                      {{-- Subject Button --}}
+                      <a href="{{ route('admin.class.subjects', ['id' => $class->id]) }}"
+                        class="btn btn-sm btn-icon btn-outline-info"
+                        data-bs-toggle="tooltip"
+                        title="Subject">
+                          <i class="ri-book-2-line"></i>
                       </a>
-                      <a class="dropdown-item" href="{{ route('admin.classlist',['update_id'=> $class->id]) }}"
+
+                      {{-- Edit Button --}}
+                      <a href="{{ route('admin.classlist', ['update_id' => $class->id]) }}"
+                        class="btn btn-sm btn-icon btn-outline-dark"
+                        data-bs-toggle="tooltip"
                         title="Edit">
-                        <i class="ri-pencil-line me-1"></i> Edit
+                          <i class="ri-pencil-line"></i>
                       </a>
-                      <a class="dropdown-item" href="javascript:void(0);" onclick="deleteClass({{$class->id}})">
-                        <i class="ri-delete-bin-6-line me-1"></i> Delete
-                      </a>
-                    </div>
+
+                      {{-- Delete Button --}}
+                      <button type="button"
+                              class="btn btn-sm btn-icon btn-outline-danger"
+                              onclick="deleteClass({{ $class->id }})"
+                              data-bs-toggle="tooltip"
+                              title="Delete">
+                          <i class="ri-delete-bin-6-line"></i>
+                      </button>
                   </div>
                 </td>
               </tr>

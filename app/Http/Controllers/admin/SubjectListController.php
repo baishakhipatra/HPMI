@@ -35,6 +35,26 @@ class SubjectListController extends Controller
         return view('admin.subject_list.index', compact('subjects', 'subject', 'editableSubjectDetails'));
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'sub_name' => 'required|string|max:255|unique:subjects,sub_name',
+            'sub_code' => 'required|string|max:50|unique:subjects,sub_code',
+            // 'sub_code' => [
+            //     'required',
+            //     'string',
+            //     'max:50',
+            //     Rule::unique('subjects', 'sub_code')->whereNull('deleted_at'),
+            // ],
+            Rule::unique('itinerary_galleries', 'title')->ignore($request->id),
+            'description' => 'nullable|string',
+        ]);
+
+        Subject::create($validated);
+
+        return redirect()->route('admin.subjectlist.index')->with('success', 'Subject created successfully.');
+    }
+
     public function update(Request $request){
         $validated = $request->validate([
             'edit_sub_name' => 'required|string|max:255',
@@ -51,25 +71,6 @@ class SubjectListController extends Controller
         return redirect()->route('admin.subjectlist.index')->with('success', 'Subject is updated successfully.');
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'sub_name' => 'required|string|max:255',
-            'sub_code' => 'required|string|max:50|unique:subjects,sub_code',
-            // 'sub_code' => [
-            //     'required',
-            //     'string',
-            //     'max:50',
-            //     Rule::unique('subjects', 'sub_code')->whereNull('deleted_at'),
-            // ],
-            Rule::unique('itinerary_galleries', 'title')->ignore($request->id),
-            'description' => 'nullable|string',
-        ]);
-
-        Subject::create($validated);
-
-        return redirect()->route('admin.subjectlist.index')->with('success', 'Subject created successfully.');
-    }
 
     public function status($id)
     {
