@@ -45,7 +45,7 @@ class Student extends Model
     {
         do {
             // You can change the format as per your requirement
-            $studentId = 'STU-' . date('Y') . '-' . strtoupper(Str::random(6));
+            $studentId = 'STU' . '-' . strtoupper(Str::random(4));
         } while (self::where('student_id', $studentId)->exists());
 
         return $studentId;

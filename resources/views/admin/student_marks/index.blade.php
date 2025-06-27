@@ -161,9 +161,7 @@
                     <thead class="table-light">
                       <tr>
                         <th>Subject</th>
-                        <th>Term 1</th>
                         <th>Midterm</th>
-                        <th>Term 2</th>
                         <th>Final</th>
                         <th>Total</th>
                         <th>Grade</th>
@@ -179,8 +177,6 @@
                       @endphp
                       <tr>
                         <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
-                       	<td>{{ $mark->term_one_stu_marks.'/'.$mark->term_one_out_off ?? '-' }}</td>
-                        <td>{{ $mark->term_two_stu_marks.'/'.$mark->term_two_out_off ?? '-' }}</td>
                         <td>{{ $mark->mid_term_stu_marks .'/'.$mark->mid_term_out_off ?? '-' }}</td>
                         <td>{{ $mark->final_exam_stu_marks.'/'.$mark->final_exam_out_off ?? '-' }}</td>
                         <td><strong>{{ $total }}</strong></td>
@@ -273,51 +269,15 @@
                         <div class="text-danger" id="error_subject_id"></div>
                       </div>
 
+
                       <div class="form-floating form-floating-outline col-md-3">
-                        <select name="term_one_out_off" id="term_one_out_off" class="form-select">
-                          <option value="">Select</option>
+                        <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" aria-placeholder="Out Of 100">
+                          <option value="">select value</option>
+                          <option value="100">100</option>
+                          {{-- <option value="">Select</option>
                           @foreach (range(50, 100, 5) as $value)
                           <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
-                        </select>
-                        <label for="term_one_out_off" class="form-label">Term 1 Out Of</label>
-                        <div class="text-danger" id="error_term_one_out_off"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="term_one_stu_marks" id="term_one_stu_marks" class="form-control"
-                          placeholder="Enter marks">
-                        <label for="term_one_stu_marks">Term 1 Student Marks</label>
-                        <div class="text-danger" id="error_term_one_stu_marks"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="term_two_out_off" id="term_two_out_off" class="form-select">
-                          <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
-                        </select>
-                        <label for="term_two_out_off" class="form-label">Term 2 Out Of</label>
-                        <div class="text-danger" id="error_term_two_out_off"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="term_two_stu_marks" id="term_two_stu_marks" class="form-control"
-                          placeholder="Enter marks">
-                        <label for="term_two_stu_marks">Term 2 Student Marks</label>
-                        <div class="text-danger" id="error_term_two_stu_marks"></div>
-                      </div>
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="mid_term_out_off" id="mid_term_out_off" class="form-select">
-                          <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
+                          @endforeach --}}
                         </select>
                         <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
                         <div class="text-danger" id="error_mid_term_out_off"></div>
@@ -334,14 +294,17 @@
 
                       <div class="form-floating form-floating-outline col-md-3">
                         <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
-                          <option value="">Select</option>
+                          <option value="">select value</option>
+                          <option value="100">100</option>
+                          {{-- <option value="">Select</option>
                           @foreach (range(50, 100, 5) as $value)
                           <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
+                          @endforeach --}}
                         </select>
                         <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
                         <div class="text-danger" id="error_final_exam_out_off"></div>
                       </div>
+
 
 
                       <div class="form-floating form-floating-outline col-md-3">
@@ -421,49 +384,14 @@
                         <div class="text-danger" id="error_subject_id"></div>
                       </div>
 
-                      {{-- ... rest of your form fields for marks ... --}}
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="term_one_out_off" id="edit_term_one_out_off" class="form-select">
-                          <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
-                        </select>
-                        <label for="edit_term_one_out_off" class="form-label">Term 1 Out Of</label>
-                        <div class="text-danger" id="error_term_one_out_off"></div>
-                      </div>
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="term_one_stu_marks" id="edit_term_one_stu_marks"
-                          class="form-control" placeholder="Enter marks">
-                        <label for="edit_term_one_stu_marks">Term 1 Student Marks</label>
-                        <div class="text-danger" id="error_term_one_stu_marks"></div>
-                      </div>
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="term_two_out_off" id="edit_term_two_out_off" class="form-select">
-                          <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
-                        </select>
-                        <label for="edit_term_two_out_off" class="form-label">Term 2 Out Of</label>
-                        <div class="text-danger" id="error_term_two_out_off"></div>
-                      </div>
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="term_two_stu_marks" id="edit_term_two_stu_marks"
-                          class="form-control" placeholder="Enter marks">
-                        <label for="edit_term_two_stu_marks">Term 2 Student Marks</label>
-                        <div class="text-danger" id="error_term_two_stu_marks"></div>
-                      </div>
-
                       <div class="form-floating form-floating-outline col-md-3">
                         <select name="mid_term_out_off" id="edit_mid_term_out_off" class="form-select">
-                          <option value="">Select</option>
+                          <option value="">select value</option>
+                          <option value="100">100</option>
+                          {{-- <option value="">Select</option>
                           @foreach (range(50, 100, 5) as $value)
                           <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
+                          @endforeach --}}
                         </select>
                         <label for="edit_mid_term_out_off" class="form-label">Mid Term Out Of</label>
                         <div class="text-danger" id="error_mid_term_out_off"></div>
@@ -478,11 +406,13 @@
 
                       <div class="form-floating form-floating-outline col-md-3">
                         <select name="final_exam_out_off" id="edit_final_exam_out_off" class="form-select">
-                          <option value="">Select</option>
+                          <option value="">select value</option>
+                          <option value="100">100</option>
+                          {{-- <option value="">Select</option>
                           @foreach (range(50, 100, 5) as $value)
                           <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach
-                        </select>
+                          @endforeach --}}
+                        </select> 
                         <label for="edit_final_exam_out_off" class="form-label">Final Exam Out Of</label>
                         <div class="text-danger" id="error_final_exam_out_off"></div>
                       </div>
@@ -739,10 +669,6 @@
                      
                       // $('#edit_class_id').val(response.data.class_id);
                       // $('#edit_subject_id').val(response.data.subject_id);
-                      $('#edit_term_one_out_off').val(response.data.term_one_out_off);
-                      $('#edit_term_one_stu_marks').val(response.data.term_one_stu_marks);
-                      $('#edit_term_two_out_off').val(response.data.term_two_out_off);
-                      $('#edit_term_two_stu_marks').val(response.data.term_two_stu_marks);
                       $('#edit_mid_term_out_off').val(response.data.mid_term_out_off);
                       $('#edit_mid_term_stu_marks').val(response.data.mid_term_stu_marks);
                       $('#edit_final_exam_out_off').val(response.data.final_exam_out_off);
@@ -775,10 +701,6 @@
                 $('#edit_subject_id').empty().append('<option value="">Select Subject</option>');
 
                 // Reset marks
-                $('#edit_term_one_out_off').val('');
-                $('#edit_term_one_stu_marks').val('');
-                $('#edit_term_two_out_off').val('');
-                $('#edit_term_two_stu_marks').val('');
                 $('#edit_mid_term_out_off').val('');
                 $('#edit_mid_term_stu_marks').val('');
                 $('#edit_final_exam_out_off').val('');
@@ -795,11 +717,6 @@
               let studentId = $(this).val();
 
               // Clear existing marks fields
-              $('#edit_term_one_out_off').val('');
-              $('#edit_term_one_stu_marks').val('');
-
-              $('#edit_term_two_out_off').val('');
-              $('#edit_term_two_stu_marks').val('');
 
               $('#edit_mid_term_out_off').val('');
               $('#edit_mid_term_stu_marks').val('');
@@ -885,34 +802,34 @@
 
 
         function deleteMark(userId) {
-            Swal.fire({
-                icon: 'warning',
-                title: "Are you sure you want to delete this?",
-                text: "You won't be able to revert this!",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-                confirmButtonText: "Delete",
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: "{{ route('admin.student-marks.delete')}}",
-                        type: 'POST',
-                        data: {
-                            "id": userId,
-                            "_token": '{{ csrf_token() }}',
-                        },
-                        success: function (data){
-                            if (data.status != 200) {
-                                toastFire('error', data.message);
-                            } else {
-                                toastFire('success', data.message);
-                                location.reload();
-                            }
-                        }
-                    });
-                }
-            });
+          Swal.fire({
+              icon: 'warning',
+              title: "Are you sure you want to delete this?",
+              text: "You won't be able to revert this!",
+              showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+              confirmButtonText: "Delete",
+          }).then((result) => {
+              if (result.isConfirmed) {
+                  $.ajax({
+                      url: "{{ route('admin.student-marks.delete')}}",
+                      type: 'POST',
+                      data: {
+                          "id": userId,
+                          "_token": '{{ csrf_token() }}',
+                      },
+                      success: function (data){
+                          if (data.status != 200) {
+                              toastFire('error', data.message);
+                          } else {
+                              toastFire('success', data.message);
+                              location.reload();
+                          }
+                      }
+                  });
+              }
+          });
         }     
     </script>
 {{-- @endsection --}}

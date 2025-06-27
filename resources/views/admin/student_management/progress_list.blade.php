@@ -70,11 +70,12 @@
             </tbody>
           </table>
             <div class="d-flex justify-content-center">
-                 {{-- {{ $progressList->links() }} --}}
+                {{-- {{ $progressList->links() }} --}}
             </div>  
         </div>
       </div>
     </div>
+
 
     <div class="col-4">
         @if(isset($updateData))
@@ -136,9 +137,18 @@
                 <form action="{{ route('admin.student.progressstore') }}" method="post">
                     @csrf
 
-                    <div class="form-floating form-floating-outline mb-3">
+                    {{-- <div class="form-floating form-floating-outline mb-3">
                         <input type="text" name="field" class="form-control" placeholder="Enter Field Name">
                         <label>Field Name</label>
+                        @error('field') <p class="text-danger small">{{ $message }}</p> @enderror
+                    </div> --}}
+
+                    <div class="form-floating form-floating-outline mb-3">
+                        <select name="field" id="field" class="form-select">
+                          <option value="identified condition">Identified Condition</option>
+                          <option value="behavioural cognitive outcomes">Behavioural Cognitive Outcomes</option>
+                        </select>
+                        <label for="field" class="form-label">Field Name</label>
                         @error('field') <p class="text-danger small">{{ $message }}</p> @enderror
                     </div>
 

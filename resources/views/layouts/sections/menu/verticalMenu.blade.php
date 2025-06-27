@@ -73,11 +73,6 @@
                 </a>
               </li>
             @endif
-            <li class="menu-item {{ (request()->is('admin/student-management/student-progress-marking*')) ? 'open' : '' }}">
-              <a href="{{route('admin.student.progresslist')}}" class="menu-link">
-                <div>Progress Marking Category</div>
-              </a>
-            </li>
           </ul>
         </li>
 
@@ -97,7 +92,12 @@
                 <div>Class List</div>
               </a>
             </li>
-             <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
+            <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
+              <a href="{{route('admin.student.progresslist')}}" class="menu-link">
+                <div>Progress Marking Category</div>
+              </a>
+            </li>
+            <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
               <a href="{{route('admin.progresschart')}}" class="menu-link">
                 <div>Progress Chart</div>
               </a>

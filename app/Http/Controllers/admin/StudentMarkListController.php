@@ -161,10 +161,6 @@ class StudentMarkListController extends Controller
                     'student_id' => $mark->student_id,
                     'class_id' => $mark->class_id,
                     'subject_id' => $mark->subject_id,
-                    'term_one_out_off' => $mark->term_one_out_off,
-                    'term_one_stu_marks' => $mark->term_one_stu_marks,
-                    'term_two_out_off' => $mark->term_two_out_off,
-                    'term_two_stu_marks' => $mark->term_two_stu_marks,
                     'mid_term_out_off' => $mark->mid_term_out_off,
                     'mid_term_stu_marks' => $mark->mid_term_stu_marks,
                     'final_exam_out_off' => $mark->final_exam_out_off,
@@ -190,12 +186,6 @@ class StudentMarkListController extends Controller
             'student_id' => 'required|exists:students,id',
             'subject_id' => 'required|exists:subjects,id',
 
-            'term_one_out_off' => 'nullable|integer',
-            'term_one_stu_marks' => 'required_with:term_one_out_off|nullable|numeric',
-
-            'term_two_out_off' => 'nullable|integer',
-            'term_two_stu_marks' => 'required_with:term_two_out_off|nullable|numeric',
-
             'mid_term_out_off' => 'nullable|integer',
             'mid_term_stu_marks' => 'required_with:mid_term_out_off|nullable|numeric',
 
@@ -205,12 +195,6 @@ class StudentMarkListController extends Controller
 
         $errors = [];
 
-        if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
-            $errors['message'] = 'Term 1 marks required.';
-        }
-        if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
-            $errors['message'] = 'Term 2 marks required.';
-        }
         if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
             $errors['message'] = 'Mid Term marks required.';
         }
@@ -219,21 +203,12 @@ class StudentMarkListController extends Controller
         }
 
         if(
-            empty($request->term_one_out_off) &&
-            empty($request->term_two_out_off) &&
             empty($request->mid_term_out_off) &&
             empty($request->final_exam_out_off)
         ) {
             $errors['message'] = 'Select at least one term.';
         }
 
-        if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
-            $errors['message'] = 'Term 1 marks cannot be greater than term 1 out off.';
-        }
-
-        if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
-            $errors['message'] = 'Term 2 marks cannot be greater than term 2 out off.';
-        }
 
         if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
             $errors['message'] = 'Mid term marks cannot be greater than mid term out off.';
@@ -284,121 +259,7 @@ class StudentMarkListController extends Controller
         ]);
     }
 
-    // public function update(Request $request)
-    // {
-    //     try {
-    //         $validated = $request->validate([
-    //             'id' => 'required|exists:students_marks,id',
-    //             'session_id'    => 'required|exists:academic_sessions,id',
-    //             'student_id'    => 'required|exists:students,id',
-    //             'class_id'      => 'required|exists:class_lists,id',
-    //             'subject_id'    => 'required|exists:subjects,id',
-    //             'term_one_out_off'      => 'nullable|integer',
-    //             'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off|max:100',
-    //             'term_two_out_off'      => 'nullable|integer',
-    //             'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off|max:100',
-    //             'mid_term_out_off'      => 'nullable|integer',
-    //             'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off|max:100',
-    //             'final_exam_out_off'    => 'nullable|integer',
-    //             'final_exam_stu_marks'  => 'nullable|numeric|required_with:final_exam_out_off|max:100',
-    //         ]);
 
-    //         $errors = [];
-
-    //         if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
-    //             $errors['term_one_stu_marks'] = 'Term 1 marks required.';
-    //         }
-    //         if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
-    //             $errors['term_two_stu_marks'] = 'Term 2 marks required.';
-    //         }
-    //         if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
-    //             $errors['mid_term_stu_marks'] = 'Mid Term marks required.';
-    //         }
-    //         if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
-    //             $errors['final_exam_stu_marks'] = 'Final Exam marks required.';
-    //         }
-
-    //         if(
-    //             empty($request->term_one_out_off) &&
-    //             empty($request->term_two_out_off) &&
-    //             empty($request->mid_term_out_off) &&
-    //             empty($request->final_exam_out_off)
-    //         ) {
-    //             $errors['at_least_one_term'] = 'Select at least one term.';
-    //         }
-
-    //         if($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off){
-    //             $errors['term_one_stu_marks'] = 'Term 1 marks cannot be greater than term 1 out off.';
-    //         }
-
-    //         if($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off){
-    //             $errors['term_two_stu_marks'] = 'Term 2 marks cannot be greater than term 2 out off.';
-    //         }
-
-    //         if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
-    //             $errors['mid_term_stu_marks'] = 'Mid term marks cannot be greater than mid term out off.';
-    //         }
-
-    //         if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
-    //             $errors['final_exam_stu_marks'] = 'Final exam marks cannot be greater than final exam out off.';
-    //         }
-
-    //         if ($errors) {
-    //             return response()->json(['success' => false, 'errors' => $errors], 422);
-    //         }
-
-    //         $mark = StudentsMark::findOrFail($validated['id']);
-
-    //         $admission = StudentAdmission::firstOrCreate(
-    //             [
-    //                 'student_id' => $validated['student_id'],
-    //                 'class_id' => $validated['class_id'],
-    //                 'session_id' => $validated['session_id'],
-    //             ],
-    //             ['admission_date' => now()]
-    //         );
-
-    //         // Duplicate check
-    //         $duplicate = StudentsMark::where('student_admission_id', $admission->id)
-    //             ->where('subject_id', $validated['subject_id'])
-    //             ->where('id', '!=', $validated['id'])
-    //             ->first();
-
-    //         if ($duplicate) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'errors' => ['duplicate_error' => 'Marks for this student, subject, and session already exist.']
-    //             ], 422);
-    //         }
-
-    //         $mark->update([
-    //             'student_id'    => $validated['student_id'],
-    //             'class_id'      => $validated['class_id'],
-    //             'session_id'    => $validated['session_id'],
-    //             'student_admission_id'  => $admission->id,
-    //             'subject_id'    => $validated['subject_id'],
-    //             'term_one_out_off'      => $validated['term_one_out_off'] ?? null,
-    //             'term_one_stu_marks'    => $validated['term_one_stu_marks'] ?? null,
-    //             'term_two_out_off'      => $validated['term_two_out_off'] ?? null,
-    //             'term_two_stu_marks'    => $validated['term_two_stu_marks'] ?? null,
-    //             'mid_term_out_off'      => $validated['mid_term_out_off'] ?? null,
-    //             'mid_term_stu_marks'    => $validated['mid_term_stu_marks'] ?? null,
-    //             'final_exam_out_off'    => $validated['final_exam_out_off'] ?? null,
-    //             'final_exam_stu_marks'  => $validated['final_exam_stu_marks'] ?? null,
-    //         ]);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Student marks updated successfully.'
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         \Log::error('Marks update failed: ' . $e->getMessage());
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Something went wrong. Please try again later.'
-    //         ], 500);
-    //     }
-    // }
 
     public function update(Request $request)
     {
@@ -410,11 +271,7 @@ class StudentMarkListController extends Controller
                 'student_id'     => 'required|exists:students,id',
                 'subject_id'     => 'required|exists:subjects,id',
 
-                'term_one_out_off'      => 'nullable|integer',
-                'term_one_stu_marks'    => 'nullable|numeric|required_with:term_one_out_off',
 
-                'term_two_out_off'      => 'nullable|integer',
-                'term_two_stu_marks'    => 'nullable|numeric|required_with:term_two_out_off',
 
                 'mid_term_out_off'      => 'nullable|integer',
                 'mid_term_stu_marks'    => 'nullable|numeric|required_with:mid_term_out_off',
@@ -427,20 +284,14 @@ class StudentMarkListController extends Controller
             $errors = [];
 
             if (
-                empty($request->term_one_out_off) &&
-                empty($request->term_two_out_off) &&
+    
                 empty($request->mid_term_out_off) &&
                 empty($request->final_exam_out_off)
             ) {
                 $errors['message'] = 'Select at least one term.';
             }
 
-            if ($request->term_one_out_off && $request->term_one_stu_marks === null) {
-                $errors['message'] = 'Term 1 marks required.';
-            }
-            if ($request->term_two_out_off && $request->term_two_stu_marks === null) {
-                $errors['message'] = 'Term 2 marks required.';
-            }
+           
             if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
                 $errors['message'] = 'Mid Term marks required.';
             }
@@ -448,12 +299,7 @@ class StudentMarkListController extends Controller
                 $errors['message'] = 'Final Exam marks required.';
             }
 
-            if ($request->term_one_out_off && $request->term_one_stu_marks > $request->term_one_out_off) {
-                $errors['message'] = 'Term 1 marks cannot be greater than term 1 out off.';
-            }
-            if ($request->term_two_out_off && $request->term_two_stu_marks > $request->term_two_out_off) {
-                $errors['message'] = 'Term 2 marks cannot be greater than term 2 out off.';
-            }
+           
             if ($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off) {
                 $errors['message'] = 'Mid term marks cannot be greater than mid term out off.';
             }
@@ -506,11 +352,6 @@ class StudentMarkListController extends Controller
                 'student_admission_id'   => $validated['student_admission_id'],
                 'subject_id'             => $validated['subject_id'],
 
-                'term_one_out_off'       => $validated['term_one_out_off'] ?? null,
-                'term_one_stu_marks'     => $validated['term_one_stu_marks'] ?? null,
-
-                'term_two_out_off'       => $validated['term_two_out_off'] ?? null,
-                'term_two_stu_marks'     => $validated['term_two_stu_marks'] ?? null,
 
                 'mid_term_out_off'       => $validated['mid_term_out_off'] ?? null,
                 'mid_term_stu_marks'     => $validated['mid_term_stu_marks'] ?? null,
@@ -553,6 +394,143 @@ class StudentMarkListController extends Controller
 
 
 
+    // public function export(Request $request)
+    // {
+    //     $studentName = $request->input('student_name');
+    //     $classId = $request->input('class_filter');
+    //     $subjectId = $request->input('subject_filter');
+    //     $sessionId = $request->input('session_filter');
+
+    //     $query = StudentsMark::with([
+    //         'student',
+    //         'class',
+    //         'subjectlist',
+    //         'studentAdmission.class',
+    //         'studentAdmission.academicsession'
+    //     ]);
+
+    //     // Apply filters
+    //     if (!empty($studentName)) {
+    //         $query->whereHas('student', function ($q) use ($studentName) {
+    //             $q->where('student_name', 'like', '%' . $studentName . '%');
+    //         });
+    //     }
+
+    //     if (!empty($classId)) {
+    //         $query->where('class_id', $classId);
+    //     }
+
+    //     if (!empty($subjectId)) {
+    //         $query->where('subject_id', $subjectId);
+    //     }
+
+    //     if (!empty($sessionId)) {
+    //         $query->whereHas('studentAdmission', function ($q) use ($sessionId) {
+    //             $q->where('session_id', $sessionId);
+    //         });
+    //     }
+
+    //     $allMarks = $query->get();
+
+    //     if ($allMarks->isEmpty()) {
+    //         return redirect()->back()->with('error', 'No records found to export.');
+    //     }
+
+    //     // Get unique subject names dynamically
+    //     $allSubjects = $allMarks->pluck('subjectlist.sub_name')->filter()->unique()->map(function ($item) {
+    //         return strtoupper($item);
+    //     })->sort()->values()->toArray(); // Sorted for consistency
+
+      
+    //     $grouped = $allMarks->groupBy(function ($item) {
+    //         return $item->student_id . '-' . $item->studentAdmission->session_id;
+    //     });
+
+    //     $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+    //     $delimiter = ",";
+    //     $f = fopen('php://memory', 'w');
+
+    //     // Header row
+    //     $header = ['NAME', 'STUDENT ID', 'CLASS', 'SESSION'];
+    //     $header = array_merge($header, $allSubjects, ['TOTAL', 'Academic %']);
+    //     fputcsv($f, $header, $delimiter);
+
+    //     //$printedStudentIds = [];
+    //     $lastStudentId = null;
+
+    //     foreach ($grouped as $groupKey => $studentMarks) {
+    //         $firstMark = $studentMarks->first();
+    //         $studentObj = $firstMark->student;
+    //         $sessionObj = $firstMark->studentAdmission->academicsession;
+    //         $classObj = $firstMark->studentAdmission->class;
+
+    //         $stuId = $studentObj->student_id ?? '';
+    //         $stuName = $studentObj->student_name ?? '';
+    //         $className = $classObj->class ?? '';
+    //         $sessionName = $sessionObj->session_name ?? '';
+
+    //         // Subject totals
+    //         $subjectTotals = [];
+
+    //         foreach ($allSubjects as $subjectName) {
+    //             $subjectTotals[$subjectName] = 0;
+    //         }
+
+    //         // Total marks
+    //         $totalObtained = 0;
+    //         $totalOutOf = 0;
+
+    //         foreach ($studentMarks as $mark) {
+    //             $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
+
+    //             $obtained = ($mark->term_one_stu_marks ?? 0) +
+    //                         ($mark->term_two_stu_marks ?? 0) +
+    //                         ($mark->mid_term_stu_marks ?? 0) +
+    //                         ($mark->final_exam_stu_marks ?? 0);
+
+    //             $outOf = ($mark->term_one_out_off ?? 0) +
+    //                     ($mark->term_two_out_off ?? 0) +
+    //                     ($mark->mid_term_out_off ?? 0) +
+    //                     ($mark->final_exam_out_off ?? 0);
+
+    //             if (isset($subjectTotals[$subjectName])) {
+    //                 $subjectTotals[$subjectName] = $obtained;
+    //             }
+
+    //             $totalObtained += $obtained;
+    //             $totalOutOf += $outOf;
+    //         }
+
+    //         $academicPercentage = $totalOutOf > 0 ? round(($totalObtained / $totalOutOf) * 100, 2) : 0;
+
+    //         $showName = !in_array($stuId, $printedStudentIds);
+    //         if ($showName) {
+    //             $printedStudentIds[] = $stuId;
+    //         } else {
+    //             $stuName = '';
+    //             $stuId = '';
+    //         }
+
+    //         $row = [$stuName, $stuId, $className, $sessionName];
+
+    //         // Add subject marks in dynamic order
+    //         foreach ($allSubjects as $sub) {
+    //             $row[] = $subjectTotals[$sub] ?? 0;
+    //         }
+
+    //         $row[] = $totalObtained;
+    //         $row[] = $academicPercentage . '%';
+
+    //         fputcsv($f, $row, $delimiter);
+    //     }
+
+    //     fseek($f, 0);
+    //     header('Content-Type: text/csv');
+    //     header("Content-Disposition: attachment; filename=\"$filename\"");
+    //     fpassthru($f);
+    //     exit;
+    // }
+
     public function export(Request $request)
     {
         $studentName = $request->input('student_name');
@@ -568,7 +546,7 @@ class StudentMarkListController extends Controller
             'studentAdmission.academicsession'
         ]);
 
-        // Apply filters
+
         if (!empty($studentName)) {
             $query->whereHas('student', function ($q) use ($studentName) {
                 $q->where('student_name', 'like', '%' . $studentName . '%');
@@ -595,91 +573,83 @@ class StudentMarkListController extends Controller
             return redirect()->back()->with('error', 'No records found to export.');
         }
 
-        // Get unique subject names dynamically
+
         $allSubjects = $allMarks->pluck('subjectlist.sub_name')->filter()->unique()->map(function ($item) {
             return strtoupper($item);
-        })->sort()->values()->toArray(); // Sorted for consistency
+        })->sort()->values()->toArray();
 
-        // Group by student ID and session
+
+
+        
         $grouped = $allMarks->groupBy(function ($item) {
-            return $item->student_id . '-' . $item->studentAdmission->session_id;
+            return $item->student_id;
         });
 
         $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
         $delimiter = ",";
         $f = fopen('php://memory', 'w');
 
-        // Header row
+       
         $header = ['NAME', 'STUDENT ID', 'CLASS', 'SESSION'];
         $header = array_merge($header, $allSubjects, ['TOTAL', 'Academic %']);
         fputcsv($f, $header, $delimiter);
 
-        $printedStudentIds = [];
+        foreach ($grouped as $student_id => $marksByStudent) {
+            $sessionGrouped = $marksByStudent->groupBy(function ($item) {
+                return $item->studentAdmission->session_id;
+            });
 
-        foreach ($grouped as $groupKey => $studentMarks) {
-            $firstMark = $studentMarks->first();
-            $studentObj = $firstMark->student;
-            $sessionObj = $firstMark->studentAdmission->academicsession;
-            $classObj = $firstMark->studentAdmission->class;
+            $firstRow = true;
+            foreach ($sessionGrouped as $sessionId => $studentMarks) {
+                $firstMark = $studentMarks->first();
+                $studentObj = $firstMark->student;
+                $classObj = $firstMark->studentAdmission->class;
+                $sessionObj = $firstMark->studentAdmission->academicsession;
 
-            $stuId = $studentObj->student_id ?? '';
-            $stuName = $studentObj->student_name ?? '';
-            $className = $classObj->class ?? '';
-            $sessionName = $sessionObj->session_name ?? '';
+                $stuName = $firstRow ? $studentObj->student_name : '';
+                $stuId = $firstRow ? $studentObj->student_id : '';
+                $firstRow = false;
 
-            // Subject totals
-            $subjectTotals = [];
+                $className = $classObj->class ?? '';
+                $sessionName = $sessionObj->session_name ?? '';
 
-            foreach ($allSubjects as $subjectName) {
-                $subjectTotals[$subjectName] = 0;
-            }
-
-            // Total marks
-            $totalObtained = 0;
-            $totalOutOf = 0;
-
-            foreach ($studentMarks as $mark) {
-                $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
-
-                $obtained = ($mark->term_one_stu_marks ?? 0) +
-                            ($mark->term_two_stu_marks ?? 0) +
-                            ($mark->mid_term_stu_marks ?? 0) +
-                            ($mark->final_exam_stu_marks ?? 0);
-
-                $outOf = ($mark->term_one_out_off ?? 0) +
-                        ($mark->term_two_out_off ?? 0) +
-                        ($mark->mid_term_out_off ?? 0) +
-                        ($mark->final_exam_out_off ?? 0);
-
-                if (isset($subjectTotals[$subjectName])) {
-                    $subjectTotals[$subjectName] = $obtained;
+                $subjectTotals = [];
+                foreach ($allSubjects as $sub) {
+                    $subjectTotals[$sub] = 0;
                 }
 
-                $totalObtained += $obtained;
-                $totalOutOf += $outOf;
+                $totalObtained = 0;
+                $totalOutOf = 0;
+
+                foreach ($studentMarks as $mark) {
+                    $subjectName = strtoupper($mark->subjectlist->sub_name ?? '');
+
+                    $obtained = ($mark->mid_term_stu_marks ?? 0) +
+                                ($mark->final_exam_stu_marks ?? 0);
+
+                    $outOf =($mark->mid_term_out_off ?? 0) +
+                            ($mark->final_exam_out_off ?? 0);
+
+                    if (isset($subjectTotals[$subjectName])) {
+                        $subjectTotals[$subjectName] = $obtained;
+                    }
+
+                    $totalObtained += $obtained;
+                    $totalOutOf += $outOf;
+                }
+
+                $academicPercentage = $totalOutOf > 0 ? round(($totalObtained / $totalOutOf) * 100, 2) . '%' : '0%';
+
+                $row = [$stuName, $stuId, $className, $sessionName];
+                foreach ($allSubjects as $subject) {
+                    $row[] = $subjectTotals[$subject] ?? 0;
+                }
+
+                $row[] = $totalObtained;
+                $row[] = $academicPercentage;
+
+                fputcsv($f, $row, $delimiter);
             }
-
-            $academicPercentage = $totalOutOf > 0 ? round(($totalObtained / $totalOutOf) * 100, 2) : 0;
-
-            $showName = !in_array($stuId, $printedStudentIds);
-            if ($showName) {
-                $printedStudentIds[] = $stuId;
-            } else {
-                $stuName = '';
-                $stuId = '';
-            }
-
-            $row = [$stuName, $stuId, $className, $sessionName];
-
-            // Add subject marks in dynamic order
-            foreach ($allSubjects as $sub) {
-                $row[] = $subjectTotals[$sub] ?? 0;
-            }
-
-            $row[] = $totalObtained;
-            $row[] = $academicPercentage . '%';
-
-            fputcsv($f, $row, $delimiter);
         }
 
         fseek($f, 0);
@@ -688,6 +658,7 @@ class StudentMarkListController extends Controller
         fpassthru($f);
         exit;
     }
+
 
 
 

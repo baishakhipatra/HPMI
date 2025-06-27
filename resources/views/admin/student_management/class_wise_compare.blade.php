@@ -54,8 +54,6 @@
             <div class="form-floating form-floating-outline mb-3">
                 <select id="term1" class="form-control">
                     <option value="">Select Term</option>
-                    <option value="term_one">Term 1</option>
-                    <option value="term_two">Term 2</option>
                     <option value="mid_term">Mid Term</option>
                     <option value="final_exam">Final Exam</option>
                 </select>
@@ -91,8 +89,6 @@
             <div class="form-floating form-floating-outline mb-3">
                 <select id="term2" class="form-control">
                     <option value="">Select Term</option>
-                    <option value="term_one">Term 1</option>
-                    <option value="term_two">Term 2</option>
                     <option value="mid_term">Mid Term</option>
                     <option value="final_exam">Final Exam</option>
                 </select>

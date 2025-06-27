@@ -10,15 +10,7 @@ use App\Models\{AcademicSession,ClassList,Subject,Student,StudentsMark,
 
 class ProgressChartController extends Controller
 {
-    // public function index(){
 
-    //     $sessions = AcademicSession::all();
-    //     $classes = ClassList::all();
-    //     $subjects = Subject::all();
-    //     $students = Student::all();
-
-    //     return view('admin.progress_chart.index', compact('sessions','classes','subjects','students'));
-    // }
 
     public function index() {
         $sessions = StudentAdmission::with('session')
@@ -64,7 +56,7 @@ class ProgressChartController extends Controller
         $session_id = $request->session_id;
         $student_id = $request->student_id;
 
-        // Get the admission record for the given session and student
+     
         $admission = StudentAdmission::with('class')
                         ->where('session_id', $session_id)
                         ->where('student_id', $student_id)
@@ -73,12 +65,12 @@ class ProgressChartController extends Controller
         if ($admission) {
             $class = $admission->class;
 
-            // Fetch subjects only from the students_marks table for this admission
+
             $subjects = StudentsMark::with('subjectlist')
                             ->where('student_id', $student_id)
                             ->where('student_admission_id', $admission->id)
                             ->get()
-                            ->unique('subject_id') // Keep only unique subjects
+                            ->unique('subject_id') 
                             ->map(function ($mark) {
                                 return [
                                     'id'   => $mark->subjectlist->id,

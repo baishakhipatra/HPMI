@@ -32,15 +32,15 @@
                 </div>
                 <div class="card-body">
 
-                    {{-- Table header --}}
-                  <div class="row fw-bold text-center mb-2">
+                  {{-- Table header --}}
+                  {{-- <div class="row fw-bold text-center mb-2">
                   <div class="col">Progress Category</div>
-                  <div class="col">Phase</div>
+                  <div class="col">Score(1-10)</div> --}}
                   {{-- <div class="col">Second Phase</div>
                   <div class="col">Third Phase</div> --}}
-                  </div>
+                  {{-- </div> --}}
 
-                  @foreach ($getDetails as $item_detail)
+                  {{-- @foreach ($getDetails as $item_detail)
                     <div class="row g-2 align-items-center mb-2 dynamic-item">
                       <div class="col">
                         <input type="text" class="form-control" disabled value="{{ $item_detail->progress_category }}">
@@ -57,9 +57,9 @@
                             <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_first_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
                           @endforeach
                         </select>
-                      </div>
+                      </div> 
 
-                      {{-- <div class="col">
+                       <div class="col">
                         <select name="formative_second_phase" class="form-select progress-value"
                             data-phase="formative_second_phase"
                             data-student="{{ $student->id }}"
@@ -70,9 +70,9 @@
                             <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_second_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
                           @endforeach
                         </select>
-                      </div> --}}
+                      </div> 
 
-                      {{-- <div class="col">
+                      <div class="col">
                         <select name="formative_third_phase" class="form-select progress-value"
                             data-phase="formative_third_phase"
                             data-student="{{ $student->id }}"
@@ -83,7 +83,30 @@
                             <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_third_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
                           @endforeach
                         </select>
-                      </div> --}}
+                      </div>
+                    </div>
+                  @endforeach --}}
+
+                  @foreach ($student_progress_category as $fieldName => $values)
+                    <div class="mb-4">
+                      <h6 class="fw-bold mb-3">{{ ucwords($fieldName) }}</h6>
+
+                      <div class="row">
+                        @foreach ($values as $item)
+                          <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ ucwords($item->value) }} (1-10)</label>
+                           <input type="number"
+                                  class="form-control progress-score-input"
+                                  placeholder="Enter score"
+                                  min="1" max="10"
+                                  data-student="{{ $student->id }}"
+                                  data-session="{{ $academic_session_id }}"
+                                  data-category="{{ $fieldName }}"
+                                  data-value="{{ $item->value }}"
+                                  value="{{ $savedScores[ucwords($fieldName)][ucwords($item->value)] ?? '' }}">
+                          </div>
+                        @endforeach
+                      </div>
                     </div>
                   @endforeach
                 </div>
@@ -108,14 +131,52 @@
 <script>
 
   // for save fields and values
-    $(document).on('change', '.progress-value', function () {
-      let phase = $(this).data('phase');
-      let value = $(this).val();
+    // $(document).on('change', '.progress-value', function () {
+    //   let phase = $(this).data('phase');
+    //   let value = $(this).val();
+    //   let student_id = $(this).data('student');
+    //   let session_id = $(this).data('session');
+    //   let category = $(this).data('category');
+
+    //   if (value !== '') {
+    //     $.ajax({
+    //       url: "{{ route('admin.student.progress.update.phase') }}",
+    //       method: "POST",
+    //       data: {
+    //         _token: '{{ csrf_token() }}',
+    //         student_id: student_id,
+    //         session_id: session_id,
+    //         category: category,
+    //         phase: phase,
+    //         value: value
+    //       },
+    //       success: function (res) {
+    //         if (res.success) {
+    //           toastFire('success', 'Progress updated successfully!');
+    //           console.log('Updated successfully');
+    //         } else {
+    //           toastFire('error', 'Progress update failed!');
+    //           console.log('Update failed');
+    //         }
+    //       },
+    //       error: function (err) {
+    //         toastFire('error', 'Something went wrong while updating progress!');
+    //         console.log('Error:', err);
+    //       }
+    //     });
+    //   }
+    // });
+
+    // Score input auto-save
+    $(document).on('change', '.progress-score-input', function () {
+      let score = $(this).val();
+      let category = $(this).data('category'); 
+      let phase = $(this).data('value'); 
       let student_id = $(this).data('student');
       let session_id = $(this).data('session');
-      let category = $(this).data('category');
 
-      if (value !== '') {
+
+      if (score !== '' && score >= 1 && score <= 10) {
         $.ajax({
           url: "{{ route('admin.student.progress.update.phase') }}",
           method: "POST",
@@ -124,25 +185,26 @@
             student_id: student_id,
             session_id: session_id,
             category: category,
-            phase: phase,
-            value: value
+            phase: phase, 
+            value: score  
           },
           success: function (res) {
             if (res.success) {
-              toastFire('success', 'Progress updated successfully!');
-              console.log('Updated successfully');
+              toastFire('success', 'Score saved successfully!');
             } else {
-              toastFire('error', 'Progress update failed!');
-              console.log('Update failed');
+              toastFire('error', 'Failed to save score.');
             }
           },
-          error: function (err) {
-            toastFire('error', 'Something went wrong while updating progress!');
-            console.log('Error:', err);
+          error: function () {
+            toastFire('error', 'Something went wrong while saving the score.');
           }
         });
+      } else {
+        toastFire('warning', 'Please enter a score between 1 and 10.');
       }
     });
+
+
 
   //for save comments
 

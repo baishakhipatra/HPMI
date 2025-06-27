@@ -204,14 +204,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
             });
 
-            Route::prefix('student-progress-categories')->group(function(){
-                Route::get('/', [StudentProgressMarkingController::class, 'studentProgress'])->name('admin.student.progresslist');
-                Route::post('/store', [StudentProgressMarkingController::class, 'studentProgressStore'])->name('admin.student.progressstore');
-                Route::post('/update/{id}', [StudentProgressMarkingController::class, 'studentProgressUpdate'])->name('admin.student.progressupdate');
-                Route::get('/status/{id}', [StudentProgressMarkingController::class, 'studentProgressStatusToggle'])->name('admin.student.progressstatus');
-                Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete');
-               
-            });
 
             Route::prefix('class-wise-comparison')->group(function() {
                 Route::get('/{student_id}', [ClassComparisonController::class, 'index'])->name('admin.student.classcompare');
@@ -247,6 +239,15 @@ Route::prefix('admin')->group(function () {
                 Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
                 Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
                 Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');
+            });
+
+            Route::prefix('student-progress-categories')->group(function(){
+                Route::get('/', [StudentProgressMarkingController::class, 'studentProgress'])->name('admin.student.progresslist');
+                Route::post('/store', [StudentProgressMarkingController::class, 'studentProgressStore'])->name('admin.student.progressstore');
+                Route::post('/update/{id}', [StudentProgressMarkingController::class, 'studentProgressUpdate'])->name('admin.student.progressupdate');
+                Route::get('/status/{id}', [StudentProgressMarkingController::class, 'studentProgressStatusToggle'])->name('admin.student.progressstatus');
+                Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete');
+               
             });
 
             Route::prefix('progress-chart')->group(function(){

@@ -108,7 +108,7 @@ class StudentListController extends Controller
         ]);
 
         try {
-            $generatedId = Student::generateStudentUid(); // Generate unique student_id
+            $generatedId = Student::generateStudentUid();
 
             $student = Student::create([
                 'student_id'     => $generatedId, // 
@@ -487,12 +487,15 @@ class StudentListController extends Controller
             abort(404, 'Student not found');
         }
         $academic_session_id = $AcademicSession->id;
+        // $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
+        //     ->groupBy('value')
+        //     ->map(function ($items) {
+        //         return $items->pluck('value')->toArray(); // get only values per field
+        //     })
+        //     ->toArray();
         $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-            ->groupBy('field')
-            ->map(function ($items) {
-                return $items->pluck('value')->toArray(); // get only values per field
-            })
-            ->toArray();
+            ->groupBy('field'); 
+
             foreach($student_progress_category as $key=>$item){
                 StudentProgressMarking::updateOrCreate([
                     'student_id' =>$student_id,
@@ -502,14 +505,24 @@ class StudentListController extends Controller
 
                 ]);
             }
-            $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
+        $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
 
-        // Create array: session_name => admission_id
+        $savedScores = StudentProgressMarking::where('student_id', $student_id)
+            ->where('admission_session_id', $academic_session_id)
+            ->get()
+            ->groupBy('progress_category')
+            ->map(function ($items) {
+                return $items->pluck('formative_first_phase', 'progress_value')->toArray();
+            })
+            ->toArray();
+
+
+       // dd($savedScores);
         $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
             return [$admission->session->session_name ?? 'Unknown' => $admission->id];
         })->toArray();
 
-        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id'));
+        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id','student_progress_category','savedScores'));
     }
     
     // public function ProgressUpdatePhase(Request $request)
@@ -535,44 +548,42 @@ class StudentListController extends Controller
     //     ]);
     // }
 
-   public function ProgressUpdatePhase(Request $request)
+    public function ProgressUpdatePhase(Request $request)
     {
         $request->validate([
             'student_id'    => 'required|integer',
             'session_id'    => 'required|integer',
-            'category'  => 'nullable|string', // optional for comments
-            'phase'     => 'nullable|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
-            'value'     => 'nullable|string',
+            'category'      => 'nullable|string',
+            'value'         => 'nullable|string', 
+            'phase'         => 'nullable|string',
             'add_comments'  => 'nullable|string',
         ]);
 
-        // Build update data
-        $updateData = [];
-        if ($request->filled('phase') && $request->filled('value')) {
-            $updateData[$request->phase] = $request->value;
-        }
 
-        if (empty($updateData) && !$request->filled('add_comments')) {
+        $updateData = [
+            'formative_first_phase' => $request->value
+        ];
+
+        if (empty($updateData['formative_first_phase']) && !$request->filled('add_comments')) {
             return response()->json(['success' => false, 'message' => 'No data to update.']);
         }
 
-        //Case 1: Save/Update Phase Value 
-        // This block executes if a 'phase', 'value', and 'category' are all provided
+
         if ($request->filled('phase') && $request->filled('value') && $request->filled('category')) {
             StudentProgressMarking::updateOrCreate(
                 [
-                    'student_id' => $request->student_id,
-                    'admission_session_id'  => $request->session_id,
-                    'progress_category'     => $request->category,
+                    'student_id'              => $request->student_id,
+                    'admission_session_id'    => $request->session_id,
+                    'progress_category'       => ucwords($request->category),
+                    'progress_value'          => ucwords($request->phase),
                 ],
                 $updateData
             );
         }
 
-        //Case 2: Save/Update Comment for ALL categories 
-        // This block executes if 'add_comments' is provided
+        
         if ($request->filled('add_comments')) {
-            // Update the 'add_comments' field for all records matching student and session
+
             StudentProgressMarking::where('student_id', $request->student_id)
                 ->where('admission_session_id', $request->session_id)
                 ->update(['add_comments' => $request->add_comments]);
@@ -580,6 +591,53 @@ class StudentListController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
+    // public function ProgressUpdatePhase(Request $request)
+    // {
+    //     $request->validate([
+    //         'student_id'    => 'required|integer',
+    //         'session_id'    => 'required|integer',
+    //         'category'  => 'nullable|string', 
+    //         'phase'     => 'nullable|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
+    //         'value'     => 'nullable|string',
+    //         'add_comments'  => 'nullable|string',
+    //     ]);
+
+        
+    //     $updateData = [];
+    //     if ($request->filled('phase') && $request->filled('value')) {
+    //         $updateData[$request->phase] = $request->value;
+    //     }
+
+    //     if (empty($updateData) && !$request->filled('add_comments')) {
+    //         return response()->json(['success' => false, 'message' => 'No data to update.']);
+    //     }
+
+
+        
+    //     if ($request->filled('phase') && $request->filled('value') && $request->filled('category')) {
+    //         StudentProgressMarking::updateOrCreate(
+    //             [
+    //                 'student_id' => $request->student_id,
+    //                 'admission_session_id'  => $request->session_id,
+    //                 'progress_category'     => $request->category,
+    //             ],
+    //             $updateData
+    //         );
+    //     }
+
+
+    //     // This block executes if 'add_comments' is provided
+    //     if ($request->filled('add_comments')) {
+    //         // Update the 'add_comments' field for all records matching student and session
+    //         StudentProgressMarking::where('student_id', $request->student_id)
+    //             ->where('admission_session_id', $request->session_id)
+    //             ->update(['add_comments' => $request->add_comments]);
+    //     }
+
+    //     return response()->json(['success' => true]);
+    // }
 
 
 
