@@ -38,27 +38,28 @@
                     </div>
                     </td>
                     <td class="text-center">
-                            <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
-                                <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{ $first->id }}"
-                                {{ $first->status ? 'checked' : '' }}
-                                onclick="statusToggle('{{ route('admin.student.progressstatus', $first->id) }}', this)">
-                                <label class="form-check-label" for="customSwitch{{ $first->id }}"></label>
-                            </div>
+                        <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
+                            <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{ $first->id }}"
+                            {{ $first->status ? 'checked' : '' }}
+                            onclick="statusToggle('{{ route('admin.student.progressstatus', $first->id) }}', this)">
+                            <label class="form-check-label" for="customSwitch{{ $first->id }}"></label>
+                        </div>
                     </td>
 
                     <td>
-                        <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                <i class="ri-more-2-line"></i>
+                        <div class="btn-group" role="group" aria-label="Action Buttons">
+                            {{-- Edit Button --}}
+                            <a href="{{ route('admin.student.progresslist', ['update_id' => $first->id]) }}"
+                            class="btn btn-sm btn-icon btn-outline-dark" data-bs-toggle="tooltip" title="Edit">
+                            <i class="ri-pencil-line"></i>
+                            </a>
+
+                            {{-- Delete Button --}}
+                            <button type="button"
+                                class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteItem({{ $first->id }})"                              
+                                data-bs-toggle="tooltip" title="Delete">                                   
+                                <i class="ri-delete-bin-6-line"></i>
                             </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{ route('admin.student.progresslist', ['update_id' => $first->id]) }}">
-                                    <i class="ri-pencil-line me-1"></i> Edit
-                                </a>
-                                <a class="dropdown-item" href="javascript:void(0);" onclick="deleteItem({{ $first->id }})">
-                                    <i class="ri-delete-bin-6-line me-1"></i> Delete
-                                </a>
-                            </div>
                         </div>
                     </td>
                 </tr>

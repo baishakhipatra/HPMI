@@ -37,6 +37,11 @@
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
+                  <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
+                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                    data-toggle="tooltip" title="Export Data">
+                    Export
+                  </a>
                 </div>
               </div>
             </div>
@@ -50,12 +55,11 @@
       <table class="table">
         <thead>
           <tr>
+            <th>Employee ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Mobile</th>
-            <th>Employee ID</th>
-            <th>DOB</th>
-            <th>Address</th>
+            <th>Date of Joining</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -63,12 +67,11 @@
         <tbody class="table-border-bottom-0">
           @foreach($admins as $item)
             <tr>
+              <td>{{ $item->user_id }}</td>
               <td>{{ ucfirst($item->name) }}</td>
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
-              <td>{{ $item->user_id }}</td>
-              <td>{{ $item->date_of_birth }}</td>
-              <td>{{ ucfirst($item->address) }}</td>
+              <td>{{ $item->date_of_joining }}</td>
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
@@ -78,18 +81,36 @@
               </td>
               {{-- Edit and delete --}}
               <td>
-                <div class="dropdown">
+                {{-- <div class="dropdown">
                   <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                       <i class="ri-more-2-line"></i>
                   </button>
                   <div class="dropdown-menu">
-                      <a class="dropdown-item" href="{{ route('admin.employee.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
-                          <i class="ri-pencil-line me-1"></i> Edit
-                      </a>
-                      <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
-                          <i class="ri-delete-bin-6-line me-1"></i> Delete
-                      </a>
+                   
+                    <a class="dropdown-item" href="{{ route('admin.employee.show', $item->id) }}" title="View" data-bs-toggle="tooltip">
+                      <i class="ri-eye-line me-1"></i> View
+                    </a>
+                    <a class="dropdown-item" href="{{ route('admin.employee.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
+                        <i class="ri-pencil-line me-1"></i> Edit
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
+                        <i class="ri-delete-bin-6-line me-1"></i> Delete
+                    </a>
                   </div>
+                </div> --}}
+                <div class="btn-group" role="group" aria-label="Action Buttons">
+                  <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                    data-bs-toggle="tooltip" title="View">                  
+                    <i class="ri-eye-line"></i>
+                  </a>
+                  <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
+                    data-bs-toggle="tooltip"  title="Edit">
+                    <i class="ri-pencil-line"></i>
+                  </a>
+                  <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteUser({{ $item->id }})"     
+                    data-bs-toggle="tooltip" title="Delete">
+                    <i class="ri-delete-bin-6-line"></i>
+                  </a>
                 </div>
               </td>
  

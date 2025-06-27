@@ -22,9 +22,17 @@
 
   <div class="card-body">
     <div class="table-responsive text-nowrap">
-      <form action="{{ route('admin.studentstore') }}" method="POST" class="container mt-4">
+      <form action="{{ route('admin.studentstore') }}" method="POST" class="container mt-4" enctype="multipart/form-data">
         @csrf
         <div class="row g-3">
+            <div class="mb-3 col-md-12">
+                <label for="image" class="form-label">Photograph of Student</label>
+                <input type="file" class="form-control  @error('image') is-invalid @enderror" 
+                      name="image" id="image" accept="image/*">
+                @error('image')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
           
           <div class="form-floating form-floating-outline col-md-4">
             <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Enter full name" value="{{ old('student_name') }}">

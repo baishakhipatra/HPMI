@@ -33,7 +33,25 @@
               @method('POST')
 
               <div class="row g-3">
-               
+                <div class="mb-3 col-md-12">
+                  <label for="image" class="form-label">Photograph of Student</label>
+                  <input type="file" class="form-control form-control-sm @error('image') is-invalid @enderror"
+                    name="image" id="image" accept="image/*">
+                  @error('image')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                  @enderror
+
+                  @if (!empty($student->image))
+                      <div class="mt-2">
+                          @if (file_exists(public_path($student->image)))
+                              <img src="{{ asset($student->image) }}" class="img-thumbnail" alt="Student Image" style="height: 50px;">
+                          @else
+                              <img src="{{ asset('assets/img/placeholder.jpg') }}" class="img-thumbnail" alt="No Image" style="height: 50px;">
+                          @endif
+                      </div>
+                  @endif
+                </div>
+
                 {{-- Student Name --}}
                 <div class="form-floating form-floating-outline col-md-4">
                   <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Enter full name"

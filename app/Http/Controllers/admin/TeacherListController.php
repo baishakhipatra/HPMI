@@ -22,8 +22,10 @@ class TeacherListController extends Controller
             $q->where(function($subQuery) use ($keyword) {
                 $subQuery->where('name', 'like', '%'. $keyword . '%')
                             ->orWhere('email', 'like', '%'. $keyword . '%')
+                            ->orWhere('mobile', 'like', '%'. $keyword . '%')
                             ->orWhere('qualifications', 'like', '%' . $keyword . '%')
-                            ->orWhere('address', 'like', '%' . $keyword . '%');                           
+                            ->orWhere('address', 'like', '%' . $keyword . '%')  
+                            ->orWhere('user_id', 'like', '%' . $keyword .  '%');                         
             });
         });
         
@@ -112,7 +114,23 @@ class TeacherListController extends Controller
     //for show details
     public function show($id) {
         $teacher = Admin::findOrFail($id);
-        return view('admin.teacher_management.show', compact('teacher'));
+
+        //get class names from TeacherClass
+        $classIds   = TeacherClass::where('teacher_id', $id)->pluck('class_id');
+        $classes    = ClassList::whereIn('id', $classIds)->pluck('class')->toArray();
+
+        //Get subject names from TeacherSubject
+        $teacherSubjects  = TeacherSubject::where('teacher_id', $id)
+                                    ->with(['subjectList', 'classList'])
+                                    ->get();
+
+        $subjects  = [];
+        foreach($teacherSubjects as $item) {
+            if($item->subjectList && $item->classList) {
+                $subjects[] = $item->classList->class. '-' . $item->subjectList->sub_name;
+            }
+        }
+        return view('admin.teacher_management.show', compact('teacher', 'classes', 'subjects'));
     }
 
 
@@ -232,6 +250,87 @@ class TeacherListController extends Controller
             'status'    => 200,
             'message'   => 'Teacher deleted successfully.',
         ]);
+    }
+
+   public function export(Request $request)
+    {
+        $keyword = $request->input('keyword');
+
+        $query = Admin::where('user_type', 'Teacher')
+                    ->with(['teacherSubjects.subjectList', 'teacherSubjects.classList']);
+
+        // Filter by keyword
+        if (!empty($keyword)) {
+            $query->where(function ($q) use ($keyword) {
+                $q->where('user_id', 'like', '%' . $keyword . '%')
+                ->orWhere('name', 'like', '%' . $keyword . '%')
+                ->orWhere('email', 'like', '%' . $keyword . '%')
+                ->orWhere('mobile', 'like', '%' . $keyword . '%')
+                ->orWhere('qualifications', 'like', '%' . $keyword . '%')
+                ->orWhere('address', 'like', '%' . $keyword . '%');
+            });
+        }
+
+        $teachers = $query->get();
+
+        if ($teachers->count() > 0) {
+            $delimiter = ",";
+            $filename = "teachers_export_" . date('Y-m-d') . ".csv";
+            $f = fopen('php://memory', 'w');
+
+            // CSV Header
+            $headers = [
+                'Teacher ID',
+                'Name',
+                'Email',
+                'Phone',
+                'Date of Birth',
+                'Date of Joining',
+                'Address',
+                'Qualification',
+                'Subjects (Class-wise)',
+                'Classes',
+            ];
+            fputcsv($f, $headers, $delimiter);
+
+            foreach ($teachers as $teacher) {
+                // Get unique class names
+                $classes = $teacher->teacherSubjects->pluck('classList.class')->unique()->filter()->values()->toArray();
+                $classesStr = implode(', ', $classes);
+
+                // Get subject-class combinations
+                $subjectCombos = [];
+                foreach ($teacher->teacherSubjects as $ts) {
+                    if ($ts->subjectList && $ts->classList) {
+                        $subjectCombos[] = $ts->classList->class . ' - ' . $ts->subjectList->sub_name;
+                    }
+                }
+                $subjectStr = implode(', ', array_unique($subjectCombos));
+
+                $lineData = [
+                    $teacher->user_id,
+                    $teacher->name,
+                    $teacher->email,
+                    $teacher->mobile,
+                    $teacher->date_of_birth,
+                    $teacher->date_of_joining,
+                    $teacher->address,
+                    $teacher->qualifications,
+                    $subjectStr,
+                    $classesStr,
+                ];
+
+                fputcsv($f, $lineData, $delimiter);
+            }
+
+            fseek($f, 0);
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $filename . '";');
+            fpassthru($f);
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'No records found to export.');
+        }
     }
 
     
