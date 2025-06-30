@@ -45,7 +45,7 @@
         </div>
 
         {{-- Class Dropdown (based on student + session) --}}
-        <div class="form-floating form-floating-outline col-md-2">
+        <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
             <select id="class_id" class="form-select">
                 <option value="">Select Class</option>
             </select>
@@ -53,7 +53,7 @@
         </div>
 
         {{-- Subject Dropdown (based on class) --}}
-        <div class="form-floating form-floating-outline col-md-2">
+        <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
             <select id="subject_id" class="form-select">
                 <option value="">Select Subject</option>
             </select>
@@ -186,7 +186,24 @@
         });
     });
     let lineChart, barChart, qualLineChart, radarChart;
+    $(document).ready(function () {
+        // Toggle Class/Subject dropdown visibility on chart type change
+        $('#chart_type').on('change', function () {
+            let selectedChart = $(this).val();
 
+            if (selectedChart === 'qualitative') {
+                $('.class-subject-toggle').addClass('d-none'); // Hide
+            } else {
+                $('.class-subject-toggle').removeClass('d-none'); // Show
+            }
+
+            // Optional: fetch data when chart type changes
+            fetchChartData();
+        });
+
+        // Trigger it once on page load to set correct visibility
+        $('#chart_type').trigger('change');
+    });
     function fetchChartData() {
         const chartType = $('#chart_type').val();
 

@@ -244,7 +244,7 @@ class ClassListController extends Controller
         // }
       
         return redirect()->route('admin.class.subjects', $request->classId)
-                            ->with('success', '$added subject(s) successfully added to the class.');
+                            ->with('success', 'subjects successfully added to the class.');
     }
     
     public function deleteSubjectToclass(Request $request) {

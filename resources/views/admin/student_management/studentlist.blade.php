@@ -112,6 +112,11 @@
                 </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                     {{-- Edit --}}
+                    <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                      data-bs-toggle="tooltip" title="View">                  
+                      <i class="ri-eye-line"></i>
+                    </a>
+
                     <a href="{{ route('admin.studentedit', $item->id) }}"
                       class="btn btn-sm btn-icon btn-outline-dark"
                       data-bs-toggle="tooltip"

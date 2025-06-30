@@ -21,12 +21,25 @@
   </div>
 
   <div class="card-body">
+
+      <!-- School Information -->
+    <div class="mb-4 border p-3">
+      <h5 class="mb-3"><strong>Name of the School:</strong> Holy Palace Multipurpose Institute</h5>
+      <p class="mb-1"><strong>Village/Ward:</strong> T114 Teghoria Main Road</p>
+      <p class="mb-1"><strong>Circle:</strong> ———</p>
+      <p class="mb-1"><strong>District:</strong> Kolkata</p>
+      <p class="mb-1"><strong>UDISE+ Code of School:</strong> 19115101102</p>
+      <p class="mb-1"><strong>Email of School:</strong> ———</p>
+      <p class="mb-1"><strong>School Website:</strong> <a href="https://www.hpmi.in/" target="_blank">https://www.hpmi.in/</a></p>
+      <p class="mb-0"><strong>Phone no. of School:</strong> 9433305657, 9330629644</p>
+    </div>
     <div class="table-responsive text-nowrap">
       <form action="{{ route('admin.studentstore') }}" method="POST" class="container mt-4" enctype="multipart/form-data">
         @csrf
         <div class="row g-3">
             <div class="mb-3 col-md-12">
                 <label for="image" class="form-label">Photograph of Student</label>
+                <span class="text-danger">*</span>
                 <input type="file" class="form-control  @error('image') is-invalid @enderror" 
                       name="image" id="image" accept="image/*">
                 @error('image')
