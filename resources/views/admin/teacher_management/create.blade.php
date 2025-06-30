@@ -48,6 +48,7 @@
                 </div>
             </div>
             <input type="hidden" name="user_type" value="Teacher">
+            <input type="hidden" name="designation_id" value="1">
         </div>
 
         {{-- Row 2: Email, Phone, DOB --}}

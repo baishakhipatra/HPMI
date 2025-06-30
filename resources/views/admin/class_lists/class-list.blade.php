@@ -61,7 +61,7 @@
                       <a href="{{ route('admin.class.subjects', ['id' => $class->id]) }}"
                         class="btn btn-sm btn-icon btn-outline-info"
                         data-bs-toggle="tooltip"
-                        title="Subject">
+                        title="ubject">
                           <i class="ri-book-2-line"></i>
                       </a>
 

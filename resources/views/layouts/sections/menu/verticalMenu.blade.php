@@ -108,6 +108,11 @@
                 <div>Progress Chart</div>
               </a>
             </li>
+            <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
+              <a href="{{route('admin.designation.list')}}" class="menu-link">
+                <div>Designations</div>
+              </a>
+            </li>
           </ul>
         </li>
       {{-- @endif
