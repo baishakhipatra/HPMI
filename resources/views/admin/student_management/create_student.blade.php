@@ -39,6 +39,7 @@
         <div class="row g-3">
             <div class="mb-3 col-md-12">
                 <label for="image" class="form-label">Photograph of Student</label>
+                <span class="text-danger">*</span>
                 <input type="file" class="form-control  @error('image') is-invalid @enderror" 
                       name="image" id="image" accept="image/*">
                 @error('image')

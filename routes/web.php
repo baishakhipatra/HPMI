@@ -176,6 +176,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist');
                 Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate');
                 Route::post('/store', [StudentListController::class, 'store'])->name('admin.studentstore');
+                Route::get('/show/{id}', [StudentListController::class, 'show'])->name('admin.student.show');
                 Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
                 Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
                 Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');

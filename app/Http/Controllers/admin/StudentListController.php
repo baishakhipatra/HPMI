@@ -158,6 +158,15 @@ class StudentListController extends Controller
         }
     }
 
+   public function show($id)
+    {
+        $student = Student::with([
+            'admission.session',
+            'admission.class'
+        ])->findOrFail($id);
+
+        return view('admin.student_management.view', compact('student'));
+    }
 
 
     public function edit($id)
