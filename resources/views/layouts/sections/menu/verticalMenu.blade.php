@@ -66,6 +66,12 @@
                 <div>Student List</div>
               </a>
             </li>
+            <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
+              <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
+                <div>Student Re-admission</div>
+              </a>
+            </li>
+
             @if($exist_student)
               <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
                 <a href="{{route('admin.studentmarklist')}}" class="menu-link">

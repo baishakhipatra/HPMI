@@ -23,7 +23,7 @@
                 + New Class Admission
             </a>
 
-            <a href="{{ route('admin.studentlist') }}" class="btn btn-danger btn-sm ms-2">
+            <a href="{{ route('admin.student.readmission.index') }}" class="btn btn-danger btn-sm ms-2">
                 Back
             </a>
         </div>
@@ -102,74 +102,7 @@
                     @endforeach
                 </tbody>
             </table>
-            {{-- <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <form id="editForm" method="POST" action="{{ route('admin.student.admissionhistoryUpdate') }}">
-                        @csrf
-                        <input type="hidden" name="id" id="admission_id">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                            <h5 class="modal-title" id="editModalLabel">Edit Admission Details</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                           
-                            <div class="form-group mb-2">
-                                <label>Session</label>
-                                <select class="form-select" name="session_id" id="session_id_modal" required>
-                                @foreach ($sessions as $session)
-                                <option value="{{ $session->id }}">
-                                    {{ old('session_id') == $session->id ? 'selected' : '' }}
-                                    {{ $session->session_name }}
-                                </option>
-                                @endforeach
-                                </select>
-                            </div>
 
-                            
-                            <div class="form-group mb-2">
-                                <label>Class</label>
-                                <select class="form-select" name="class_id" id="class_id_modal" required>
-                                @foreach ($classes as $class)
-                                <option value="{{ $class->id }}">
-                                    {{ old('class_id') == $class->id ? 'selected' : '' }}
-                                    {{ $class->class }}
-                                </option>
-                                @endforeach
-                                </select>
-                            </div>
-
-                            
-                            <div class="form-group mb-2">
-                                <label for="section_id">Section</label>
-                                <select name="section_id" class="form-select" id="section_id_modal" required>
-                                <option value="">Select Section</option>
-                                </select>
-                                @error('section_id')<small class="text-danger">{{ $message }}</small>@enderror
-                            </div>
-
-                           
-                            <div class="form-group mb-2">
-                                <label>Roll Number</label>
-                                <input type="number" class="form-control" name="roll_number" id="roll_number_modal" value="{{ old('roll_number') }}" required>
-                            </div>
-
-                           
-                            <div class="form-group mb-2">
-                                <label>Admission Date</label>
-                                <input type="date" class="form-control" name="admission_date" id="admission_date_modal" value="{{ old('admission_date') }}" required>
-                            </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-success">Update</button>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            </div>
-
-                        </div>
-                    </form>
-                </div>
-            </div> --}}
             <!-- Edit Modal -->
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -252,88 +185,7 @@
 @endsection
 
 <script>
-    // document.querySelectorAll('.editBtn').forEach(button => {
-    //     button.addEventListener('click', function () {
-    //         document.getElementById('admission_id').value = this.dataset.id;
 
-    //         // dropdown binding properly:
-    //         let sessionSelect = document.getElementById('session_id_modal');
-    //         let classSelect = document.getElementById('class_id_modal');
-    //         // let sectionInput = document.getElementById('section_id');
-    //         let rollInput = document.getElementById('roll_number_modal');
-    //         let admissionDateInput = document.getElementById('admission_date_modal');
-
-    //         sessionSelect.value = this.dataset.session_id;
-    //         classSelect.value = this.dataset.class_id;
-    //         // sectionInput.value = this.dataset.section_id;
-    //         rollInput.value = this.dataset.roll_number;
-    //         admissionDateInput.value = this.dataset.admission_date;
-
-    //         loadSections(this.dataset.class_id, this.dataset.section);
-    //     });
-    // });
-
-    // $(document).ready(function() {
-    //     $('#class_id').on('change', function() {
-    //         var classId = $(this).val();
-    //         $('#section_id').html('<option value="">Loading...</option>');
-
-    //         if (classId) {
-    //             $.ajax({
-    //                 url: "{{ route('admin.student.get-sections') }}",
-    //                 type: 'GET',
-    //                 dataType: 'json',
-    //                 data: { classId: classId },
-    //                 success: function(response) {
-    //                     if(response.success){
-    //                         console.log(response.sections);
-    //                         // You can loop here to populate dropdown, etc
-    //                         $('#section_id').empty();
-    //                         $('#section_id').append('<option value="">Select Section</option>');
-    //                         $.each(response.sections, function(key, section) {
-    //                             $('#section_id').append('<option value="'+section.section+'">'+section.section+'</option>');
-    //                         });
-    //                     }
-    //                 },
-    //                 error: function(xhr) {
-    //                     console.error(xhr);
-    //                 }
-    //             });
-    //         } else {
-    //             $('#section_id').html('<option value="">Select Section</option>');
-    //         }
-    //     });
-    // });
-    // function loadSections(classId, selectedSection = null) {
-    //     $('#section_id_modal').html('<option value="">Loading...</option>');
-
-    //     if (classId) {
-    //         $.ajax({
-    //             url: "{{ route('admin.student.get-sections') }}",
-    //             type: 'GET',
-    //             dataType: 'json',
-    //             data: { classId: classId },
-    //             success: function(response) {
-    //                 if(response.success){
-    //                     $('#section_id_modal').empty().append('<option value="">Select Section</option>');
-    //                     $.each(response.sections, function(key, section) {
-    //                         $('#section_id_modal').append('<option value="'+section.section+'">'+section.section+'</option>');
-    //                     });
-
-    //                     // Select previous section after dropdown filled
-    //                     if (selectedSection) {
-    //                         $('#section_id_modal').val(selectedSection);
-    //                     }
-    //                 }
-    //             },
-    //             error: function(xhr) {
-    //                 console.error(xhr);
-    //             }
-    //         });
-    //     } else {
-    //         $('#section_id_modal').html('<option value="">Select Section</option>');
-    //     }
-    // }
 
     $(document).ready(function () {
 

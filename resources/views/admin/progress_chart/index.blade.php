@@ -24,7 +24,7 @@
             </select>
             <label for="chart_type">Chart Type</label>
         </div>
-        {{-- Session Dropdown --}}
+
         <div class="form-floating form-floating-outline col-md-2">
 
             <select id="session_id" class="form-select">
@@ -36,7 +36,7 @@
             <label for="session_id">Session</label>
         </div>
 
-        {{-- Student Dropdown (loaded via AJAX) --}}
+    
         <div class="form-floating form-floating-outline col-md-2">
             <select id="student_id" class="form-select">
                 <option value="">Select Student</option>
@@ -44,7 +44,7 @@
             <label for="student_id">Student</label>
         </div>
 
-        {{-- Class Dropdown (based on student + session) --}}
+   
         <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
             <select id="class_id" class="form-select">
                 <option value="">Select Class</option>
@@ -52,7 +52,7 @@
             <label for="class_id">Class</label>
         </div>
 
-        {{-- Subject Dropdown (based on class) --}}
+
         <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
             <select id="subject_id" class="form-select">
                 <option value="">Select Subject</option>
@@ -78,19 +78,21 @@
     </div>
 
     <div id="qualitativeCharts" class="row mb-4 d-none">
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
+        <div class="col-md-6 d-flex">
+            <div class="card p-3 shadow-sm w-100 h-100">
                 <h5 class="mb-3">Qualitative Progress Trend</h5>
-                <canvas id="qualLineChart" height="200"></canvas>
+                <canvas id="qualLineChart" height="300"></canvas>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="mb-3">Current Progress Assessment</h5>
-                <canvas id="radarChart" height="200"></canvas>
+        <div class="col-md-6 d-flex">
+            <div class="card p-3 shadow-sm w-100 h-100" style="display: flex; justify-content: center; align-items: center;">
+                <div style="width: 400px; height: 400px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
+
 
     <div class="row">
         <div class="col-md-3">
@@ -123,13 +125,13 @@
 @endsection
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    //for fetch session,student, subject, class
+    
     $(document).ready(function () {
-        //  Load students when session changes
+  
         $('#session_id').change(function () {
             const sessionId = $(this).val();
 
-            // Clear and disable dependent dropdowns
+ 
             $('#student_id').empty().append('<option value="">Loading...</option>');
             $('#class_id').empty().append('<option value="">Select Class</option>').prop('disabled', false);
             $('#subject_id').empty().append('<option value="">Select Subject</option>').prop('disabled', false);
@@ -204,6 +206,8 @@
         // Trigger it once on page load to set correct visibility
         $('#chart_type').trigger('change');
     });
+
+    
     function fetchChartData() {
         const chartType = $('#chart_type').val();
 

@@ -332,104 +332,103 @@ class StudentListController extends Controller
         ]);
     }
 
-    public function admissionHistory($id)
-    {
-        $student = Student::findOrFail($id);
-        $sessions = AcademicSession::all();
-        $classes = ClassList::all();
-        $admissionHistories = StudentAdmission::with(['student','class','session'])
-                            ->where('student_id', $id)
-                            ->orderBy('created_at', 'desc')
-                            ->get();
-        return view('admin.student_management.admission_history',compact('student','admissionHistories','sessions','classes'));
-    }
+    // public function admissionHistory($id)
+    // {
+    //     $student = Student::findOrFail($id);
+    //     $sessions = AcademicSession::all();
+    //     $classes = ClassList::all();
+    //     $admissionHistories = StudentAdmission::with(['student','class','session'])
+    //                         ->where('student_id', $id)
+    //                         ->orderBy('created_at', 'desc')
+    //                         ->get();
+    //     return view('admin.student_management.admission_history',compact('student','admissionHistories','sessions','classes'));
+    // }
 
     
-    public function admissionhistoryUpdate(Request $request)
-    {
-        // dd($request->all());
-        $request->validate([
-            'id' => 'required|exists:student_admissions,id',
-            'session_id' => 'required|integer',
-            'class_id' => 'required|integer',
-            'section_id' => 'required',
-            'roll_number' => 'required|numeric',
-            'admission_date' => 'required|date',
-        ]);
+    // public function admissionhistoryUpdate(Request $request)
+    // {
+    //     // dd($request->all());
+    //     $request->validate([
+    //         'id' => 'required|exists:student_admissions,id',
+    //         'session_id' => 'required|integer',
+    //         'class_id' => 'required|integer',
+    //         'section_id' => 'required',
+    //         'roll_number' => 'required|numeric',
+    //         'admission_date' => 'required|date',
+    //     ]);
 
-        $history = StudentAdmission::findOrFail($request->id);
+    //     $history = StudentAdmission::findOrFail($request->id);
 
-        $alreadyAdmitted = StudentAdmission::where('student_id', $history->student_id)
-            ->where('session_id', $request->session_id)
-            ->where('id', '!=', $history->id)
-            ->exists();
+    //     $alreadyAdmitted = StudentAdmission::where('student_id', $history->student_id)
+    //         ->where('session_id', $request->session_id)
+    //         ->where('id', '!=', $history->id)
+    //         ->exists();
 
-        if ($alreadyAdmitted) {
-            return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
-                ->withInput();
-        }
-        $history->update([
-            'session_id' => $request->session_id,
-            'class_id' => $request->class_id,
-            'section' => $request->section_id,
-            'roll_number' => $request->roll_number,
-            'admission_date' => $request->admission_date,
-        ]);
+    //     if ($alreadyAdmitted) {
+    //         return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
+    //             ->withInput();
+    //     }
+    //     $history->update([
+    //         'session_id' => $request->session_id,
+    //         'class_id' => $request->class_id,
+    //         'section' => $request->section_id,
+    //         'roll_number' => $request->roll_number,
+    //         'admission_date' => $request->admission_date,
+    //     ]);
 
-        return redirect()->back()->with('success', 'Admission history updated successfully.');
-    }
+    //     return redirect()->back()->with('success', 'Admission history updated successfully.');
+    // }
 
 
-    public function reAdmissionForm($id)
-    {
-        $student = Student::findOrFail($id);
-        $classes = ClassList::all();
-        $sessions = AcademicSession::all();
+    // public function reAdmissionForm($id)
+    // {
+    //     $student = Student::findOrFail($id);
+    //     $classes = ClassList::all();
+    //     $sessions = AcademicSession::all();
 
-        return view('admin.student_management.re-admission', compact('student','classes','sessions'));
-    }
+    //     return view('admin.student_management.re-admission', compact('student','classes','sessions'));
+    // }
 
-    public function reAdmissionStore(Request $request, $id)
-    {
-        $student = Student::findOrFail($id);
-        //dd($request->all());
-        $request->validate([
-            'session_id' => 'required',
-            'class_id'  => 'required',
-            'section_id'  => 'required',
-            //'roll_number' => 'required',
-            'roll_number' => [
-                'required',
-                'integer',
-                Rule::unique('student_admissions')->where(function ($query) use ($request) {
-                    return $query->where('class_id', $request->class_id)
-                                ->where('section', $request->section_id);
-                }),
-            ],
-            'admission_date' => 'required|date',
-        ]);
+    // public function reAdmissionStore(Request $request, $id)
+    // {
+    //     $student = Student::findOrFail($id);
+    //     //dd($request->all());
+    //     $request->validate([
+    //         'session_id' => 'required',
+    //         'class_id'  => 'required',
+    //         'section_id'  => 'required',
+    //         //'roll_number' => 'required',
+    //         'roll_number' => [
+    //             'required',
+    //             'integer',
+    //             Rule::unique('student_admissions')->where(function ($query) use ($request) {
+    //                 return $query->where('class_id', $request->class_id)
+    //                             ->where('section', $request->section_id);
+    //             }),
+    //         ],
+    //         'admission_date' => 'required|date',
+    //     ]);
 
-        $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
-                        ->where('session_id', $request->session_id)
-                        ->exists();
+    //     $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
+    //                     ->where('session_id', $request->session_id)
+    //                     ->exists();
 
-        if ($alreadyAdmitted) {
-            return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
-                                    ->withInput();
-        }
+    //     if ($alreadyAdmitted) {
+    //         return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
+    //                                 ->withInput();
+    //     }
 
-        StudentAdmission::create([
-            'student_id' => $student->id,
-            'session_id' => $request->session_id,
-            'class_id'  => $request->class_id,
-            'section' => $request->section_id,
-            'roll_number' => $request->roll_number,
-            'admission_date' => $request->admission_date,
-        ]);
-        return redirect()->route('admin.student.admissionhistory', $student->id)->with('success', 'Re-admission Done Successfully');
-    }
+    //     StudentAdmission::create([
+    //         'student_id' => $student->id,
+    //         'session_id' => $request->session_id,
+    //         'class_id'  => $request->class_id,
+    //         'section' => $request->section_id,
+    //         'roll_number' => $request->roll_number,
+    //         'admission_date' => $request->admission_date,
+    //     ]);
+    //     return redirect()->route('admin.student.admissionhistory', $student->id)->with('success', 'Re-admission Done Successfully');
+    // }
 
-   
 
     public function export(Request $request)
     {

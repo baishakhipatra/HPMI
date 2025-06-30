@@ -111,7 +111,7 @@ class ProgressChartController extends Controller
 
             $markings = $query->get();
 
-            $trend = $markings->groupBy('progress_category')->map(function ($items, $category) {
+            $trend = $markings->groupBy('progress_value')->map(function ($items, $value) {
                 return round($items->avg('formative_first_phase'), 2);
             });
 
@@ -157,8 +157,7 @@ class ProgressChartController extends Controller
 
 
         $trend = [
-            'Term 1' => round($marks->avg('term_one_stu_marks'), 2),
-            'Term 2' => round($marks->avg('term_two_stu_marks'), 2),
+
             'Midterm' => round($marks->avg('mid_term_stu_marks'), 2),
             'Final Exam' => round($marks->avg('final_exam_stu_marks'), 2),
         ];
@@ -167,8 +166,7 @@ class ProgressChartController extends Controller
         $subjectPerformance = $marks->groupBy('subjectlist.sub_name')->map(function ($items) {
             return round($items->avg(function ($item) {
                 return (
-                    ($item->term_one_stu_marks ?? 0) +
-                    ($item->term_two_stu_marks ?? 0) +
+
                     ($item->mid_term_stu_marks ?? 0) +
                     ($item->final_exam_stu_marks ?? 0)
                 ) / 4;
@@ -180,8 +178,7 @@ class ProgressChartController extends Controller
             'subjects_monitored' => $marks->unique('subject_id')->count(),
             'avg_performance' => round($marks->avg(function ($item) {
                 return (
-                    ($item->term_one_stu_marks ?? 0) +
-                    ($item->term_two_stu_marks ?? 0) +
+                    
                     ($item->mid_term_stu_marks ?? 0) +
                     ($item->final_exam_stu_marks ?? 0)
                 ) / 4;

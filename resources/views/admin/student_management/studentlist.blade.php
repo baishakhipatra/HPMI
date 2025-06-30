@@ -134,12 +134,12 @@
                     </a>
 
                     {{-- Admission History --}}
-                    <a href="{{ route('admin.student.admissionhistory', $item->id) }}"
+                    {{-- <a href="{{ route('admin.student.admissionhistory', $item->id) }}"
                       class="btn btn-sm btn-icon btn-outline-info"
                       data-bs-toggle="tooltip"
                       title="Admission History">
                         <i class="ri-graduation-cap-line"></i>
-                    </a>
+                    </a> --}}
 
                     {{-- Progress Marking --}}
                     <a href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}"

@@ -16,7 +16,7 @@
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="mb-0">New Class Admission</h3>
-    <a href="{{ route('admin.student.admissionhistory', $student->id) }}" class="btn btn-danger">Back</a>
+    <a href="{{ route('admin.student.readmission.index', ['student_id' => $student->id]) }}" class="btn btn-danger">Back</a>
   </div>
 
   <div class="card-body">
@@ -158,4 +158,3 @@
     });
   });
 </script>
-
