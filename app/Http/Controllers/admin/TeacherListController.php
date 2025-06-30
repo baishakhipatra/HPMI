@@ -15,7 +15,7 @@ class TeacherListController extends Controller
     public function index(Request $request) 
     {
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Teacher')
+        $query = Admin::where('user_type', 'Teacher')->orWhere('designation_id', '1')
                 ->with(['teacherSubjects']);
 
         $query->when($keyword, function ($q) use ($keyword) {
@@ -33,6 +33,7 @@ class TeacherListController extends Controller
 
         return view('admin.teacher_management.index', compact('admins'));
     }
+
     public function create(){
         $user_id = generateTeacherId();
         $classLists = ClassList::all();
@@ -44,6 +45,7 @@ class TeacherListController extends Controller
         $validator = Validator::make($request->all(), [
             'user_id'            => 'required|string|unique:admins,user_id',
             'user_type'          => 'required|in:Teacher,Employee,Admin',
+            'designation_id'     => 'nullable|exists:designations,id',
             'name'               => 'required|string|max:255',
             'email'              => 'required|email|unique:admins,email',
             'mobile'             => [
@@ -89,6 +91,7 @@ class TeacherListController extends Controller
             'address'         => $request->address,
             'password'        => Hash::make($request->password),
             'status'          => 1,
+            'designation_id'  => $request->designation_id,
         ]);
         // dd($request->all());
         //  Save class associations

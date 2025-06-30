@@ -21,7 +21,7 @@ class UserListController extends Controller
         // }
 
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Employee');
+        $query = Admin::where('user_type', 'Employee')->orWhere('designation_id', '2');
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
@@ -48,6 +48,7 @@ class UserListController extends Controller
         $validator = Validator::make($request->all(), [
             // 'user_id'          => 'nullable|string|unique:admins,user_id',
             'user_id'          => 'required|string|unique:admins,user_id',
+            'designation_id'   => 'nullable|exists:designations,id',
             'name'             => 'required|string|max:255',
             'email'            => 'required|email|unique:admins,email',
             //'mobile'           => 'required|digits:10|unique:admins,mobile',
@@ -93,6 +94,7 @@ class UserListController extends Controller
             'password'         => Hash::make($request->password),
             'user_type'        => 'Employee',
             'status'           => 1,
+            'designation_id'   => $request->designation_id,
         ]);
         //dd('Hi');
 

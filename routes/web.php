@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
                                 SubjectListController ,StudentMarkListController, StudentProgressMarkingController,
-                                ClassComparisonController ,ProgressChartController };
+                                ClassComparisonController ,ProgressChartController, DesignationController};
 
 //End New Route
 
@@ -259,6 +259,11 @@ Route::prefix('admin')->group(function () {
                 Route::get('get-students-by-session', [ProgressChartController::class, 'getStudentsBySession'])->name('admin.getStudentsBySession');
                 Route::get('get-class-subject-by-student', [ProgressChartController::class, 'getClassBySessionAndStudent'])->name('admin.getClassBySessionAndStudent');
                 Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
+            });
+
+            Route::prefix('designations')->group(function(){
+                Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list');
+                Route::get('/status/{id}', [DesignationController::class, 'status'])->name('admin.designation.status');
             });
         });
 

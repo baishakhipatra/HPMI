@@ -40,6 +40,7 @@
           @error('user_type') <p class="text-danger small">{{ $message }}</p> @enderror
         </div> --}}
         <input type="hidden" name="user_type" value="Employee">
+        <input type="hidden" name="designation_id" value="2">
       </div>
 
       {{-- Row 2: Email, Mobile, DOB --}}
