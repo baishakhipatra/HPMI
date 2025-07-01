@@ -16,7 +16,7 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0">Student List</h3>
+    <h3 class="mb-0 text-primary">Student List</h3>
     <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
   </div>
 

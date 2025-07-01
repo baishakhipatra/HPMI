@@ -13,7 +13,7 @@
         <div class="card">
           <!-- Card Header -->
           <div class="card-header d-flex align-items-center justify-content-between">
-            <h5 class="mb-0">Edit Employee</h5>
+            <h4 class="mb-0 text-primary">Edit Employee</h5>
             <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
             </a>

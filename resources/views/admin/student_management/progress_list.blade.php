@@ -10,7 +10,9 @@
     <div class="row">
         <div class="col-8">
         <div class="card">
-            <h4 class="mb-0">Progress Marking Categories</h4>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0 text-primary">Progress Marking Categories</h5>
+            </div>
             <div class="card-body">
             <table class="table table-sm table-hover">
                 <thead>
@@ -34,7 +36,7 @@
                         <td class="text-center">
                         <div class="d-flex flex-column align-items-center">
                             @foreach($items as $item)
-                            <span class="badge bg-light-primary text-primary mb-1">{{ ucwords($item->value) }}</span>
+                            <span class="badge bg-dark-primary text-primary mb-1">{{ ucwords($item->value) }}</span>
                             @endforeach
                         </div>
                         </td>
@@ -133,7 +135,7 @@
 
             <div class="card">
                 <div class="card-header">
-                    <h4>Add Progress Field & Values</h4>
+                    <h5>Add Progress Field & Values</h4>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.student.progressstore') }}" method="post">

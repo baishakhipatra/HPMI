@@ -17,7 +17,7 @@
 
 <div class="container">
      <div class="card-header d-flex justify-content-between align-items-center">
-        <h3>Class Wise Comparison: {{ ucwords($student->student_name) }}</h3>
+        <h4>Class Wise Comparison: {{ ucwords($student->student_name) }}</h3>
         <div class="text-end">
             <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
                 <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back

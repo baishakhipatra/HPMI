@@ -20,6 +20,9 @@
   <div class="row">
     <div class="col-8">
       <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h4 class="mb-0 text-primary">Class List</h5>
+        </div>
         <div class="card-body">
           <table class="table table-sm table-hover">
             <thead>
@@ -98,7 +101,7 @@
         @if(isset($update_data))
         <div class="card">
             <div class="card-header">
-            <h4>Edit Class & Sections</h4>
+            <h5>Edit Class & Sections</h4>
             </div>
             <div class="card-body">
             <form action="{{ route('admin.classupdate',['id' => $update_data->id]) }}" method="post" enctype="multipart/form-data">
@@ -153,7 +156,7 @@
         @else
         <div class="card">
             <div class="card-header">
-            <h4>Add Class & Sections</h4>
+            <h5>Add Class & Sections</h4>
             </div>
             <div class="card-body">
             <form action="{{ route('admin.classstore') }}" method="post">

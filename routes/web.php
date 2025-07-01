@@ -274,6 +274,8 @@ Route::prefix('admin')->group(function () {
             Route::prefix('designations')->group(function(){
                 Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list');
                 Route::get('/status/{id}', [DesignationController::class, 'status'])->name('admin.designation.status');
+                Route::get('/permissions/{id}', [DesignationController::class, 'permissions'])->name('admin.designation.permissions');
+                Route::post('/permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');
             });
         });
 

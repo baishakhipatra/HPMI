@@ -20,7 +20,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Designation List</h5>
+                <h4 class="mb-0 text-primary">Designation List</h5>
             </div>
             <div class="px-3 py-2">
                 <form method="GET" action="">
@@ -52,7 +52,7 @@
                 <div class="table-responsive text-nowrap">
                     <table class="table">
                         <thead>
-                            <tr>
+                            <tr class="text-center">
                                 <th>Name</th>
                                 <th>Status</th>
                                 <th>Actions</th>
@@ -61,16 +61,19 @@
                         <tbody class="table-border-bottom-0">
                             @forelse($designations as $item)
                                 <tr>
-                                    <td>{{ $item->name}}</td>
-                                    <td>
-                                        <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
-                                            <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
-                                            {{ $item->status ? 'checked' : ''}} onclick="statusToggle('{{route('admin.designation.status', $item->id)}}', this)">
-                                            <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
+                                    <td class="text-center">{{ $item->name}}</td>
+                                    <td class="text-center align-middle">
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
+                                                <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
+                                                    {{ $item->status ? 'checked' : '' }} 
+                                                    onclick="statusToggle('{{ route('admin.designation.status', $item->id) }}', this)">
+                                                <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
+                                            </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        <a href="javascript:void(0);">
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.designation.permissions', $item->id) }}">
                                             <span class="badge bg-label-danger mb-0 cursor-pointer">Permission</span>
                                         </a>
                                         <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-dark"                     
@@ -84,11 +87,10 @@
                             @endforelse
                         </tbody>
                     </table>
-                    {{-- {{ $subjects->links() }} --}}
+                     {{ $designations->links() }}
                 </div>
             </div>
         </div>
     </div>
 
 @endsection
-

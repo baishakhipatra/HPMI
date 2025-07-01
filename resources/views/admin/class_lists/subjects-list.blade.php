@@ -105,15 +105,12 @@
                                     <tr class="text-center">
                                         <td>{{ $subject->subject ? ucwords($subject->subject->sub_name) : 'N/A' }}</td>
                                         <td>
-                                            <div class="dropdown">
-                                            <button class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                                                <i class="ri-more-2-line"></i>
-                                            </button>
-                                            <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteClassToSub({{ $subject->id }})">
-                                                    <i class="ri-delete-bin-6-line me-1"></i> Delete
-                                                </a>
-                                            </div>
+                                            <div class="btn-group" role="group" aria-label="Subject Actions">
+                                                {{-- Delete Button --}}
+                                                <button type="button" class="btn btn-sm btn-icon btn-outline-danger"                                                       
+                                                    onclick="deleteClassToSub({{ $subject->id }})" data-bs-toggle="tooltip" title="Delete">                                                                        
+                                                    <i class="ri-delete-bin-6-line"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>

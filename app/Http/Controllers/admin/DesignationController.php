@@ -4,15 +4,20 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Admin, DesignationPermission, Designation};
+use App\Models\{Admin, DesignationPermission, Designation, Permission};
 
 class DesignationController extends Controller
 {
     //
 
-    public function index() {
-       $designations =  Designation::orderBy('id')->get();
-       return view('admin.designations.index', compact('designations'));
+    public function index(Request $request) {
+
+        $keyword = $request->input('keyword');
+
+        $designations =  Designation::when($keyword, function($query, $keyword){
+                            $query->where('name', 'like', '%' . $keyword .'%');
+                            })->orderBy('id','desc')->paginate(10);
+        return view('admin.designations.index', compact('designations', 'keyword'));
     }
 
     public function status($id)
@@ -25,6 +30,29 @@ class DesignationController extends Controller
             'status'  => 200,
             'message' => 'Status updated successfully'
         ]);
+    }
+
+    public function permissions(Request $request, $id) {
+        $designation = Designation::findOrFail($id);
+        $permissions = Permission::orderBy('parent_name')->get();
+        $assignedPermissions = $designation->permissions->pluck('id')->toArray();
+
+        return view('admin.designations.permissions', compact('designation', 'permissions', 'assignedPermissions'));
+    }
+
+    public function updatePermissions(Request $request) {
+        $request->validate([
+            'designation_id'    => 'required|exists:designations,id',
+            'permissions'       => 'array',
+            'permissions.*'     => 'exists:permissions,id',
+        ]);
+
+        $designation = Designation::findOrFail($request->designation_id);
+        $permissionIds = $request->input('permissions', []);
+
+        $designation->permissions()->sync($permissionIds);
+
+        return redirect()->route('admin.designation.list')->with('success', 'Permissions updated successfully.');
     }
 
 }
