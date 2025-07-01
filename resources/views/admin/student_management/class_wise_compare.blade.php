@@ -190,69 +190,7 @@
         });
     });
 
-    // $(document).ready(function () {
-    //     $('#compareMarksBtn').click(function () {
-    //         let studentId = {{ $student->id }}
-    //         let session1 = $('#comparison1').val();
-    //         let session2 = $('#comparison2').val();
-    //         let term1 = $('#term1').val();
-    //         let term2 = $('#term2').val();
 
-    //         if (!session1 || !session2 || !term1 || !term2) {
-    //             toastr.error('Please select both sessions.');
-    //             return;
-    //         }
-
-    //         if (session1 === session2) {
-    //             toastr.error('Both sessions must be different.');
-    //             return;
-    //         }
-
-    //         $.ajax({
-    //             url: "{{ route('admin.student.comparemarks') }}", 
-    //             type: "POST",
-    //             data: {
-    //                 _token: "{{ csrf_token() }}",
-    //                 student_id: {{ $student->id }},
-    //                 session1: session1,
-    //                 session2: session2,
-    //                 term1: term1,
-    //                 term2:term2,
-    //             },
-    //             success: function (res) {
-    //                 if (res.success) {
-    //                     let table = `<table class="table table-bordered">
-    //                     <thead>
-    //                         <tr>
-    //                             <th>Subject</th>
-    //                             <th>Session 1 (${res.session1})</th>
-    //                             <th>Session 2 (${res.session2})</th>
-    //                             <th>Improvement (%)</th>
-    //                         </tr>
-    //                     </thead>
-    //                     <tbody>`;
-
-    //                     $.each(res.data, function (i, row) {
-    //                         table += `
-    //                             <tr>
-    //                                 <td>${row.subject}</td>
-    //                                 <td>${row.marks1}</td>
-    //                                 <td>${row.marks2}</td>
-    //                                 <td>${row.improvement}</td>
-    //                             </tr>`;
-    //                     });
-
-    //                     table += `</tbody></table>`;
-    //                     $('#comparison-result').html(table);
-    //                 } else
-    //                 {
-    //                 $('#comparison-result').html(`<div class="alert alert-warning">No data found.</div>`);
-    //                 }   
-    //             }
-    //         });
-
-    //     });
-    // });
     $(document).ready(function () {
     $('#compareMarksBtn').click(function () {
         let studentId = {{ $student->id }};
@@ -264,12 +202,12 @@
         let subject2 = $('#subject2').val();
 
         if (!session1 || !session2 || !term1 || !term2 || !subject1 || !subject2) {
-            toastFire.error('Please select sessions, terms and subjects.');
+            toastFire('error','Please select sessions, terms and subjects.');
             return;
         }
 
         if (session1 === session2) {
-            toastFire.error('Both sessions must be different.');
+            toastFire('error','Both sessions must be different.');
             return;
         }
 

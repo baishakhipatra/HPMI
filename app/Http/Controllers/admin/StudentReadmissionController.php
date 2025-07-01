@@ -9,24 +9,56 @@ use Illuminate\Validation\Rule;
 
 class StudentReadmissionController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $student = null;
+    //     $admissionHistories = [];
+
+    //     if ($request->has('keyword')) {
+    //         $student = Student::where('student_name', 'like', '%' . $request->keyword . '%')->first();
+
+    //         if ($student) {
+    //             $admissionHistories = StudentAdmission::with(['session', 'class'])
+    //                                 ->where('student_id', $student->id)
+    //                                 ->orderBy('created_at', 'desc')
+    //                                 ->get();
+    //         }
+    //     }
+
+    //     return view('admin.student_management.index', compact('student', 'admissionHistories'));
+    // }
+
+
     public function index(Request $request)
     {
-        $student = null;
+        $students = collect();
+        $selectedStudent = null;
         $admissionHistories = [];
 
-        if ($request->has('keyword')) {
-            $student = Student::where('student_name', 'like', '%' . $request->keyword . '%')->first();
+        if ($request->filled('keyword')) {
+            $students = Student::where('student_name', 'like', '%' . $request->keyword . '%')->get();
 
-            if ($student) {
+            // Auto-select if only one student found and no student_id sent
+            if ($students->count() === 1 && !$request->filled('student_id')) {
+                $selectedStudent = $students->first();
+            }
+
+            // If student_id is sent, select based on that
+            if ($request->filled('student_id')) {
+                $selectedStudent = Student::where('student_id', $request->student_id)->first();
+            }
+
+            if ($selectedStudent) {
                 $admissionHistories = StudentAdmission::with(['session', 'class'])
-                                    ->where('student_id', $student->id)
-                                    ->orderBy('created_at', 'desc')
-                                    ->get();
+                    ->where('student_id', $selectedStudent->id)
+                    ->orderBy('created_at', 'desc')
+                    ->get();
             }
         }
 
-        return view('admin.student_management.index', compact('student', 'admissionHistories'));
+        return view('admin.student_management.index', compact('students', 'selectedStudent', 'admissionHistories'));
     }
+
 
 
     public function admissionHistory(Request $request)
