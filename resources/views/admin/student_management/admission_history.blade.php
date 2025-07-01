@@ -75,7 +75,7 @@
                             <td>{{ $history->class->class ?? '-' }}</td> 
                             <td>{{ $history->section }}</td>
                             <td>{{ $history->roll_number }}</td>
-                            <td>{{ \Carbon\Carbon::parse($history->admission_date)->format('d-m-Y') }}</td>
+                            <td>{{date('d-m-Y',strtotime($history->admission_date))}}</td>
                             <td>
                                 <div class="dropdown">
                                     <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
@@ -103,13 +103,13 @@
                 </tbody>
             </table>
 
-            <!-- Edit Modal -->
+            
             <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <form id="editForm" method="POST" action="{{ route('admin.student.admissionhistoryUpdate') }}">
                         @csrf
 
-                        <!-- Hidden admission ID -->
+                        
                         <input type="hidden" name="id" id="admission_id">
 
                         <div class="modal-content">
@@ -120,7 +120,7 @@
 
                             <div class="modal-body">
 
-                                <!-- Session -->
+                                
                                 <div class="form-group mb-2">
                                     <label>Session</label>
                                     <select class="form-select" name="session_id" id="session_id_modal" required>
@@ -132,7 +132,7 @@
                                     @error('session_id') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
 
-                                <!-- Class -->
+                                
                                 <div class="form-group mb-2">
                                     <label>Class</label>
                                     <select class="form-select" name="class_id" id="class_id_modal" required>
@@ -144,7 +144,7 @@
                                     @error('class_id') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
 
-                                <!-- Section -->
+
                                 <div class="form-group mb-2">
                                     <label>Section</label>
                                     <select class="form-select" name="section_id" id="section_id_modal" required>
@@ -153,14 +153,14 @@
                                     @error('section_id') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
 
-                                <!-- Roll Number -->
+                        
                                 <div class="form-group mb-2">
                                     <label>Roll Number</label>
                                     <input type="number" class="form-control" name="roll_number" id="roll_number_modal" required>
                                     @error('roll_number') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
 
-                                <!-- Admission Date -->
+                 
                                 <div class="form-group mb-2">
                                     <label>Admission Date</label>
                                     <input type="date" class="form-control" name="admission_date" id="admission_date_modal" required>
