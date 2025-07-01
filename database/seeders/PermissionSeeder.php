@@ -24,7 +24,9 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'master_management', 'name' => 'class_create', 'route' => 'admin.classcreate'],
             ['parent_name' => 'master_management', 'name' => 'class_update', 'route' => 'admin.classedit'],
             ['parent_name' => 'master_management', 'name' => 'class_delete', 'route' => 'admin.classdelete'],
-            ['parent_name' => 'master_management', 'name' => 'class_subject', 'route' => 'admin.class.subjects'],
+            ['parent_name' => 'master_management', 'name' => 'class_wise_subject', 'route' => 'admin.class.subjects'],
+            ['parent_name' => 'master_management', 'name' => 'class_wise_subject_assign', 'route' => 'admin.class.subjects.assign'],
+            ['parent_name' => 'master_management', 'name' => 'class_wise_subject_delete', 'route' => 'admin.class.subjects.delete'],
 
             ['parent_name' => 'master_management', 'name' => 'progress_marking_categories_list', 'route' => 'admin.student.progresslist'],
             ['parent_name' => 'master_management', 'name' => 'progress_marking_categories_create', 'route' => 'admin.student.progressstore'],
@@ -41,7 +43,6 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'employee_management', 'name' => 'employee_edit', 'route' => 'admin.employee.edit'],
             ['parent_name' => 'employee_management', 'name' => 'employee_delete', 'route' => 'admin.employee.delete'],
             ['parent_name' => 'employee_management', 'name' => 'employee_export', 'route' => 'admin.employee.export'],
-            ['parent_name' => 'employee_management', 'name' => 'designation_permissions', 'route' => 'admin.designation.permission'],
 
             ['parent_name' => 'teacher_management', 'name' => 'teacher_list', 'route' => 'admin.teacher.index'],
             ['parent_name' => 'teacher_management', 'name' => 'teacher_create', 'route' => 'admin.teacher.create'],
@@ -49,8 +50,6 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'teacher_management', 'name' => 'teacher_edit', 'route' => 'admin.teacher.edit'],
             ['parent_name' => 'teacher_management', 'name' => 'teacher_delete', 'route' => 'admin.teacher.delete'],
             ['parent_name' => 'teacher_management', 'name' => 'teacher_export', 'route' => 'admin.teacher.export'],
-            ['parent_name' => 'teacher_management', 'name' => 'designation_permissions', 'route' => 'admin.designation.permission'],
-
 
             ['parent_name' => 'student_management', 'name' => 'student_list', 'route' => 'admin.studentlist'],
             ['parent_name' => 'student_management', 'name' => 'student_create', 'route' => 'admin.studentcreate'],
@@ -59,9 +58,11 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'student_management', 'name' => 'student_delete', 'route' => 'admin.studentdelete'],
             ['parent_name' => 'student_management', 'name' => 'student_export', 'route' => 'admin.student.export'],
 
-            ['parent_name' => 'student_management', 'name' => 'student_admission_history', 'route' => 'admin.student.admissionhistory'],
             ['parent_name' => 'student_management', 'name' => 'student_progress_marking', 'route' => 'admin.student.progressmarkinglist'],
             ['parent_name' => 'student_management', 'name' => 'student_class_wise_comparison', 'route' => 'admin.student.classcompare'],
+
+            ['parent_name' => 'student_management', 'name' => 'student_readmision_list', 'route' => 'admin.student.readmission.index'],
+            ['parent_name' => 'student_management', 'name' => 'student_readmision_create', 'route' => 'admin.student.readmission.store'],
 
             ['parent_name' => 'student_management', 'name' => 'student_mark_list', 'route' => 'admin.studentmarklist'],
             ['parent_name' => 'student_management', 'name' => 'student_mark_create', 'route' => 'admin.student-marks.store'],
