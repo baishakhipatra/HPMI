@@ -1,9 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-<!-- Select2 JS -->
+
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Show - Teacher')
@@ -17,7 +14,13 @@
                 <div class="card">
                     <!-- Card Header -->
                     <div class="card-header">
-                        <h5 class="border-bottom text-capitalize pb-4 mt-4 mb-8">Employee Details</h5>
+                        <h4 class="mb-0 text-primary">Employee Details</h5>
+                        
+                        {{-- Back Button --}}
+                        <div class="text-end">
+                        <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger">
+                            <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
+                        </div>
                         
                     {{-- </div>
 
@@ -52,12 +55,6 @@
                             </li>
 
                         </ul>
-
-                        {{-- Back Button --}}
-                        <div class="text-end">
-                        <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger">
-                            <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
-                        </div>
 
                     </div>
                 </div>

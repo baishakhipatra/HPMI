@@ -9,7 +9,7 @@
 
 <div class="card p-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3>Create Employee</h3>
+    <h3 class="mb-0 text-primary">Create Employee</h3>
     <a href="{{ route('admin.employee.index') }}" class="btn btn-danger">
       <i class="ri-arrow-left-line"></i> Back
     </a>

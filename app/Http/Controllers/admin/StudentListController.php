@@ -102,7 +102,7 @@ class StudentListController extends Controller
             'father_name'     => 'nullable|string|max:255',
             'mother_name'     => 'nullable|string|max:255',
             'divyang'         => 'required|in:Yes,No',
-            'image'           => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+            'image'           => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ],[
             'phone_number.regex' => 'Phone number should be exactly 10 digits.',
             'aadhar_no.regex'    => 'Aadhaar number should be exactly 12 digits.',

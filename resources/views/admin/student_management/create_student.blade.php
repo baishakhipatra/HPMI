@@ -23,7 +23,7 @@
   <div class="card-body">
 
       <!-- School Information -->
-    <div class="mb-4 border p-3">
+    {{-- <div class="mb-4 border p-3 col-8">
       <h5 class="mb-3"><strong>Name of the School:</strong> Holy Palace Multipurpose Institute</h5>
       <p class="mb-1"><strong>Village/Ward:</strong> T114 Teghoria Main Road</p>
       <p class="mb-1"><strong>Circle:</strong> ———</p>
@@ -32,20 +32,37 @@
       <p class="mb-1"><strong>Email of School:</strong> ———</p>
       <p class="mb-1"><strong>School Website:</strong> <a href="https://www.hpmi.in/" target="_blank">https://www.hpmi.in/</a></p>
       <p class="mb-0"><strong>Phone no. of School:</strong> 9433305657, 9330629644</p>
-    </div>
+    </div> --}}
     <div class="table-responsive text-nowrap">
       <form action="{{ route('admin.studentstore') }}" method="POST" class="container mt-4" enctype="multipart/form-data">
         @csrf
-        <div class="row g-3">
-            <div class="mb-3 col-md-12">
-                <label for="image" class="form-label">Photograph of Student</label>
-                <span class="text-danger">*</span>
-                <input type="file" class="form-control  @error('image') is-invalid @enderror" 
-                      name="image" id="image" accept="image/*">
-                @error('image')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+          <div class="row g-3">
+            <div class="mb-4 border p-3 col-md-8">
+              <h5 class="mb-3"><strong>Name of the School:</strong> Holy Palace Multipurpose Institute</h5>
+              <p class="mb-1"><strong>Village/Ward:</strong> T114 Teghoria Main Road</p>
+              <p class="mb-1"><strong>Circle:</strong> ———</p>
+              <p class="mb-1"><strong>District:</strong> Kolkata</p>
+              <p class="mb-1"><strong>UDISE+ Code of School:</strong> 19115101102</p>
+              <p class="mb-1"><strong>Email of School:</strong> ———</p>
+              <p class="mb-1"><strong>School Website:</strong> <a href="https://www.hpmi.in/" target="_blank">https://www.hpmi.in/</a></p>
+              <p class="mb-0"><strong>Phone no. of School:</strong> 9433305657, 9330629644</p>
             </div>
+            <div class="mb-3 col-md-4">
+              <label for="image" class="form-label">Photograph of Student <span class="text-danger">*</span></label>
+              
+              <div class="border rounded d-flex align-items-center justify-content-center mb-2" 
+                  style="height: 150px; width: 150px; overflow: hidden; position: relative;" id="preview-box">
+                  <span class="text-muted" id="preview-text">Passport Photo</span>
+                  <img id="image-preview" src="#" alt="Preview" class="img-fluid h-100 w-100 d-none" style="object-fit: cover;">
+              </div>
+
+              <input type="file" class="form-control @error('image') is-invalid @enderror"
+                    name="image" id="image" accept="image/*" onchange="previewImage(event)">
+              
+              @error('image')
+                  <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
+          </div>
           
           <div class="form-floating form-floating-outline col-md-4">
             <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Enter full name" value="{{ old('student_name') }}">
@@ -255,4 +272,25 @@
       }
     });
   });
+
+  // for upload photo
+  function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('image-preview');
+    const text = document.getElementById('preview-text');
+
+    if(input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.classList.remove('d-none');
+        text.classList.add('d-none');
+      };
+      reader.readAsDataURL(input.files[0]);
+    } else{
+        preview.src = '#';
+        preview.classList.add('d-none');
+        text.classList.remove('d-none');
+    }
+  }
 </script>

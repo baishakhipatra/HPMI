@@ -11,7 +11,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h3 class="mb-0">Progress Charts</h3>
+            <h4 class="mb-0 text-primary">Progress Charts</h3>
             <small class="text-muted">Visual representation of student performance trends</small>
         </div>
 

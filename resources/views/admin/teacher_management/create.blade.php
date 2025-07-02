@@ -12,7 +12,7 @@
 
 <div class="card p-4">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3>Create Teacher</h3>
+    <h3 class="mb-0 text-primary">Create Teacher</h3>
     <a href="{{ route('admin.teacher.index') }}" class="btn btn-danger">
       <i class="ri-arrow-left-line"></i> Back
     </a>

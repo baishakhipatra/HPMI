@@ -7,4 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Permission extends Model
 {
     //
+
+    public function designations()
+    {
+        return $this->belongsToMany(Designation::class, 'designation_permissions');
+    }
 }

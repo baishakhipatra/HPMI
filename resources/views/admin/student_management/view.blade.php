@@ -1,9 +1,6 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-<!-- Select2 JS -->
+
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Show - Teacher')
@@ -14,131 +11,61 @@
     <section class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card">
+                <div class="card shadow border-0">
                     <!-- Card Header -->
-                    <div class="card-header">
-                        <h5 class="border-bottom text-capitalize pb-4 mt-4 mb-8">Student Details</h5>
-                        
-                    {{-- </div>
-
-                    <div class="card-body pt-12"> --}}
-
-                        <ul class="list-unstyled mb-4">
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Student Photo:</span>
-                                @if($student->image)
-                                    <img src="{{ asset($student->image) }}" alt="Student Photo" width="100">
-                                @else
-                                    <span>N/A</span>
-                                @endif
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Full Name:</span>
-                                <span>{{ ucwords($student->student_name ?? 'N/A') }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Date of Birth:</span>
-                                <span>{{date('d-m-Y',strtotime($student->date_of_birth))}}</span>                               
-                            </li>
-
-                            
-                            <li class="mb-2">
-                                <span class="h6 me-1">Gender:</span>
-                                <span>{{ $student->gender ?? 'N/A' }}</span>
-                            </li>
-
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Aadhaar No.:</span>
-                                <span>{{ $student->aadhar_no ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Blood Group:</span>
-                                <span>{{ $student->blood_group ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Height:</span>
-                                <span>{{ $student->height ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Weight:</span>
-                                <span>{{ $student->weight ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Father's Name:</span>
-                                <span>{{ ucwords($student->father_name ?? 'N/A') }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Mother's Name:</span>
-                                <span>{{ ucwords($student->mother_name ?? 'N/A') }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Guardian's Name:</span>
-                                <span>{{ ucwords($student->parent_name ?? 'N/A') }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Email address:</span>
-                                <span>{{ $student->email ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Contact Number:</span>
-                                <span>{{ $student->phone_number ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Student Address:</span>
-                                <span>{{ ucwords($student->address ?? 'N/A') }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Divyang :</span>
-                                <span>{{ $student->divyang ?? 'N/A' }}</span>
-                            </li>
-
-                            {{-- <li class="mb-2">
-                                <span class="h6 me-1">Admission Date:</span>
-                                <span>{{ optional($student->admission)->admission_date ? date('d-m-Y', strtotime($student->admission->admission_date)) : 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Class:</span>
-                                <span>{{ optional($student->admission->classList)->class ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Section:</span>
-                                <span>{{ $student->admission->section ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Roll Number:</span>
-                                <span>{{ $student->admission->roll_number ?? 'N/A' }}</span>
-                            </li>
-
-                            <li class="mb-2">
-                                <span class="h6 me-1">Academic Session:</span>
-                                <span>{{ optional($student->admission->session)->session_name ?? 'N/A' }}</span>
-                            </li> --}}
-
-                        </ul>
-
-                        {{-- Back Button --}}
-                        <div class="text-end">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary">Student Details</h5>
                         <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
-                            <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
-                        </div>
+                            <i class="ri-arrow-left-line"></i> Back
+                        </a>
+                    </div>
 
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-4 text-center">
+                                @if($student->image)
+                                    <img src="{{ asset($student->image) }}" alt="Student Photo" class="img-fluid rounded shadow" style="max-height: 150px;">
+                                @else
+                                    <div class="text-muted">No Photo</div>
+                                @endif
+                                <div class="mt-2 fw-semibold">{{ ucwords($student->student_name ?? 'N/A') }}</div>
+                            </div>
+
+                            <div class="col-md-9">
+                                <div class="row">
+                                    @php
+                                        $details = [
+                                            'Date of Birth'      => $student->date_of_birth ? date('d-m-Y', strtotime($student->date_of_birth)) : 'N/A',
+                                            'Gender'             => $student->gender ?? 'N/A',
+                                            'Aadhaar No.'        => $student->aadhar_no ?? 'N/A',
+                                            'Blood Group'        => $student->blood_group ?? 'N/A',
+                                            'Height'             => $student->height ?? 'N/A',
+                                            'Weight'             => $student->weight ?? 'N/A',
+                                            "Father's Name"      => ucwords($student->father_name ?? 'N/A'),
+                                            "Mother's Name"      => ucwords($student->mother_name ?? 'N/A'),
+                                            "Guardian's Name"    => ucwords($student->parent_name ?? 'N/A'),
+                                            'Email Address'      => $student->email ?? 'N/A',
+                                            'Contact Number'     => $student->phone_number ?? 'N/A',
+                                            'Student Address'    => ucwords($student->address ?? 'N/A'),
+                                            'Divyang'            => $student->divyang ?? 'N/A',
+                                            'Admission Date'     => optional($student->admission)->admission_date ? date('d-m-Y', strtotime($student->admission->admission_date)) : 'N/A',
+                                            'Class'              => strToUpper(optional($student->admission->class)->class ?? 'N/A'),
+                                            'Section'            => strToUpper($student->admission->section ?? 'N/A'),
+                                            'Roll Number'        => $student->admission->roll_number ?? 'N/A',
+                                            'Academic Session'   => optional($student->admission->session)->session_name ?? 'N/A',
+                                        ];
+                                    @endphp
+
+                                    @foreach($details as $label => $value)
+                                        <div class="col-md-6 mb-3">
+                                            <strong class="text-muted">{{ $label }}:</strong>
+                                            <div>{{ $value }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
