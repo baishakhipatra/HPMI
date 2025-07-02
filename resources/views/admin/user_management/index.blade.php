@@ -3,7 +3,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'User - List')
+@section('title', 'Employee - List')
 
 @section('content')
 

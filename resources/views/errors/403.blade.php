@@ -1,6 +1,6 @@
 @extends('layouts/blankLayout')
 
-@section('title', 'Error - Pages')
+@section('title', 'Access Denied')
 
 @section('page-style')
 <!-- Page -->
@@ -18,7 +18,7 @@
     <img src="{{ asset('assets/img/illustrations/tree-3.png') }}" alt="misc-tree" class="img-fluid misc-object d-none d-lg-inline-block">
     <img src="{{ asset('assets/img/illustrations/misc-mask-light.png') }}" alt="misc-error" class="misc-bg d-none d-lg-inline-block z-n1" height="172">
     <div class="d-flex flex-column align-items-center">
-      <img src="{{ asset('assets/img/illustrations/403.png') }}" alt="misc-error" class="misc-model img-fluid z-1" width="780">
+      {{-- <img src="{{ asset('assets/img/illustrations/403.png') }}" alt="misc-error" class="misc-model img-fluid z-1" width="780"> --}}
       {{-- Optional Back Button --}}
       {{-- <div>
         <a href="{{ url('/') }}" class="btn btn-primary text-center my-6">Back to Home</a>

@@ -13,13 +13,20 @@ class StudentListController extends Controller
    
     public function index(Request $request) 
     {
+        $admin = auth()->guard('admin')->user();
         $keyword = $request->input('keyword');
 
-        $query = Student::with('admission.session');
-
-        $query->when($keyword, function ($q) use ($keyword) {
-            $q->where(function($subQuery) use ($keyword) {
-                $subQuery->where('student_name', 'like', '%'. $keyword . '%')
+        // Start a base query
+        $query = Student::with('admission.session')
+            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($admin) {
+                $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+                $q->whereHas('admission', function($q) use ($assignedClassIds) {
+                    $q->whereIn('class_id', $assignedClassIds);
+                });
+            })
+            ->when($keyword, function ($q) use ($keyword) {
+                $q->where(function($subQuery) use ($keyword) {
+                    $subQuery->where('student_name', 'like', '%'. $keyword . '%')
                         ->orWhere('student_id', 'like', '%'. $keyword . '%')
                         ->orWhere('gender', 'like', '%'. $keyword . '%')
                         ->orWhere('parent_name', 'like', '%'. $keyword . '%')
@@ -32,11 +39,9 @@ class StudentListController extends Controller
                         ->orWhere('email', 'like', '%'. $keyword . '%')
                         ->orWhere('phone_number', 'like', '%'. $keyword . '%')
                         ->orWhere('address', 'like', '%'. $keyword . '%');
+                });
             });
-            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
-            // });
-        });
+
 
         $students = $query->latest('id')->paginate(10);
 
@@ -434,31 +439,35 @@ class StudentListController extends Controller
     {
         $keyword = $request->input('keyword');
 
-        $query = Student::query();
+        $admin = auth()->guard('admin')->user();
 
-        // Search by keyword in multiple fields
-        if (!empty($keyword)) {
-            $query->where(function ($q) use ($keyword) {
-                $q->where('student_name', 'like', '%' . $keyword . '%')
-                    ->orWhere('student_id', 'like', '%'. $keyword . '%')
-                    ->orWhere('gender', 'like', '%'. $keyword . '%')
-                    ->orWhere('parent_name', 'like', '%'. $keyword . '%')
-                    ->orWhere('father_name', 'like', '%'. $keyword . '%')
-                    ->orWhere('mother_name', 'like', '%'. $keyword . '%')
-                    ->orWhere('aadhar_no', 'like', '%'. $keyword . '%')
-                    ->orWhere('blood_group', 'like', '%'. $keyword . '%')
-                    ->orWhere('height', 'like', '%'. $keyword . '%')
-                    ->orWhere('weight', 'like', '%'. $keyword . '%')
-                    ->orWhere('email', 'like', '%'. $keyword . '%')
-                    ->orWhere('phone_number', 'like', '%'. $keyword . '%')
-                    ->orWhere('address', 'like', '%'. $keyword . '%');             
-             });
-            // ->orWhereHas('session', function ($sessionQuery) use ($keyword) {
-            //     $sessionQuery->where('session_name', 'like', '%'. $keyword . '%');
-            // });
-        }
+        $query = Student::with(['admission.academicsession'])
+            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($admin) {
+                $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+                $q->whereHas('admission', function ($q) use ($assignedClassIds) {
+                    $q->whereIn('class_id', $assignedClassIds);
+                });
+            })
+            ->when($keyword, function ($q) use ($keyword) {
+                $q->where(function($subQuery) use ($keyword) {
+                    $subQuery->where('student_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('student_id', 'like', '%' . $keyword . '%')
+                        ->orWhere('gender', 'like', '%' . $keyword . '%')
+                        ->orWhere('parent_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('father_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('mother_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('aadhar_no', 'like', '%' . $keyword . '%')
+                        ->orWhere('blood_group', 'like', '%' . $keyword . '%')
+                        ->orWhere('height', 'like', '%' . $keyword . '%')
+                        ->orWhere('weight', 'like', '%' . $keyword . '%')
+                        ->orWhere('email', 'like', '%' . $keyword . '%')
+                        ->orWhere('phone_number', 'like', '%' . $keyword . '%')
+                        ->orWhere('address', 'like', '%' . $keyword . '%');
+                });
+            });
 
-        $students = $query->with(['admission.academicsession'])->latest()->get();
+        $students = $query->latest()->get();
+
 
         if ($students->count() > 0) {
             $delimiter = ",";

@@ -6,7 +6,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Marks - List')
+@section('title', 'Student - Marks - List')
 
 @section('content')
     <style>

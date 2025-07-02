@@ -4,7 +4,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Student - List')
+@section('title', 'Classwise - comparison')
 
 @section('content')
 

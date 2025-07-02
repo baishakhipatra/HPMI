@@ -36,4 +36,15 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(TeacherSubject::class, 'teacher_id');
     }
+    public function designationData(){
+        return $this->belongsTo(Designation::class,'designation_id', 'id');
+    }
+    public function hasPermissionByRoute($route)
+    {
+        if (!$this->designationData) {
+            return false; // Ensure user has a designation
+        }
+
+        return $this->designationData->permissions()->where('route', $route)->exists();
+    }
 }

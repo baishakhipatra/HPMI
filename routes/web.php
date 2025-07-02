@@ -145,28 +145,28 @@ Route::prefix('admin')->group(function () {
 
         //usermanagement/userlist
         Route::prefix('employees/')->group(function() {
-            Route::get('/', [UserListController::class, 'index'])->name('admin.employee.index');
-            Route::get('/create', [UserListController::class, 'create'])->name('admin.employee.create');
+            Route::get('/', [UserListController::class, 'index'])->name('admin.employee.index')->middleware('check.permission');
+            Route::get('/create', [UserListController::class, 'create'])->name('admin.employee.create')->middleware('check.permission');
             Route::post('/store', [UserListController::class, 'store'])->name('admin.employee.store');
-            Route::get('/show/{id}', [UserListController::class, 'show'])->name('admin.employee.show');
-            Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.employee.edit');
+            Route::get('/show/{id}', [UserListController::class, 'show'])->name('admin.employee.show')->middleware('check.permission');
+            Route::get('/edit/{id}', [UserListController::class, 'edit'])->name('admin.employee.edit')->middleware('check.permission');
             Route::post('/update', [UserListController::class, 'update'])->name('admin.employee.update');
             Route::get('/status/{id}', [UserListController::class, 'status'])->name('admin.employee.status');
-            Route::post('/delete', [UserListController::class, 'delete'])->name('admin.employee.delete');
-            Route::get('/export', [UserListController::class, 'export'])->name('admin.employee.export');
+            Route::post('/delete', [UserListController::class, 'delete'])->name('admin.employee.delete')->middleware('check.permission');
+            Route::get('/export', [UserListController::class, 'export'])->name('admin.employee.export')->middleware('check.permission');
         });
 
         //teachermanagement/teacherlist
         Route::prefix('teachers/')->group(function() {
-            Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacher.index');
-            Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacher.create');
+            Route::get('/', [TeacherListController::class, 'index'])->name('admin.teacher.index')->middleware('check.permission');
+            Route::get('/create', [TeacherListController::class, 'create'])->name('admin.teacher.create')->middleware('check.permission');
             Route::post('/store', [TeacherListController::class, 'store'])->name('admin.teacher.store');
-            Route::get('/show/{id}', [TeacherListController::class, 'show'])->name('admin.teacher.show');
-            Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacher.edit');
+            Route::get('/show/{id}', [TeacherListController::class, 'show'])->name('admin.teacher.show')->middleware('check.permission');
+            Route::get('/edit/{id}', [TeacherListController::class, 'edit'])->name('admin.teacher.edit')->middleware('check.permission');
             Route::post('/update', [TeacherListController::class, 'update'])->name('admin.teacher.update');
             Route::get('/status/{id}', [TeacherListController::class, 'status'])->name('admin.teacher.status');
-            Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete');
-            Route::get('/export', [TeacherListController::class, 'export'])->name('admin.teacher.export');
+            Route::post('/delete', [TeacherListController::class, 'delete'])->name('admin.teacher.delete')->middleware('check.permission');
+            Route::get('/export', [TeacherListController::class, 'export'])->name('admin.teacher.export')->middleware('check.permission');
 
             //get class and subject
             Route::post('/get-subject-by-class', [TeacherListController::class, 'getSubjectsByClass'])->name('admin.getSubjectsByClass');
@@ -174,16 +174,16 @@ Route::prefix('admin')->group(function () {
 
         Route::prefix('student-management')->group(function(){
             Route::prefix('student-list')->group(function(){
-                Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist');
-                Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate');
+                Route::get('/', [StudentListController::class, 'index'])->name('admin.studentlist')->middleware('check.permission');
+                Route::get('/create', [StudentListController::class, 'create'])->name('admin.studentcreate')->middleware('check.permission');
                 Route::post('/store', [StudentListController::class, 'store'])->name('admin.studentstore');
-                Route::get('/show/{id}', [StudentListController::class, 'show'])->name('admin.student.show');
-                Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit');
+                Route::get('/show/{id}', [StudentListController::class, 'show'])->name('admin.student.show')->middleware('check.permission');
+                Route::get('/edit/{id}', [StudentListController::class, 'edit'])->name('admin.studentedit')->middleware('check.permission');
                 Route::post('/update/{id}', [StudentListController::class, 'update'])->name('admin.studentupdate');
                 Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
                 Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
-                Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
-                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
+                Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete')->middleware('check.permission');
+                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export')->middleware('check.permission');
             });
 
             // Route::prefix('admission-history')->group(function(){
@@ -195,32 +195,32 @@ Route::prefix('admin')->group(function () {
 
 
             Route::prefix('readmission')->group(function () {
-                Route::get('/', [StudentReadmissionController::class, 'index'])->name('admin.student.readmission.index');
+                Route::get('/', [StudentReadmissionController::class, 'index'])->name('admin.student.readmission.index')->middleware('check.permission');
                 Route::get('/history', [StudentReadmissionController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
                 Route::post('/update', [StudentReadmissionController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
                 Route::get('/form/{id}', [StudentReadmissionController::class, 'reAdmissionForm'])->name('admin.student.readmission');
-                Route::post('/store/{id}', [StudentReadmissionController::class, 'reAdmissionStore'])->name('admin.student.readmission.store');
+                Route::post('/store/{id}', [StudentReadmissionController::class, 'reAdmissionStore'])->name('admin.student.readmission.store')->middleware('check.permission');
             });
 
             Route::prefix('student-progress-marking')->group(function(){
-                Route::get('/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist');
+                Route::get('/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist')->middleware('check.permission');
                 Route::post('/progress-update-phase', [StudentListController::class, 'ProgressUpdatePhase'])->name('admin.student.progress.update.phase');
             });
 
             Route::prefix('studentmark-list')->group(function(){
-                Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist');
+                Route::get('/', [StudentMarkListController::class, 'index'])->name('admin.studentmarklist')->middleware('check.permission');
                 Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
                 Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
                 Route::get('/student-marks/edit-data/{id}', [StudentMarkListController::class, 'getEditData'])->name('admin.student-marks.getData');
-                Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
-                Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
-                Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete');
-                Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
+                Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store')->middleware('check.permission');
+                Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update')->middleware('check.permission');
+                Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete')->middleware('check.permission');
+                Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export')->middleware('check.permission');
             });
 
 
             Route::prefix('class-wise-comparison')->group(function() {
-                Route::get('/{student_id}', [ClassComparisonController::class, 'index'])->name('admin.student.classcompare');
+                Route::get('/{student_id}', [ClassComparisonController::class, 'index'])->name('admin.student.classcompare')->middleware('check.permission');
                 Route::post('/get-class-by-session', [ClassComparisonController::class, 'getClassBySession'])->name('admin.student.getClass');
                 Route::post('/get-subjects-by-class', [ClassComparisonController::class, 'getSubjectsByClass'])->name('admin.student.getSubjects');
                 Route::post('/compare-marks', [ClassComparisonController::class, 'compareMarks'])->name('admin.student.comparemarks');
@@ -232,50 +232,51 @@ Route::prefix('admin')->group(function () {
         //Master module
         Route::prefix('master-module')->group(function(){
             Route::prefix('class-list')->group(function(){
-                Route::get('/', [ClassListController::class, 'index'])->name('admin.classlist');
-                Route::get('/create', [ClassListController::class, 'create'])->name('admin.classcreate');
+                Route::get('/', [ClassListController::class, 'index'])->name('admin.classlist')->middleware('check.permission');
+                Route::get('/create', [ClassListController::class, 'create'])->name('admin.classcreate')->middleware('check.permission');
                 Route::post('/store', [ClassListController::class, 'store'])->name('admin.classstore');
-                Route::get('/edit/{id}', [ClassListController::class, 'edit'])->name('admin.classedit');
+                Route::get('/edit/{id}', [ClassListController::class, 'edit'])->name('admin.classedit')->middleware('check.permission');
                 Route::post('/update/{id}', [ClassListController::class, 'update'])->name('admin.classupdate');
                 Route::get('/status/{id}', [ClassListController::class, 'status'])->name('admin.classstatus');
-                Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete');
+                Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete')->middleware('check.permission');
 
                 //classwise subject
-                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects');
-                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign');
-                Route::post('/subjects/delete', [ClassListController::class, 'deleteSubjectToclass'])->name('admin.class.subjects.delete');
+                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects')->middleware('check.permission');
+                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign')->middleware('check.permission');
+                Route::post('/subjects/delete', [ClassListController::class, 'deleteSubjectToclass'])->name('admin.class.subjects.delete')->middleware('check.permission');
             });
         
             Route::prefix('subject-list')->group(function(){
-                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index');               
-                Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create');
+                Route::get('/', [SubjectListController::class, 'index'])->name('admin.subjectlist.index')->middleware('check.permission');               
+                Route::get('/create', [SubjectListController::class, 'create'])->name('admin.subjectlist.create')->middleware('check.permission');
                 Route::post('/store', [SubjectListController::class, 'store'])->name('admin.subjectlist.store');
-                Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update');
+                Route::post('/update', [SubjectListController::class, 'update'])->name('admin.subjectlist.update')->middleware('check.permission');
                 Route::get('/status/{id}', [SubjectListController::class, 'status'])->name('admin.subjectlist.status');
-                Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete');
+                Route::post('/delete', [SubjectListController::class, 'delete'])->name('admin.subjectlist.delete')->middleware('check.permission');
             });
 
             Route::prefix('progress-marking-categories')->group(function(){
-                Route::get('/', [StudentProgressMarkingController::class, 'studentProgress'])->name('admin.student.progresslist');
-                Route::post('/store', [StudentProgressMarkingController::class, 'studentProgressStore'])->name('admin.student.progressstore');
-                Route::post('/update/{id}', [StudentProgressMarkingController::class, 'studentProgressUpdate'])->name('admin.student.progressupdate');
+                Route::get('/', [StudentProgressMarkingController::class, 'studentProgress'])->name('admin.student.progresslist')->middleware('check.permission');
+                Route::post('/store', [StudentProgressMarkingController::class, 'studentProgressStore'])->name('admin.student.progressstore')->middleware('check.permission');
+                Route::post('/update/{id}', [StudentProgressMarkingController::class, 'studentProgressUpdate'])->name('admin.student.progressupdate')->middleware('check.permission');
                 Route::get('/status/{id}', [StudentProgressMarkingController::class, 'studentProgressStatusToggle'])->name('admin.student.progressstatus');
-                Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete');
+                Route::post('/delete', [StudentProgressMarkingController::class, 'studentProgressDelete'])->name('admin.student.progressdelete')->middleware('check.permission');
                
             });
 
             Route::prefix('progress-chart')->group(function(){
-                Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart');
+                Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart')->middleware('check.permission');
                 Route::get('get-students-by-session', [ProgressChartController::class, 'getStudentsBySession'])->name('admin.getStudentsBySession');
                 Route::get('get-class-subject-by-student', [ProgressChartController::class, 'getClassBySessionAndStudent'])->name('admin.getClassBySessionAndStudent');
                 Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
             });
 
             Route::prefix('designations')->group(function(){
-                Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list');
+                Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list')->middleware('check.permission');
                 Route::get('/status/{id}', [DesignationController::class, 'status'])->name('admin.designation.status');
                 Route::get('/permissions/{id}', [DesignationController::class, 'permissions'])->name('admin.designation.permissions');
-                Route::post('/permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');
+                Route::post('/update-permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');
+                Route::post('/permission-ajax', [DesignationController::class, 'updatePermissionAjax'])->name('admin.designation.permissions.ajax');
             });
         });
 

@@ -5,7 +5,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Teacher - List')
+@section('title', 'Classwise - Subject - List')
 
 @section('content')
 
@@ -30,38 +30,7 @@
     <div class="row">
         {{-- Subjects List --}}
         <div class="col-md-8">
-            {{-- <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Class: {{$classData->class}}</h5>
-                    <a href="{{ route('admin.classlist') }}" class="btn btn-sm btn-danger">
-                        <i class="ri-arrow-left-line"></i> Back
-                    </a>
-                </div>
-                <div class="px-3 py-2">
-                <form method="GET" action="">
-                    <div class="row">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="d-flex justify-content-end">
-                                <div class="form-group me-2 mb-0">
-                                    <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" 
-                                        value="{{ request()->input('keyword') }}" placeholder="Search something...">
-                                </div>
-                                <div class="form-group mb-0">
-                                    <div class="btn-group">
-                                        <button type="submit" class="btn btn-sm btn-primary">
-                                            <i class="ri-filter-3-line"></i>
-                                        </button>
-                                        <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
-                                            <i class="ri-close-line"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div> --}}
+           
             <div class="card">
                 <div class="card-header">
                     <div class="row w-100 align-items-center">

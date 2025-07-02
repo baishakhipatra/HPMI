@@ -3,6 +3,8 @@
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin;
+use App\Models\Permission;
+use App\Models\DesignationPermission;
 
 // if(!function_exists('generateEmployeeId')) {
 //     function generateEmployeeId() {
@@ -71,4 +73,36 @@ function calculateGrade($total)
     if($total >= 60) return 'B';
     if($total >= 50) return 'C';
     return 'F';
+}
+
+if(!function_exists('hasPermissionByParent')){
+    function hasPermissionByParent($parentName){
+        // Ensure designation is loaded
+        $user = Auth::guard('admin')->user();
+        if (!$user || !$user->designationData) {
+            return false;
+        }
+        $permission_id = Permission::where('parent_name', $parentName)->value('id');
+        if($permission_id){
+            return DesignationPermission::where('permission_id', $permission_id)->where('designation_id', $user->designationData->id)->exists();
+        }else{
+            return false;
+        }
+    }
+}
+
+if(!function_exists('hasPermissionByChild')){
+    function hasPermissionByChild($childName){
+        // Ensure designation is loaded
+        $user = Auth::guard('admin')->user();
+        if (!$user || !$user->designationData) {
+            return false;
+        }
+        $permission_id = Permission::where('name', $childName)->value('id');
+        if($permission_id){
+            return DesignationPermission::where('permission_id', $permission_id)->where('designation_id', $user->designationData->id)->exists();
+        }else{
+            return false;
+        }
+    }
 }

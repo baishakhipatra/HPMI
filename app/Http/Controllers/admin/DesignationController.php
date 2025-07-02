@@ -55,4 +55,27 @@ class DesignationController extends Controller
         return redirect()->route('admin.designation.list')->with('success', 'Permissions updated successfully.');
     }
 
+    public function updatePermissionAjax(Request $request) {
+        //dd($request->all());
+        $request->validate([
+            'designation_id' => 'required|exists:designations,id',
+            'permission_id' => 'required|exists:permissions,id',
+            'checked' => 'required|boolean',
+        ]);
+
+        $designation = Designation::findOrFail($request->designation_id);
+        $permissionId = $request->permission_id;
+
+        if($request->checked) {
+            // Add permission if not already attached
+            $designation->permissions()->syncWithoutDetaching([$permissionId]);
+        } else{
+             // Remove permission
+             $designation->permissions()->detach([$permissionId]);
+        }
+
+        return response()->json(['success' => true]);
+
+    }
+
 }

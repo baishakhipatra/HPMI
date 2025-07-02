@@ -74,6 +74,10 @@ class UserListController extends Controller
                     $validator->errors()->add('date_of_birth', 'Date of Birth cannot be later than Date of Joining.');
                 }
             }
+
+            if ($request->date_of_birth && $request->date_of_birth > now()->toDateString()) {
+                $validator->errors()->add('date_of_birth', 'Date of Birth cannot be in the future.');
+            }
         });
 
         //If validation fails

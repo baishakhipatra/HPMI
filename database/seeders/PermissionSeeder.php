@@ -81,11 +81,5 @@ class PermissionSeeder extends Seeder
             );
         }
 
-        //Assign all permissions to Admin
-        $adminDesignation = Designation::find(3);
-        if($adminDesignation) {
-            $allPermissionIds = Permission::pluck('id');
-            $adminDesignation->permissions()->sync($allPermissionIds);
-        }
     }
 }

@@ -20,4 +20,9 @@ class TeacherClass extends Model
     public function classList() {
         return $this->belongsTo(ClassList::class, 'class_id');
     }
+
+    public function teacher()
+    {
+        return $this->belongsTo(Admin::class, 'teacher_id');
+    }
 }

@@ -26,97 +26,133 @@
       </a>
     </li>
     
-    {{-- @auth('admin')
-      @if(auth('admin')->user()->user_type == 'Admin') --}}
-        <li class="menu-item {{ (request()->is('admin/employees*')) ? 'open' : '' }}" style="">
-          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-briefcase-line"></i>
-            <div>Employee Management</div>
+    {{-- Employee Management --}}
+    @if (hasPermissionByParent('employee_management'))
+    <li class="menu-item {{ (request()->is('admin/employees*')) ? 'open' : '' }}" style="">
+      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+        <i class="menu-icon tf-icons ri-briefcase-line"></i>
+        <div>Employee Management</div>
+      </a>
+      <ul class="menu-sub">
+        @if (hasPermissionByChild('employee_list'))
+        <li class="menu-item {{ (request()->is('admin/employees')) ? 'open' : '' }}">
+          <a href="{{route('admin.employee.index')}}" class="menu-link">
+            <div>Employee List</div>
           </a>
-          <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/employees')) ? 'open' : '' }}">
-              <a href="{{route('admin.employee.index')}}" class="menu-link">
-                <div>Employee List</div>
-              </a>
-            </li>
-          </ul>
         </li>
-        <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}" style="">
-          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-presentation-fill"></i>
-            <div>Teacher Management</div>
-          </a>
-          <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}">
-              <a href="{{route('admin.teacher.index')}}" class="menu-link">
-                <div>Teacher List</div>
-              </a>
-            </li>
-          </ul>
-        </li>
+        @endif
+      </ul>
+    </li>
+    @endif
 
-        <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
-          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
-            <div>Student Management</div>
+    {{-- Teacher Management --}}
+    @if (hasPermissionByParent('teacher_management'))
+    <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}" style="">
+      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+        <i class="menu-icon tf-icons ri-presentation-fill"></i>
+        <div>Teacher Management</div>
+      </a>
+      <ul class="menu-sub">
+        @if (hasPermissionByChild('teacher_list'))
+        <li class="menu-item {{ (request()->is('admin/teachers*')) ? 'open' : '' }}">
+          <a href="{{route('admin.teacher.index')}}" class="menu-link">
+            <div>Teacher List</div>
           </a>
-          <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.studentlist')}}" class="menu-link">
-                <div>Student List</div>
-              </a>
-            </li>
-            <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
-              <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
-                <div>Student Re-admission</div>
-              </a>
-            </li>
-
-            @if($exist_student)
-              <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
-                <a href="{{route('admin.studentmarklist')}}" class="menu-link">
-                  <div>Student Marks</div>
-                </a>
-              </li>
-            @endif
-          </ul>
         </li>
+        @endif
+      </ul>
+    </li>
+    @endif
 
-        <li class="menu-item {{ (request()->is('admin/master-module*')) ? 'open' : '' }}" style="">
-          <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-            <i class="menu-icon tf-icons ri-database-2-line"></i>
-            <div>Master Module</div>
+
+    {{-- Student Management --}}
+    @if (hasPermissionByParent('student_management'))
+    <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
+      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+        <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
+        <div>Student Management</div>
+      </a>
+      <ul class="menu-sub">
+        @if (hasPermissionByChild('student_list'))
+        <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
+          <a href="{{route('admin.studentlist')}}" class="menu-link">
+            <div>Student List</div>
           </a>
-          <ul class="menu-sub">
-            <li class="menu-item {{ (request()->is('admin/master-module/subject-list')) ? 'open' : '' }}">
-              <a href="{{route('admin.subjectlist.index')}}" class="menu-link">
-                <div>Subject List</div>
-              </a>
-            </li>
-            <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.classlist')}}" class="menu-link">
-                <div>Class List</div>
-              </a>
-            </li>
-            <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
-              <a href="{{route('admin.student.progresslist')}}" class="menu-link">
-                <div>Progress Marking Category</div>
-              </a>
-            </li>
-            <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
-              <a href="{{route('admin.progresschart')}}" class="menu-link">
-                <div>Progress Chart</div>
-              </a>
-            </li>
-            <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
-              <a href="{{route('admin.designation.list')}}" class="menu-link">
-                <div>Designations</div>
-              </a>
-            </li>
-          </ul>
         </li>
-      {{-- @endif
-    @endauth --}}
+        @endif
+
+        @if (hasPermissionByChild('student_readmision_list'))
+        <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
+          <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
+            <div>Student Re-admission</div>
+          </a>
+        </li>
+        @endif
+
+        @if (hasPermissionByChild('student_mark_list'))
+          @if($exist_student)
+            <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
+              <a href="{{route('admin.studentmarklist')}}" class="menu-link">
+                <div>Student Marks</div>
+              </a>
+            </li>
+          @endif
+        @endif
+      </ul>
+    </li>
+    @endif
+
+    {{-- Master Management --}}
+    @if (hasPermissionByParent('master_management'))
+    <li class="menu-item {{ (request()->is('admin/master-module*')) ? 'open' : '' }}" style="">
+      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+        <i class="menu-icon tf-icons ri-database-2-line"></i>
+        <div>Master Module</div>
+      </a>
+      <ul class="menu-sub">
+        @if (hasPermissionByChild('subject_list'))
+        <li class="menu-item {{ (request()->is('admin/master-module/subject-list')) ? 'open' : '' }}">
+          <a href="{{route('admin.subjectlist.index')}}" class="menu-link">
+            <div>Subject List</div>
+          </a>
+        </li>
+        @endif
+
+        @if (hasPermissionByChild('class_list'))
+        <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
+          <a href="{{route('admin.classlist')}}" class="menu-link">
+            <div>Class List</div>
+          </a>
+        </li>
+        @endif
+
+        @if (hasPermissionByChild('progress_marking_list'))
+        <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
+          <a href="{{route('admin.student.progresslist')}}" class="menu-link">
+            <div>Progress Marking Category</div>
+          </a>
+        </li>
+        @endif
+
+        @if (hasPermissionByChild('progress_chart'))
+        <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
+          <a href="{{route('admin.progresschart')}}" class="menu-link">
+            <div>Progress Chart</div>
+          </a>
+        </li>
+        @endif
+
+        @if (hasPermissionByChild('designations'))
+        <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
+          <a href="{{route('admin.designation.list')}}" class="menu-link">
+            <div>Designations</div>
+          </a>
+        </li>
+        @endif
+      </ul>
+    </li>
+    @endif
+    
     <li class="menu-item">
       <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

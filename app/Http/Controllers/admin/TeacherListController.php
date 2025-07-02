@@ -60,7 +60,7 @@ class TeacherListController extends Controller
             'qualifications'     => 'nullable|string|max:255',
             'address'            => 'nullable|string',
             'subjects_taught'    => 'nullable|array',
-            'subjects_taught.*'  => 'nullable|exists:class_wise_subjects,id',
+            'subjects_taught.*'  => 'exists:class_wise_subjects,id',
             'classes_assigned'   => 'nullable|array',
             'classes_assigned.*' => 'nullable|exists:class_lists,id',
             'password'           => 'required|string|min:6',
@@ -71,6 +71,10 @@ class TeacherListController extends Controller
                 if ($request->date_of_birth >= $request->date_of_joining) {
                     $validator->errors()->add('date_of_birth', 'Date of Birth must be earlier than Date of Joining.');
                 }
+            }
+
+            if ($request->date_of_birth && $request->date_of_birth > now()->toDateString()) {
+                $validator->errors()->add('date_of_birth', 'Date of Birth cannot be in the future.');
             }
         });
         // Return with errors if any
@@ -95,21 +99,25 @@ class TeacherListController extends Controller
         ]);
         // dd($request->all());
         //  Save class associations
-        if (count($request->subjects_taught) > 0) {
-
+        if (!empty($request->subjects_taught) && count($request->subjects_taught) > 0) {
             foreach ($request->subjects_taught as $classWiseSubjectId) {
-                $getsubject = ClassWiseSubject::select(['class_id', 'subject_id'])->where('id', $classWiseSubjectId)->first();
-                TeacherClass::create([
-                    'teacher_id' => $teacher->id,
-                    'class_id'   => $getsubject->class_id,
-                ]);
-                TeacherSubject::create([
-                    'teacher_id' => $teacher->id,
-                    'subject_id' => $getsubject->subject_id,
-                    'class_id'   => $getsubject->class_id,
-                ]);
+                $getsubject = ClassWiseSubject::select(['class_id', 'subject_id'])->find($classWiseSubjectId);
+
+                if ($getsubject) {
+                    TeacherClass::create([
+                        'teacher_id' => $teacher->id,
+                        'class_id'   => $getsubject->class_id,
+                    ]);
+                    TeacherSubject::create([
+                        'teacher_id' => $teacher->id,
+                        'subject_id' => $getsubject->subject_id,
+                        'class_id'   => $getsubject->class_id,
+                    ]);
+                }
             }
         }
+        //dd($request->all());
+
 
         return redirect()->route('admin.teacher.index')->with('success', 'Teacher created successfully');
     }
