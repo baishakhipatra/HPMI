@@ -66,7 +66,7 @@
                                 <th>Class</th>
                                 <th>Section</th>
                                 <th>Roll No</th>
-                                <th>Admission Date</th>
+                                <th>Admission Date</th> 
                             </tr>
                         </thead>
                         <tbody>
@@ -77,7 +77,7 @@
                                     <td>{{ ucwords($history->section) }}</td>
                                     <td>{{ $history->roll_number }}</td>
                                     <td>{{date('d-m-Y',strtotime($history->admission_date))}}</td>
-                                   
+
                                 </tr>
                             @endforeach
                         </tbody>
