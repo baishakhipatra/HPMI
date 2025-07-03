@@ -22,8 +22,8 @@
                 <div class="card shadow-sm rounded-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">My Profile</h4>
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-sm btn-primary">
-                            <i class="fa fa-arrow-left"></i> Back
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-danger">
+                            <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
                         </a>
                     </div>
 

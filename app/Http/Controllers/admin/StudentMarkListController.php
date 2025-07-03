@@ -7,46 +7,120 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark, AcademicSession};
+use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark, AcademicSession, TeacherClass};
 
 class StudentMarkListController extends Controller
 {
     
 
-    public function index(Request $request)
+    // public function index(Request $request)
+    // {
+    //     $sessions = StudentAdmission::with('session')
+    //         ->select('session_id')
+    //         ->distinct()
+    //         ->get();
+
+    //     $classes = ClassList::with('sections')->get();
+    //     $subjects = Subject::all();
+    //     $academicSessions = AcademicSession::all();
+
+    //     $classOptions = $classes->map(function($class){
+    //         $sections = $class->sections->pluck('section')->toArray();
+    //         $sectionList = implode(', ', $sections);
+    //         return [
+    //             'id' => $class->id,
+    //             'name' => $class->class
+    //         ];
+    //     });
+
+    //     $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
+
+    //     if($request->filled('student_name')) {
+    //         $query->whereHas('student', function ($q) use ($request) {
+    //             $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
+    //         });
+    //     }
+
+    //     if($request->filled('class_filter')){
+    //         $query->where('class_id', $request->class_filter);
+    //     }
+
+    //     if($request->filled('subject_filter')){
+    //         $query->where('subject_id', $request->subject_filter);
+    //     }
+
+    //     if ($request->filled('session_filter')) {
+    //         $query->whereHas('studentAdmission', function ($q) use ($request) {
+    //             $q->where('session_id', $request->session_filter);
+    //         });
+    //     }
+
+    //     $marks = $query->paginate(10);
+
+    //     $groupedMarks = $marks->getCollection()
+    //     ->filter(function ($item) {
+    //         return $item->studentAdmission !== null;
+    //     })
+    //     ->groupBy(function($item) {
+    //         return $item->studentAdmission->student_id . '_' .
+    //             $item->studentAdmission->session_id . '_' .
+    //             $item->studentAdmission->class_id;
+    //     });
+
+        
+    //     $marks->setCollection(collect());
+
+    //     return view('admin.student_marks.index', compact('classes', 'subjects', 'classOptions', 'sessions',
+    //         'marks', 'groupedMarks', 'academicSessions'
+    //     ));
+    // }
+    public function index(Request $request) 
     {
+        $admin = auth()->guard('admin')->user();
+
         $sessions = StudentAdmission::with('session')
             ->select('session_id')
             ->distinct()
             ->get();
 
-        $classes = ClassList::with('sections')->get();
+        $classes = ClassList::with('sections')
+            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($admin) {
+                $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+                $q->whereIn('id', $assignedClassIds);
+            })
+            ->get();
+
         $subjects = Subject::all();
         $academicSessions = AcademicSession::all();
 
-        $classOptions = $classes->map(function($class){
-            $sections = $class->sections->pluck('section')->toArray();
-            $sectionList = implode(', ', $sections);
+        $classOptions = $classes->map(function ($class) {
             return [
                 'id' => $class->id,
                 'name' => $class->class
             ];
         });
 
+        // Build base marks query
         $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
 
-        if($request->filled('student_name')) {
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            $query->whereIn('class_id', $assignedClassIds);
+        }
+
+        if ($request->filled('student_name')) {
             $query->whereHas('student', function ($q) use ($request) {
                 $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
             });
         }
 
-        if($request->filled('class_filter')){
+        if ($request->filled('class_filter')) {
             $query->where('class_id', $request->class_filter);
         }
 
-        if($request->filled('subject_filter')){
+        if ($request->filled('subject_filter')) {
             $query->where('subject_id', $request->subject_filter);
         }
 
@@ -59,56 +133,101 @@ class StudentMarkListController extends Controller
         $marks = $query->paginate(10);
 
         $groupedMarks = $marks->getCollection()
-        ->filter(function ($item) {
-            return $item->studentAdmission !== null;
-        })
-        ->groupBy(function($item) {
-            return $item->studentAdmission->student_id . '_' .
+            ->filter(fn ($item) => $item->studentAdmission !== null)
+            ->groupBy(fn ($item) => 
+                $item->studentAdmission->student_id . '_' .
                 $item->studentAdmission->session_id . '_' .
-                $item->studentAdmission->class_id;
-        });
+                $item->studentAdmission->class_id
+            );
 
-        
         $marks->setCollection(collect());
 
-        return view('admin.student_marks.index', compact('classes', 'subjects', 'classOptions', 'sessions',
-            'marks', 'groupedMarks', 'academicSessions'
+        return view('admin.student_marks.index', compact(
+            'classes', 'subjects', 'classOptions', 'sessions', 'marks', 'groupedMarks', 'academicSessions'
         ));
     }
 
 
+    // public function getStudentsBySession(Request $request)
+    // {
+    //     $sessionId = $request->sessionId;
+
+    //     $admissions = StudentAdmission::with('student')
+    //                     ->where('session_id', $sessionId)
+    //                     ->whereHas('student')
+    //                     ->get();
+
+    //     $students = $admissions->map(function ($admission) {
+    //         return [
+    //             'id' => ucwords($admission->student->id),
+    //             'name' => ucwords($admission->student->student_name),
+    //         ];
+    //     });
+
+       
+    //     return response()->json([
+    //         'success' => true,
+    //         'students' => $students,
+    //     ]);
+    // }
+
     public function getStudentsBySession(Request $request)
     {
         $sessionId = $request->sessionId;
+        $admin = auth()->guard('admin')->user();
+        $assignedClassIds = [];
 
+        // If the logged-in user is a teacher, get their assigned classes
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+        }
+
+        // Fetch student admissions, filtered by session and (if teacher) by assigned class
         $admissions = StudentAdmission::with('student')
-                        ->where('session_id', $sessionId)
-                        ->whereHas('student')
-                        ->get();
+            ->where('session_id', $sessionId)
+            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($assignedClassIds) {
+                $q->whereIn('class_id', $assignedClassIds);
+            })
+            ->whereHas('student')
+            ->get();
 
+        // Map students
         $students = $admissions->map(function ($admission) {
             return [
-                'id' => ucwords($admission->student->id),
+                'id' => $admission->student->id,
                 'name' => ucwords($admission->student->student_name),
             ];
         });
 
-       
         return response()->json([
             'success' => true,
             'students' => $students,
         ]);
     }
+
+
     public function getClassBySessionAndStudent(Request $request)
     {
          $session_id = $request->session_id;
          $student_id = $request->student_id;
 
+        // $admissions = StudentAdmission::with('class')
+        //                 ->where('session_id', $session_id)
+        //                 ->where('student_id', $student_id)
+        //                 ->get();
+        $admin = auth()->guard('admin')->user();
+        $assignedClassIds = [];
+
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+        }
         $admissions = StudentAdmission::with('class')
-                        ->where('session_id', $session_id)
-                        ->where('student_id', $student_id)
-                        ->get();
-    
+                ->where('session_id', $session_id)
+                ->where('student_id', $student_id)
+                ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($assignedClassIds) {
+                    $q->whereIn('class_id', $assignedClassIds);
+                })->get();
+                
         if(count($admissions)>0){
             $ClassWiseSubject = ClassWiseSubject::with('subject')
             ->where('class_id', $admissions[0]->class_id)
@@ -140,6 +259,7 @@ class StudentMarkListController extends Controller
             ]);
         }   
     }
+
     public function getEditData($id) {
         try {
             $mark = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission'])
@@ -395,6 +515,7 @@ class StudentMarkListController extends Controller
 
     public function export(Request $request)
     {
+        $admin = auth()->guard('admin')->user();
         $studentName = $request->input('student_name');
         $classId = $request->input('class_filter');
         $subjectId = $request->input('subject_filter');
@@ -408,6 +529,11 @@ class StudentMarkListController extends Controller
             'studentAdmission.academicsession'
         ]);
 
+         // If teacher, restrict to only assigned classes
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            $query->whereIn('class_id', $assignedClassIds);
+        }
 
         if (!empty($studentName)) {
             $query->whereHas('student', function ($q) use ($studentName) {
@@ -435,13 +561,9 @@ class StudentMarkListController extends Controller
             return redirect()->back()->with('error', 'No records found to export.');
         }
 
-
         $allSubjects = $allMarks->pluck('subjectlist.sub_name')->filter()->unique()->map(function ($item) {
             return strtoupper($item);
         })->sort()->values()->toArray();
-
-
-
         
         $grouped = $allMarks->groupBy(function ($item) {
             return $item->student_id;

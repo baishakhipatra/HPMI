@@ -251,6 +251,17 @@
                       </div>
 
 
+                      @php
+                        $admin = auth()->guard('admin')->user();
+                        $assignedClasses = [];
+
+                        if ($admin && $admin->user_type === 'Teacher') {
+                            $assignedClasses = $admin->teacherClasses->pluck('classList'); // Eager load class
+                        } else {
+                            $assignedClasses = $classes; // All classes for admin
+                        }
+                      @endphp
+                      
                       <div class="form-floating form-floating-outline col-md-2">
                         <select name="class_id" id="class_id" class="form-select">
                           <option value="">Select Class</option>

@@ -67,39 +67,39 @@
 
     {{-- Student Management --}}
     @if (hasPermissionByParent('student_management'))
-    <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
-      <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
-        <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
-        <div>Student Management</div>
-      </a>
-      <ul class="menu-sub">
-        @if (hasPermissionByChild('student_list'))
-        <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
-          <a href="{{route('admin.studentlist')}}" class="menu-link">
-            <div>Student List</div>
-          </a>
-        </li>
-        @endif
-
-        @if (hasPermissionByChild('student_readmision_list'))
-        <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
-          <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
-            <div>Student Re-admission</div>
-          </a>
-        </li>
-        @endif
-
-        @if (hasPermissionByChild('student_mark_list'))
-          @if($exist_student)
-            <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
-              <a href="{{route('admin.studentmarklist')}}" class="menu-link">
-                <div>Student Marks</div>
-              </a>
-            </li>
+      <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
+        <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
+          <i class="menu-icon tf-icons ri-graduation-cap-line"></i>
+          <div>Student Management</div>
+        </a>
+        <ul class="menu-sub">
+          @if (hasPermissionByChild('student_list'))
+          <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
+            <a href="{{route('admin.studentlist')}}" class="menu-link">
+              <div>Student List</div>
+            </a>
+          </li>
           @endif
-        @endif
-      </ul>
-    </li>
+
+          @if (hasPermissionByChild('student_readmision_list'))
+          <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
+            <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
+              <div>Student Re-admission</div>
+            </a>
+          </li>
+          @endif
+
+          @if (hasPermissionByChild('student_mark_list'))
+            @if($exist_student)
+              <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
+                <a href="{{route('admin.studentmarklist')}}" class="menu-link">
+                  <div>Student Marks</div>
+                </a>
+              </li>
+            @endif
+          @endif
+        </ul>
+      </li>
     @endif
 
     {{-- Master Management --}}

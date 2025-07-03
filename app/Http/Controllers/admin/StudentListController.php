@@ -163,7 +163,7 @@ class StudentListController extends Controller
         }
     }
 
-   public function show($id)
+    public function show($id)
     {
         $student = Student::with([
             'admission.session',
