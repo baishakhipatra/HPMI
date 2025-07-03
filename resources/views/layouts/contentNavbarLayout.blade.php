@@ -72,16 +72,20 @@ $container = ($container ?? 'container-xxl');
           <script src="{{ asset('build/assets/custom.js') }}"></script>
 
           <!-- Select2 CSS -->
-          <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+          {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+
+          {{-- for icon --}}
+          <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
           <!-- jQuery (required) -->
-          <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+          {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
+
 
           <!-- Select2 JS -->
-          <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+          {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script> --}}
 
           <!-- Stacked scripts from individual views (optional) -->
-          @stack('scripts')
+          @yield('scripts')
           <div class="content-backdrop fade"></div>
         </div>
         <!--/ Content wrapper -->

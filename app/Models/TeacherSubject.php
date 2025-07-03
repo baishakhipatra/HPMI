@@ -19,7 +19,7 @@ class TeacherSubject extends Model
      * Get the class associated with this mapping.
      */
     public function subjectList() {
-        return $this->belongsTo(subject::class, 'subject_id');
+        return $this->belongsTo(Subject::class, 'subject_id');
     }
 
     public function classList() {
