@@ -273,6 +273,8 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('designations')->group(function(){
                 Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list')->middleware('check.permission');
+                Route::post('/store', [DesignationController::class, 'store'])->name('admin.designation.store');
+                Route::post('/update', [DesignationController::class, 'update'])->name('admin.designation.update');
                 Route::get('/status/{id}', [DesignationController::class, 'status'])->name('admin.designation.status');
                 Route::get('/permissions/{id}', [DesignationController::class, 'permissions'])->name('admin.designation.permissions');
                 Route::post('/update-permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');

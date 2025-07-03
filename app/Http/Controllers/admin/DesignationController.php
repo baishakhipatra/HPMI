@@ -17,7 +17,39 @@ class DesignationController extends Controller
         $designations =  Designation::when($keyword, function($query, $keyword){
                             $query->where('name', 'like', '%' . $keyword .'%');
                             })->orderBy('id','desc')->paginate(10);
-        return view('admin.designations.index', compact('designations', 'keyword'));
+
+        $editableDesignationDetails = null;
+        if($request->has('edit') && is_numeric($request->edit)) {
+            $editableDesignationDetails = Designation::find($request->edit);
+        }
+        return view('admin.designations.index', compact('designations', 'keyword', 'editableDesignationDetails'));
+    }
+
+    public function store(Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:designations,name',
+        ]);
+
+        Designation::create([
+            'name' => $request->name,
+            'status' => 1, 
+        ]);
+
+        return redirect()->route('admin.designation.list')->with('success', 'Designation created successfully');
+    }
+
+    public function update(Request $request) {
+        $request->validate([
+            'id'   => 'required|exists:designations,id',
+            'name'  => 'required|string|max:255|unique:designations,name,' . $request->id,
+        ]);
+
+        $designation = Designation::find($request->id);
+        $designation->update([
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('admin.designation.list')->with('success', 'Designation updated successfully');
     }
 
     public function status($id)

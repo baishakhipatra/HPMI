@@ -6,7 +6,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Teacher - List')
+@section('title', 'Subject - List')
 
 @section('content')
 

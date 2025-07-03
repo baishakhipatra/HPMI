@@ -25,40 +25,37 @@
         </div>
         <form method="POST" action="{{ route('admin.designation.permissions.update') }}">
             @csrf
-                    <input type="hidden" name="designation_id" value="{{ $designation->id }}">
-           
-                    @foreach($permissions->groupBy('parent_name') as $group => $groupPermissions)
-                        <div class="card-header" style="background: #f4f0ff;">
-                            <h5 class="text-primary mb-0">{{ ucwords(str_replace('_', ' ', $group)) }}</h5>
-                        </div>
+            <input type="hidden" name="designation_id" value="{{ $designation->id }}">
+    
+            @foreach($permissions->groupBy('parent_name') as $group => $groupPermissions)
+                <div class="card-header" style="background: #f4f0ff;">
+                    <h5 class="text-primary mb-0">{{ ucwords(str_replace('_', ' ', $group)) }}</h5>
+                </div>
 
-                        <div class="card-body mt-2">
-                            <div class="row">
-                                @php $chunked = $groupPermissions->chunk(8); @endphp
+                <div class="card-body mt-2">
+                    <div class="row">
+                        @php $chunked = $groupPermissions->chunk(8); @endphp
 
-                                @foreach($chunked as $chunk)
-                                    <div class="col-md-6">
-                                        @foreach($chunk as $permission)
-                                            <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" value="{{ $permission->id }}" id="perm_{{ $permission->id }}"
-                                                    {{ in_array($permission->id, $assignedPermissions) ? 'checked' : '' }}
-                                                    onchange="updatePermissionAjax(this, {{ $designation->id }})">
+                        @foreach($chunked as $chunk)
+                            <div class="col-md-6">
+                                @foreach($chunk as $permission)
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" value="{{ $permission->id }}" id="perm_{{ $permission->id }}"
+                                            {{ in_array($permission->id, $assignedPermissions) ? 'checked' : '' }}
+                                            onchange="updatePermissionAjax(this, {{ $designation->id }})">
 
-                                                <label class="form-check-label" for="perm_{{ $permission->id }}">
-                                                    {{ ucwords(str_replace('_', ' ', $permission->name)) }}
-                                                </label>
-                                            </div>
-                                        @endforeach
+                                        <label class="form-check-label" for="perm_{{ $permission->id }}">
+                                            {{ ucwords(str_replace('_', ' ', $permission->name)) }}
+                                        </label>
                                     </div>
                                 @endforeach
                             </div>
-                        </div>
-                    @endforeach
-            <div class="card-footer text-end">
-                {{-- <button type="submit" class="btn btn-primary">Save Permissions</button> --}}
-                {{-- <a href="{{ route('admin.designation.list') }}" class="btn btn-sm btn-danger">
-                    <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a> --}}
+                        @endforeach
+                    </div>
                 </div>
+            @endforeach
+            <div class="card-footer text-end">
+                
             </div>
         </form>
     </div>
