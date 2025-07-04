@@ -13,26 +13,44 @@ use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, 
 
 class StudentMarkListController extends Controller
 {
-    
-    public function index(Request $request) 
+
+    public function index(Request $request)
     {
         $admin = auth()->guard('admin')->user();
+        $isTeacher = ($admin && $admin->user_type === 'Teacher');
 
+        // Fetch sessions (available for all users)
         $sessions = StudentAdmission::with('session')
             ->select('session_id')
             ->distinct()
             ->get();
 
-        $classes = ClassList::with('sections')
-            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($admin) {
-                $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
-                $q->whereIn('id', $assignedClassIds);
-            })
-            ->get();
+        // Fetch classes based on user type
+        $classesQuery = ClassList::with('sections');
+        if ($isTeacher) {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->unique()->toArray(); // Ensure unique IDs
+            $classesQuery->whereIn('id', $assignedClassIds);
+        }
+        $classes = $classesQuery->get();
 
-        $subjects = Subject::all();
+        // Prepare subjects for the initial modal load (filtered by teacher's classes or all unique class-wise subjects for admin)
+        $subjectsQuery = ClassWiseSubject::with('subject');
+        if ($isTeacher) {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->unique()->toArray(); // Ensure unique IDs
+            $subjectsQuery->whereIn('class_id', $assignedClassIds);
+        }
+
+        $subjects = $subjectsQuery->get()
+            ->filter(fn($item) => $item->subject !== null) // Remove entries if subject is soft-deleted or null
+            ->unique('subject_id') // Crucially, get unique subjects by their ID
+            ->map(function ($item) { // Map to a simpler structure for the view
+                return (object)['id' => $item->subject->id, 'sub_name' => $item->subject->sub_name];
+            })
+            ->values(); // Reset array keys after unique and map
+
         $academicSessions = AcademicSession::all();
 
+        // Prepare class options for filtering/modal (if needed)
         $classOptions = $classes->map(function ($class) {
             return [
                 'id' => $class->id,
@@ -41,13 +59,20 @@ class StudentMarkListController extends Controller
         });
 
         // Build base marks query
-        $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission']);
+        $query = StudentsMark::with(['student', 'class', 'subjectlist', 'studentAdmission.session', 'studentAdmission.class']);
 
-        if ($admin && $admin->user_type === 'Teacher') {
-            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+        // Apply teacher-specific filtering for the main marks table
+        if ($isTeacher) {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->unique()->toArray();
             $query->whereIn('class_id', $assignedClassIds);
+            // Optionally, you might want to filter students within those classes only
+            // $studentIdsInAssignedClasses = StudentAdmission::whereIn('class_id', $assignedClassIds)->pluck('student_id')->unique()->toArray();
+            // $query->whereHas('student', function ($q) use ($studentIdsInAssignedClasses) {
+            //     $q->whereIn('id', $studentIdsInAssignedClasses);
+            // });
         }
 
+        // Apply filters from request
         if ($request->filled('student_name')) {
             $query->whereHas('student', function ($q) use ($request) {
                 $q->where('student_name', 'LIKE', '%' . $request->student_name . '%');
@@ -68,17 +93,18 @@ class StudentMarkListController extends Controller
             });
         }
 
-        $marks = $query->paginate(10);
+        $marks = $query->latest('id')->paginate(10);
 
+        // Group marks for display (ensure studentAdmission is not null before accessing its properties)
         $groupedMarks = $marks->getCollection()
             ->filter(fn ($item) => $item->studentAdmission !== null)
-            ->groupBy(fn ($item) => 
+            ->groupBy(fn ($item) =>
                 $item->studentAdmission->student_id . '_' .
                 $item->studentAdmission->session_id . '_' .
                 $item->studentAdmission->class_id
             );
 
-        $marks->setCollection(collect());
+        $marks->setCollection(collect($groupedMarks)); // Replace the collection with grouped data for pagination awareness
 
         return view('admin.student_marks.index', compact(
             'classes', 'subjects', 'classOptions', 'sessions', 'marks', 'groupedMarks', 'academicSessions'
@@ -90,90 +116,71 @@ class StudentMarkListController extends Controller
     {
         $sessionId = $request->sessionId;
         $admin = auth()->guard('admin')->user();
-        $assignedClassIds = [];
+        $isTeacher = ($admin && $admin->user_type === 'Teacher');
 
-        // If the logged-in user is a teacher, get their assigned classes
-        if ($admin && $admin->user_type === 'Teacher') {
-            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+        $query = StudentAdmission::where('session_id', $sessionId)
+                    ->with('student')
+                    ->select('student_id')
+                    ->distinct();
+
+        // For teachers, further filter students by assigned classes in this session
+        if ($isTeacher) {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->unique()->toArray();
+            $query->whereIn('class_id', $assignedClassIds);
         }
 
-        // Fetch student admissions, filtered by session and (if teacher) by assigned class
-        $admissions = StudentAdmission::with('student')
-            ->where('session_id', $sessionId)
-            ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($assignedClassIds) {
-                $q->whereIn('class_id', $assignedClassIds);
-            })
-            ->whereHas('student')
-            ->get();
+        $students = $query->get()
+            ->filter(fn($admission) => $admission->student !== null) // Filter out if student record is missing
+            ->map(function($admission) {
+                return [
+                    'id' => $admission->student->id, // Assuming student model has an 'id'
+                    'name' => $admission->student->student_name // Assuming student model has a 'student_name'
+                ];
+            });
 
-        // Map students
-        $students = $admissions->map(function ($admission) {
-            return [
-                'id' => $admission->student->id,
-                'name' => ucwords($admission->student->student_name),
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'students' => $students,
-        ]);
+        return response()->json(['success' => true, 'students' => $students]);
     }
-
 
     public function getClassBySessionAndStudent(Request $request)
     {
-         $session_id = $request->session_id;
-         $student_id = $request->student_id;
+        $student_id = $request->student_id;
+        $session_id = $request->session_id;
 
-        // $admissions = StudentAdmission::with('class')
-        //                 ->where('session_id', $session_id)
-        //                 ->where('student_id', $student_id)
-        //                 ->get();
-        $admin = auth()->guard('admin')->user();
-        $assignedClassIds = [];
+        $admission = StudentAdmission::where('student_id', $student_id)
+            ->where('session_id', $session_id)
+            ->first();
 
-        if ($admin && $admin->user_type === 'Teacher') {
-            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+        if (!$admission) {
+            return response()->json(['success' => false, 'message' => 'No record found for this student in this session.']);
         }
-        $admissions = StudentAdmission::with('class')
-                ->where('session_id', $session_id)
-                ->where('student_id', $student_id)
-                ->when($admin && $admin->user_type === 'Teacher', function ($q) use ($assignedClassIds) {
-                    $q->whereIn('class_id', $assignedClassIds);
-                })->get();
-                
-        if(count($admissions)>0){
-            $ClassWiseSubject = ClassWiseSubject::with('subject')
-            ->where('class_id', $admissions[0]->class_id)
-            ->get();
-            
-            $subjects = $ClassWiseSubject->map(function ($subjectData) {
-                return [
-                    'id' => $subjectData->subject->id,
-                    'name' => ucwords($subjectData->subject->sub_name),
-                ];
-            });
-            // dd($subjects);
-            $classes = $admissions->map(function ($admission) {
-                return [
-                    'id' => $admission->class->id,
-                    'name' => ucwords($admission->class->class).'('.$admission->section.')',
-                ];
-            });
-            return response()->json([
-                'success' => true,
-                'classes' => $classes,
-                'subjects' => $subjects,
-            ]);
-            }else{
-            return response()->json([
-                'success' => true,
-                'classes' => [],
-                'subjects' => [],
-            ]);
-        }   
+
+        $class_id = $admission->class_id;
+
+        // Fetch subjects specifically for this class_id
+        $classSubjects = ClassWiseSubject::with('subject')
+            ->where('class_id', $class_id)
+            ->get()
+            ->filter(fn($s) => $s->subject !== null); // Ensure subject relation exists
+
+        $subjects = $classSubjects->map(function ($row) {
+            return [
+                'id' => $row->subject->id,
+                'name' => $row->subject->sub_name,
+            ];
+        });
+
+        // Fetch the class name for the response
+        $class_name = optional($admission->class)->class; // Use optional to prevent error if class relation is null
+
+        return response()->json([
+            'success' => true,
+            'subjects' => $subjects,
+            'classes' => [
+                ['id' => $admission->class_id, 'name' => $class_name]
+            ],
+        ]);
     }
+
 
     public function getEditData($id) {
         try {
@@ -216,55 +223,31 @@ class StudentMarkListController extends Controller
     public function storeStudentMarks(Request $request)
     {
         $validated = $request->validate([
-            'session_id' => 'required|exists:academic_sessions,id', // Added
-            'class_id'   => 'required|exists:class_lists,id',
+            'session_id' => 'required|exists:academic_sessions,id',
+            'class_id' => 'required|exists:class_lists,id',
             'student_id' => 'required|exists:students,id',
-            'subject_id' => 'required|exists:subjects,id',
 
-            'mid_term_out_off' => 'nullable|integer',
-            'mid_term_stu_marks' => 'required_with:mid_term_out_off|nullable|numeric',
+            'subject_id' => 'required|array|min:1',
+            'subject_id.*' => 'required|exists:subjects,id',
 
-            'final_exam_out_off' => 'nullable|integer',
-            'final_exam_stu_marks' => 'required_with:final_exam_out_off|nullable|numeric',
+            'mid_term_out_off' => 'required|array',
+            'mid_term_out_off.*' => 'nullable|integer',
+
+            'mid_term_stu_marks' => 'required|array',
+            'mid_term_stu_marks.*' => 'nullable|numeric',
+
+            'final_exam_out_off' => 'required|array',
+            'final_exam_out_off.*' => 'nullable|integer',
+
+            'final_exam_stu_marks' => 'required|array',
+            'final_exam_stu_marks.*' => 'nullable|numeric',
         ]);
 
-        $errors = [];
-
-        if ($request->mid_term_out_off && $request->mid_term_stu_marks === null) {
-            $errors['message'] = 'Mid Term marks required.';
-        }
-        if ($request->final_exam_out_off && $request->final_exam_stu_marks === null) {
-            $errors['message'] = 'Final Exam marks required.';
-        }
-
-        if(
-            empty($request->mid_term_out_off) &&
-            empty($request->final_exam_out_off)
-        ) {
-            $errors['message'] = 'Select at least one term.';
-        }
-
-
-        if($request->mid_term_out_off && $request->mid_term_stu_marks > $request->mid_term_out_off){
-            $errors['message'] = 'Mid term marks cannot be greater than mid term out off.';
-        }
-
-        if($request->final_exam_out_off && $request->final_exam_stu_marks > $request->final_exam_out_off){
-            $errors['message'] = 'Final exam marks cannot be greater than final exam out off.';
-        }
-
-        if (!empty($errors)) {
-            return response()->json([
-                'success' => false,
-                'message' => $errors['message']
-            ], 422);
-        }
-
-        // Correct admission lookup with session
-        $admission = StudentAdmission::where('student_id', $validated['student_id'])
-                            ->where('class_id', $validated['class_id'])
-                            ->where('session_id', $validated['session_id'])
-                            ->first();
+        // Get student_admission_id
+        $admission = StudentAdmission::where('student_id', $request->student_id)
+            ->where('class_id', $request->class_id)
+            ->where('session_id', $request->session_id)
+            ->first();
 
         if (!$admission) {
             return response()->json([
@@ -273,27 +256,76 @@ class StudentMarkListController extends Controller
             ], 422);
         }
 
-        $validated['student_admission_id'] = $admission->id;
+        $errors = [];
 
-        $existing = StudentsMark::where('student_admission_id', $validated['student_admission_id'])
-                        ->where('subject_id', $validated['subject_id'])
-                        ->first();
+        foreach ($request->subject_id as $index => $subjectId) {
+            $midOutOf = $request->mid_term_out_off[$index];
+            $midMarks = $request->mid_term_stu_marks[$index];
+            $finalOutOf = $request->final_exam_out_off[$index];
+            $finalMarks = $request->final_exam_stu_marks[$index];
 
-        if ($existing) {
+            if (empty($midOutOf) && empty($finalOutOf)) {
+                $errors[] = "Select at least one term for subject index $index.";
+                continue;
+            }
+
+            if ($midOutOf && $midMarks === null) {
+                $errors[] = "Mid Term marks required for subject index $index.";
+            }
+
+            if ($finalOutOf && $finalMarks === null) {
+                $errors[] = "Final Exam marks required for subject index $index.";
+            }
+
+            if ($midOutOf && $midMarks > $midOutOf) {
+                $errors[] = "Mid Term marks cannot be greater than out of for subject index $index.";
+            }
+
+            if ($finalOutOf && $finalMarks > $finalOutOf) {
+                $errors[] = "Final Exam marks cannot be greater than out of for subject index $index.";
+            }
+
+            // Check if mark already exists
+            $existing = StudentsMark::where('student_admission_id', $admission->id)
+                ->where('subject_id', $subjectId)
+                ->first();
+
+            if ($existing) {
+                // $errors[] = "Marks already entered for subject (ID: $subjectId). Edit existing entry.";
+                $subjectName = Subject::find($subjectId)?->sub_name ?? 'Unknown Subject';
+                $errors[] = "Marks already entered for subject: {$subjectName}. Edit existing entry.";
+            }
+        }
+
+        if (!empty($errors)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Marks already entered for this subject in this session. You can only edit the existing entry.'
+                'message' => implode(' ', $errors),
             ], 422);
         }
 
-        StudentsMark::create($validated);
+        // Save all valid entries
+        foreach ($request->subject_id as $index => $subjectId) {
+            StudentsMark::create([
+                'student_admission_id' => $admission->id,
+                'session_id' => $request->session_id,
+                'class_id' => $request->class_id,
+                'student_id' => $request->student_id,
+                'subject_id' => $subjectId,
+
+                'mid_term_out_off' => $request->mid_term_out_off[$index],
+                'mid_term_stu_marks' => $request->mid_term_stu_marks[$index],
+
+                'final_exam_out_off' => $request->final_exam_out_off[$index],
+                'final_exam_stu_marks' => $request->final_exam_stu_marks[$index],
+            ]);
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Marks stored successfully!'
         ]);
     }
-
 
 
     public function update(Request $request)

@@ -38,7 +38,7 @@
               <p class="mb-0"><strong>Phone no. of School:</strong> 9433305657, 9330629644</p>
             </div>
             <div class="mb-3 col-md-4">
-              <label for="image" class="form-label">Photograph of Student <span class="text-danger">*</span></label>
+              <label for="image" class="form-label">Photograph of Student </label>
               
               <div class="border rounded d-flex align-items-center justify-content-center mb-2" 
                   style="height: 150px; width: 150px; overflow: hidden; position: relative;" id="preview-box">
@@ -88,11 +88,6 @@
           </div>
 
           {{-- Blood Group --}}
-          {{-- <div class="form-floating form-floating-outline col-md-4">
-            <input type="text" class="form-control" id="blood_group" name="blood_group" placeholder="Enter Blood Group" value="{{ old('blood_group') }}">
-            <label for="blood_group">Blood Group</label>
-            @error('blood_group')<small class="text-danger">{{ $message }}</small>@enderror
-          </div> --}}
           <div class="form-floating form-floating-outline col-md-4">
             <select class="form-select" id="blood_group" name="blood_group">
                 <option value="">Select Blood Group</option>

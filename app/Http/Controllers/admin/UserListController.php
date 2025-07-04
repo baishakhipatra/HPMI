@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Admin;
+use App\Models\{Admin, Designation};
 
 class UserListController extends Controller
 {
@@ -40,7 +40,8 @@ class UserListController extends Controller
     }
     public function create(){
         $user_id = generateEmployeeId();
-        return view('admin.user_management.create',compact('user_id'));
+        $designations = Designation::whereNotIn('id', [1, 3])->where('status', 1)->get();
+        return view('admin.user_management.create',compact('user_id', 'designations'));
     }
 
     public function store(Request $request) {
@@ -107,18 +108,23 @@ class UserListController extends Controller
 
 
     public function show($id) {
-        $employee = Admin::findOrFail($id);
+        $employee = Admin::with('designationData')->findOrFail($id);
         return view('admin.user_management.show', compact('employee'));
     }
 
     public function edit($id) {
         $data = Admin::findOrFail($id);
-        return view('admin.user_management.edit', compact('data'));
+
+        $designations = Designation::whereNotIn('id', [1, 3])
+                            ->where('status', 1)->get();
+        return view('admin.user_management.edit', compact('data', 'designations'));
     }
 
     public function update(Request $request) {
+        //dd($request->all());
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
+            'name'      => 'required|string|max:255',
+            'designation_id'  => 'nullable|exists:designations,id',
             'address'   => 'nullable|string',
             'mobile'             => [
                 'required',
@@ -129,6 +135,7 @@ class UserListController extends Controller
             ],
             'email'     => 'required|email|unique:admins,email,' . $request->id,
         ]);
+        //dd($request->all());
 
         // Custom DOB check
         $validator->after(function ($validator) use ($request) {
@@ -154,7 +161,9 @@ class UserListController extends Controller
             'date_of_joining'  => $request->date_of_joining,
             'qualifications'   => $request->qualifications,
             'address'          => $request->address,
+            'designation_id'   => $request->designation_id,
         ]);
+        //dd($request->designation_id);
         return redirect()->route('admin.employee.index')->with('success', 'Employee updated successfully!');
     }
 

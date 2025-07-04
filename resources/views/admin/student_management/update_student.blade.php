@@ -95,12 +95,6 @@
 
              
                 {{-- Blood Group --}}
-              {{-- <div class="form-floating form-floating-outline col-md-4">
-                <input type="text" class="form-control" id="blood_group" name="blood_group" placeholder="Enter Blood Group"
-                      value="{{ old('blood_group', $student->blood_group) }}">
-                <label for="blood_group">Blood Group</label>
-                @error('blood_group')<small class="text-danger">{{ $message }}</small>@enderror
-              </div> --}}
               <div class="form-floating form-floating-outline col-md-4">
                 <select class="form-select" id="blood_group" name="blood_group">
                     <option value="">Select Blood Group</option>
