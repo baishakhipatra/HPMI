@@ -95,10 +95,25 @@
 
              
                 {{-- Blood Group --}}
-              <div class="form-floating form-floating-outline col-md-4">
+              {{-- <div class="form-floating form-floating-outline col-md-4">
                 <input type="text" class="form-control" id="blood_group" name="blood_group" placeholder="Enter Blood Group"
                       value="{{ old('blood_group', $student->blood_group) }}">
-                <label for="blood_group">Blood Group<span class="text-danger">*</span></label>
+                <label for="blood_group">Blood Group</label>
+                @error('blood_group')<small class="text-danger">{{ $message }}</small>@enderror
+              </div> --}}
+              <div class="form-floating form-floating-outline col-md-4">
+                <select class="form-select" id="blood_group" name="blood_group">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+" {{ old('blood_group', $student->blood_group) == 'A+' ? 'selected' : '' }}>A+</option>
+                    <option value="A-" {{ old('blood_group', $student->blood_group) == 'A-' ? 'selected' : '' }}>A-</option>
+                    <option value="B+" {{ old('blood_group', $student->blood_group) == 'B+' ? 'selected' : '' }}>B+</option>
+                    <option value="B-" {{ old('blood_group', $student->blood_group) == 'B-' ? 'selected' : '' }}>B-</option>
+                    <option value="AB+" {{ old('blood_group', $student->blood_group) == 'AB+' ? 'selected' : '' }}>AB+</option>
+                    <option value="AB-" {{ old('blood_group', $student->blood_group) == 'AB-' ? 'selected' : '' }}>AB-</option>
+                    <option value="O+" {{ old('blood_group', $student->blood_group) == 'O+' ? 'selected' : '' }}>O+</option>
+                    <option value="O-" {{ old('blood_group', $student->blood_group) == 'O-' ? 'selected' : '' }}>O-</option>
+                </select>
+                <label for="blood_group">Blood Group</label>
                 @error('blood_group')<small class="text-danger">{{ $message }}</small>@enderror
               </div>
 
@@ -106,7 +121,7 @@
               <div class="form-floating form-floating-outline col-md-4">
                 <input type="text" class="form-control" id="height" name="height" placeholder="Enter Height"
                       value="{{ old('height', $student->height) }}">
-                <label for="height">Height<span class="text-danger">*</span></label>
+                <label for="height">Height</label>
                 @error('height')<small class="text-danger">{{ $message }}</small>@enderror
               </div>
 
@@ -114,7 +129,7 @@
               <div class="form-floating form-floating-outline col-md-4">
                 <input type="text" class="form-control" id="weight" name="weight" placeholder="Enter Weight (kg)"
                       value="{{ old('weight', $student->weight) }}">
-                <label for="weight">Weight<span class="text-danger">*</span></label>
+                <label for="weight">Weight</label>
                 @error('weight')<small class="text-danger">{{ $message }}</small>@enderror
               </div>
 
@@ -146,7 +161,7 @@
               <div class="form-floating form-floating-outline col-md-4">
                 <input type="email" class="form-control" id="email" name="email" placeholder="student@example.com"
                       value="{{ old('email', $student->email) }}">
-                <label for="email">Email Address<span class="text-danger">*</span></label>
+                <label for="email">Email Address</label>
                 @error('email')<small class="text-danger">{{ $message }}</small>@enderror
               </div>
 
@@ -231,7 +246,7 @@
                     <input type="number" class="form-control" 
                             id="roll_number" name="roll_number" 
                             value="{{ old('roll_number', optional($student->admission)->roll_number) }}">
-                    <label for="roll_number">Roll Number</label>
+                    <label for="roll_number">Roll Number<span class="text-danger">*</span></label>
                     @error('roll_number')
                         <small class="text-danger">{{ $message }}</small>
                     @enderror

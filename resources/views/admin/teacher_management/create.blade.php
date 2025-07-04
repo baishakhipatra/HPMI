@@ -43,7 +43,7 @@
             <div class="col-md-6">
                 <div class="form-floating form-floating-outline">
                     <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name') }}">
-                    <label>Full Name</label>
+                    <label>Full Name<span class="text-danger">*</span></label>
                     @error('name') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -56,21 +56,21 @@
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">
-                    <label>Email</label>
+                    <label>Email<span class="text-danger">*</span></label>
                     @error('email') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="text" name="mobile" class="form-control" placeholder="Mobile" value="{{ old('mobile') }}">
-                    <label>Phone</label>
+                    <label>Phone<span class="text-danger">*</span></label>
                     @error('mobile') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}">
-                    <label>Date of Birth</label>
+                    <label>Date of Birth<span class="text-danger">*</span></label>
                     @error('date_of_birth') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -81,21 +81,21 @@
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="date" name="date_of_joining" class="form-control" value="{{ old('date_of_joining') }}">
-                    <label>Date of Joining</label>
+                    <label>Date of Joining<span class="text-danger">*</span></label>
                     @error('date_of_joining') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="text" name="qualifications" class="form-control" placeholder="Qualifications" value="{{ old('qualifications') }}">
-                    <label>Qualifications</label>
+                    <label>Qualifications<span class="text-danger">*</span></label>
                     @error('qualifications') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <textarea name="address" class="form-control" placeholder="Address" style="height: 70px;">{{ old('address') }}</textarea>
-                    <label>Address</label>
+                    <label>Address<span class="text-danger">*</span></label>
                     @error('address') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -110,7 +110,7 @@
                             <option value="{{ $class->id }}">{{ $class->class }}</option>
                         @endforeach
                     </select>
-                    <label>Class Assigned</label>
+                    <label>Class Assigned<span class="text-danger">*</span></label>
                     @error('classes_assigned') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -133,7 +133,7 @@
                     <div class="input-group input-group-merge">
                         <div class="form-floating form-floating-outline flex-grow-1">
                             <input type="password" id="password" class="form-control" name="password" placeholder="********" />
-                            <label for="password">Password</label>
+                            <label for="password">Password<span class="text-danger">*</span></label>
                             @error('password') <p class="small text-danger">{{ $message }}</p> @enderror
                         </div>
                         <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
