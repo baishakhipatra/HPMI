@@ -316,6 +316,7 @@
                               </div>
                           </div>
                       </div>
+                      
 
                       <div class="mt-3">
                           <button type="button" class="btn btn-sm btn-outline-primary" id="addMoreSubject">+ Add More</button>
@@ -681,7 +682,8 @@
             let availableSubjects = fetchedSubjects.filter(s => !subjectsUsed.includes(s.id.toString())); // Convert s.id to string for strict comparison
 
             if (availableSubjects.length === 0) {
-                alert("All available subjects for this class are already selected or no subjects are assigned.");
+               // alert("All available subjects for this class are already selected or no subjects are assigned.");
+               toastFire('error',"All available subjects for this class are already selected or no subjects are assigned.");
                 return;
             }
 
