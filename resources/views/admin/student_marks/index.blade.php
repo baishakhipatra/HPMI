@@ -2,7 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Add your toastFire function if it's custom -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
 
 @extends('layouts/contentNavbarLayout')
 
@@ -255,7 +255,7 @@
                           </div>
 
                           <div class="form-floating form-floating-outline col-md-4">
-                              <select name="student_id" id="student_id" class="form-select select2">
+                              <select name="student_id" id="student_id" class="form-select">
                                   <option value="">Select Student</option>
                               </select>
                               <label for="student_id" class="form-label">Student</label>
@@ -446,7 +446,7 @@
     
 @endsection
 {{-- @section('scripts') --}}
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
     <script>
         
       $(document).ready(function () {
@@ -591,12 +591,12 @@
                             });
                             $('#student_id').val(null).trigger('change'); // clear selection and re-trigger select2 update
                             // Re-initialize select2 for student_id (important if it's within a modal)
-                            $('#student_id').select2({
-                              placeholder: 'Select Student',
-                              allowClear: true,
-                              dropdownParent: $('#addMarksModal'),
-                              minimumResultsForSearch: 0 // Keep this here too for re-initialization
-                            });
+                            // $('#student_id').select2({
+                            //   placeholder: 'Select Student',
+                            //   allowClear: true,
+                            //   dropdownParent: $('#addMarksModal'),
+                            //   minimumResultsForSearch: 0 // Keep this here too for re-initialization
+                            // });
                         }
                     },
                     error: function (xhr) {
@@ -682,8 +682,8 @@
             let availableSubjects = fetchedSubjects.filter(s => !subjectsUsed.includes(s.id.toString())); // Convert s.id to string for strict comparison
 
             if (availableSubjects.length === 0) {
-               // alert("All available subjects for this class are already selected or no subjects are assigned.");
-               toastFire('error',"All available subjects for this class are already selected or no subjects are assigned.");
+                // alert("All available subjects for this class are already selected or no subjects are assigned.");
+                toastFire('error', "All available subjects for this class are already selected or no subjects are assigned.");
                 return;
             }
 
@@ -729,11 +729,11 @@
         });
 
         // Initialize select2 for student_id on document ready (for initial load)
-        $('#student_id').select2({
-            placeholder: 'Select Student',
-            allowClear: true,
-            dropdownParent: $('#addMarksModal'), // Make sure this matches your modal's ID
-        });
+        // $('#student_id').select2({
+        //     placeholder: 'Select Student',
+        //     allowClear: true,
+        //     dropdownParent: $('#addMarksModal'), // Make sure this matches your modal's ID
+        // });
 
         // Remove Subject-Marks Group
         $(document).on('click', '.remove-subject-group', function () {
