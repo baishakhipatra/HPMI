@@ -53,7 +53,7 @@ class PermissionSeeder extends Seeder
 
             ['parent_name' => 'student_management', 'name' => 'student_list', 'route' => 'admin.studentlist'],
             ['parent_name' => 'student_management', 'name' => 'create_student', 'route' => 'admin.studentcreate'],
-            ['parent_name' => 'student_management', 'name' => 'details_student', 'route' => 'admin.admin.student.show'],
+            ['parent_name' => 'student_management', 'name' => 'details_student', 'route' => 'admin.student.show'],
             ['parent_name' => 'student_management', 'name' => 'edit_student', 'route' => 'admin.studentedit'],
             ['parent_name' => 'student_management', 'name' => 'delete_student', 'route' => 'admin.studentdelete'],
             ['parent_name' => 'student_management', 'name' => 'export_student_list', 'route' => 'admin.student.export'],
