@@ -27,7 +27,7 @@
 
               {{-- Row 1: Name, Emp_ID, Type --}}
               <div class="row mb-3">
-                 <div class="col-md-4">
+                 <div class="col-md-3">
                   <div class="form-floating form-floating-outline">
                     <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
                     <label>Employee ID</label>
@@ -35,7 +35,7 @@
                   </div>
                 </div>
                 
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-floating form-floating-outline">
                     <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name', $data->name) }}">
                     <label>Full Name</label>
@@ -43,11 +43,27 @@
                   </div>
                 </div>
                
-                <div class="col-md-4">
+                <div class="col-md-3">
                   <div class="form-floating form-floating-outline">
                     <input type="text" name="user_type" value="{{ old('user_type', $data->user_type) }}" class="form-control" readonly>
                     <label>Type</label>
                     @error('user_type') <p class="text-danger small">{{ $message }}</p> @enderror
+                  </div>
+                </div>
+
+                <div class="col-md-3">
+                  <div class="form-floating form-floating-outline">
+                    <select name="designation_id" class="form-select">
+                      <option value="">Select Designation</option>
+                      @foreach($designations as $designation)
+                        <option value="{{ $designation->id }}" 
+                          {{ old('designation_id', $data->designation_id) == $designation->id ? 'selected' : '' }}>
+                          {{ ucwords($designation->name) }}
+                        </option>
+                      @endforeach
+                    </select>
+                    <label>Designation<span class="text-danger">*</span></label>
+                    @error('designation_id') <p class="text-danger small">{{ $message }}</p> @enderror
                   </div>
                 </div>
               </div>

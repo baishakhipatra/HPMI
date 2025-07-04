@@ -21,26 +21,36 @@
 
       {{-- Row 1: Employee ID, Name, Type --}}
       <div class="row mb-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-floating form-floating-outline">
             <input type="text" name="user_id" value="{{ old('user_id', $user_id) }}" class="form-control" readonly>
             <label>Employee ID</label>
             @error('user_id') <p class="text-danger small">{{ $message }}</p> @enderror
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-floating form-floating-outline">
             <input type="text" name="name" class="form-control" placeholder="Full Name" value="{{ old('name') }}">
             <label>Full Name<span class="text-danger">*</span></label>
             @error('name') <p class="text-danger small">{{ $message }}</p> @enderror
           </div>
         </div>
-        {{-- <div class="col-md-4">
-          <input type="hidden" name="user_type" class="form-control" value="Employee" readonly>
-          @error('user_type') <p class="text-danger small">{{ $message }}</p> @enderror
-        </div> --}}
+        <div class="col-md-4">
+          <div class="form-floating form-floating-outline">
+            <select name="designation_id" class="form-select">
+              <option value="">Select Designation</option>
+              @foreach($designations as $designation)
+                <option value="{{ $designation->id }}" {{ old('designation_id') == $designation->id ? 'selected' : '' }}>
+                  {{ ucwords($designation->name) }}
+                </option>
+              @endforeach
+            </select>
+            <label>Designation<span class="text-danger">*</span></label>
+            @error('designation_id') <p class="text-danger small">{{ $message }}</p> @enderror
+          </div>
+        </div>
         <input type="hidden" name="user_type" value="Employee">
-        <input type="hidden" name="designation_id" value="2">
+        {{-- <input type="hidden" name="designation_id" value="2"> --}}
       </div>
 
       {{-- Row 2: Email, Mobile, DOB --}}

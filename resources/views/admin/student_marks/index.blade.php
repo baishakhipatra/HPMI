@@ -2,7 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Add your toastFire function if it's custom -->
-
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 @extends('layouts/contentNavbarLayout')
 
@@ -164,6 +164,7 @@
                         <th>Midterm</th>
                         <th>Final</th>
                         <th>Total</th>
+                        <th>Average</th>
                         <th>Grade</th>
                         <th>Actions</th>
                       </tr>
@@ -171,15 +172,25 @@
                     <tbody>
                       @foreach($studentMarks as $mark)
                       @php
-                      $total = ($mark->term_one_stu_marks ?? 0) + ($mark->term_two_stu_marks ?? 0) +
-                      ($mark->mid_term_stu_marks ?? 0) + ($mark->final_exam_stu_marks ?? 0);
-                      $grade = calculateGrade($total);
+                          $mid = $mark->mid_term_stu_marks ?? 0;
+                          $final = $mark->final_exam_stu_marks ?? 0;
+
+                          // Count how many terms have marks (to avoid dividing by 2 if one is null)
+                          $count = 0;
+                          if (!is_null($mark->mid_term_stu_marks)) $count++;
+                          if (!is_null($mark->final_exam_stu_marks)) $count++;
+
+                          $average = $count > 0 ? ($mid + $final) / $count : 0;
+
+                          $total = $mid + $final; // Just for display if needed
+                          $grade = calculateGrade($average);
                       @endphp
                       <tr>
                         <td>{{ ucwords($mark->subjectlist->sub_name ?? '-') }}</td>
                         <td>{{ $mark->mid_term_stu_marks .'/'.$mark->mid_term_out_off ?? '-' }}</td>
                         <td>{{ $mark->final_exam_stu_marks.'/'.$mark->final_exam_out_off ?? '-' }}</td>
                         <td><strong>{{ $total }}</strong></td>
+                        <td>{{ number_format($average, 2) }}</td>
                         <td><span class="grade">{{ $grade }}</span></td>
                         <td class="actions-cell">
                           <div class="btn-group" role="group" aria-label="Mark Actions">
@@ -200,7 +211,6 @@
                           </div>
                         </td>
                       </tr>
-
                       @endforeach
                     </tbody>
                   </table>
@@ -229,105 +239,87 @@
                 </div>
                 <form method="POST" id="StudentMarksStore" enctype="multipart/form-data">
                   @csrf
+                
                   <div class="modal-body">
-                    <div class="row g-3">
-                      <div class="form-floating form-floating-outline col-md-2">
-                        <select name="session_id" id="session_id" class="form-select">
-                          <option value="">Select Session</option>
-                          @foreach($sessions as $item)
-                          <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
-                          @endforeach
-                        </select>
-                        <label for="session_id" class="form-label">Session</label>
-                        <div class="text-danger" id="error_session_id"></div>
+                      <div class="row g-3">
+                          {{-- First row: Session, Student, Class --}}
+                          <div class="form-floating form-floating-outline col-md-4">
+                              <select name="session_id" id="session_id" class="form-select">
+                                  <option value="">Select Session</option>
+                                  @foreach($sessions as $item)
+                                      <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                  @endforeach
+                              </select>
+                              <label for="session_id" class="form-label">Session</label>
+                              <div class="text-danger" id="error_session_id"></div>
+                          </div>
+
+                          <div class="form-floating form-floating-outline col-md-4">
+                              <select name="student_id" id="student_id" class="form-select select2">
+                                  <option value="">Select Student</option>
+                              </select>
+                              <label for="student_id" class="form-label">Student</label>
+                              <div class="text-danger" id="error_student_id"></div>
+                          </div>
+
+                          <div class="form-floating form-floating-outline col-md-4">
+                              <select name="class_id" id="class_id" class="form-select">
+                                  <option value="">Select Class</option>
+                                  {{-- Class will be populated by AJAX based on student selection --}}
+                              </select>
+                              <label for="class_id" class="form-label">Class</label>
+                              <div class="text-danger" id="error_class_id"></div>
+                          </div>
+                      </div>
+                      <hr>
+
+                      {{-- Subject & Marks Fields --}}
+                      <div id="subject-marks-wrapper">
+                          <div class="row g-3 subject-marks-group">
+                              <div class="form-floating form-floating-outline col-md-3">
+                                  <select name="subject_id[]" class="form-select subject-dropdown">
+                                      <option value="">Select Subject</option>
+                                      {{-- Initial subjects loaded from controller. More will be added via AJAX and Add More. --}}
+                                      @foreach($subjects as $subject)
+                                          <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                                      @endforeach
+                                  </select>
+                                  <label class="form-label">Subject</label>
+                              </div>
+
+                              <div class="form-floating form-floating-outline col-md-2">
+                                  <select name="mid_term_out_off[]" class="form-select">
+                                      <option value="100">100</option>
+                                  </select>
+                                  <label class="form-label">Mid Term Out Of</label>
+                              </div>
+
+                              <div class="form-floating form-floating-outline col-md-2">
+                                  <input type="number" name="mid_term_stu_marks[]" class="form-control" placeholder="Mid Term Marks">
+                                  <label>Mid Term Student Marks</label>
+                              </div>
+
+                              <div class="form-floating form-floating-outline col-md-2">
+                                  <select name="final_exam_out_off[]" class="form-select">
+                                      <option value="100">100</option>
+                                  </select>
+                                  <label class="form-label">Final Exam Out Of</label>
+                              </div>
+
+                              <div class="form-floating form-floating-outline col-md-2">
+                                  <input type="number" name="final_exam_stu_marks[]" class="form-control" placeholder="Final Exam Marks">
+                                  <label>Final Exam Student Marks</label>
+                              </div>
+
+                              <div class="col-md-1 d-flex align-items-center">
+                                  <button type="button" class="btn btn-danger remove-subject-group d-none">×</button>
+                              </div>
+                          </div>
                       </div>
 
-                      <div class="form-floating form-floating-outline col-md-6">
-                        <select name="student_id" id="student_id" class="form-select">
-                          <option value="">Select Student</option>
-                        </select>
-                        <label for="student_id" class="form-label">Student</label>
-                        <div class="text-danger" id="error_student_id"></div>
+                      <div class="mt-3">
+                          <button type="button" class="btn btn-sm btn-outline-primary" id="addMoreSubject">+ Add More</button>
                       </div>
-
-
-                      @php
-                        $admin = auth()->guard('admin')->user();
-                        $assignedClasses = [];
-
-                        if ($admin && $admin->user_type === 'Teacher') {
-                            $assignedClasses = $admin->teacherClasses->pluck('classList'); // Eager load class
-                        } else {
-                            $assignedClasses = $classes; // All classes for admin
-                        }
-                      @endphp
-                      
-                      <div class="form-floating form-floating-outline col-md-2">
-                        <select name="class_id" id="class_id" class="form-select">
-                          <option value="">Select Class</option>
-                        </select>
-                        <label for="class_id" class="form-label">Class</label>
-                        <div class="text-danger" id="error_class_id"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-2">
-                        <select name="subject_id" id="subject_id" class="form-select">
-                          <option value="">Select Subject</option>
-                          @foreach($subjects as $subject)
-                          <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
-                          @endforeach
-                        </select>
-                        <label for="subject_id" class="form-label">Subject</label>
-                        <div class="text-danger" id="error_subject_id"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="mid_term_out_off" id="mid_term_out_off" class="form-select" aria-placeholder="Out Of 100">
-                          <option value="">select value</option>
-                          <option value="100">100</option>
-                          {{-- <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach --}}
-                        </select>
-                        <label for="mid_term_out_off" class="form-label">Mid Term Out Of</label>
-                        <div class="text-danger" id="error_mid_term_out_off"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="mid_term_stu_marks" id="mid_term_stu_marks" class="form-control"
-                          placeholder="Enter marks">
-                        <label for="mid_term_stu_marks">Mid Term Student Marks</label>
-                        <div class="text-danger" id="error_mid_term_stu_marks"></div>
-                      </div>
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <select name="final_exam_out_off" id="final_exam_out_off" class="form-select">
-                          <option value="">select value</option>
-                          <option value="100">100</option>
-                          {{-- <option value="">Select</option>
-                          @foreach (range(50, 100, 5) as $value)
-                          <option value="{{ $value }}">{{ $value }}</option>
-                          @endforeach --}}
-                        </select>
-                        <label for="final_exam_out_off" class="form-label">Final Exam Out Of</label>
-                        <div class="text-danger" id="error_final_exam_out_off"></div>
-                      </div>
-
-
-
-                      <div class="form-floating form-floating-outline col-md-3">
-                        <input type="number" name="final_exam_stu_marks" id="final_exam_stu_marks"
-                          class="form-control" placeholder="Enter marks">
-                        <label for="final_exam_stu_marks">Final Exam Student Marks</label>
-                        <div class="text-danger" id="error_final_exam_stu_marks"></div>
-                      </div>
-
-                    </div>
                   </div>
 
                   <div class="modal-footer">
@@ -453,131 +445,311 @@
     
 @endsection
 {{-- @section('scripts') --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
-        $(document).ready(function () {
-            $('#StudentMarksStoreButton').on('click', function (e) {
-                e.preventDefault(); 
+        
+      $(document).ready(function () {
+        // Global variable to store subjects fetched by AJAX for 'Add More' functionality
+        let fetchedSubjects = [];
 
-                // Get the form element
-                var form = $('#StudentMarksStore')[0];
+        // Handler for storing student marks
+        $('#StudentMarksStoreButton').on('click', function (e) {
+            e.preventDefault();
 
-                // Create FormData from the form
-                var formData = new FormData(form);
-                $('#formAlert').addClass('d-none').removeClass('alert-danger alert-success').text('');
-                $('.text-danger').text('');
-                $('input, select').removeClass('is-invalid');
+            var form = $('#StudentMarksStore')[0];
+            var formData = new FormData(form);
+
+            // Reset previous validation messages and styles
+            $('#formAlert').addClass('d-none').removeClass('alert-danger alert-success').text('');
+            $('.text-danger').text('');
+            $('input, select').removeClass('is-invalid');
+
+            $.ajax({
+                url: "{{ route('admin.student-marks.store') }}",
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.success === true) {
+                        $('#formAlert')
+                            .removeClass('d-none alert-danger')
+                            .addClass('alert alert-success')
+                            .text(response.message);
+
+                        $('#StudentMarksStore')[0].reset();
+                        // Reset subject-marks wrapper to initial state
+                        $('#subject-marks-wrapper').html(`
+                            <div class="row g-3 subject-marks-group">
+                                <div class="form-floating form-floating-outline col-md-3">
+                                    <select name="subject_id[]" class="form-select subject-dropdown">
+                                        <option value="">Select Subject</option>
+                                        {{-- Re-populate with initial subjects from controller or leave empty --}}
+                                        @foreach($subjects as $subject)
+                                            <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="form-label">Subject</label>
+                                </div>
+                                <div class="form-floating form-floating-outline col-md-2">
+                                    <select name="mid_term_out_off[]" class="form-select">
+                                        <option value="100">100</option>
+                                    </select>
+                                    <label class="form-label">Mid Term Out Of</label>
+                                </div>
+                                <div class="form-floating form-floating-outline col-md-2">
+                                    <input type="number" name="mid_term_stu_marks[]" class="form-control" placeholder="Mid Term Marks">
+                                    <label>Mid Term Student Marks</label>
+                                </div>
+                                <div class="form-floating form-floating-outline col-md-2">
+                                    <select name="final_exam_out_off[]" class="form-select">
+                                        <option value="100">100</option>
+                                    </select>
+                                    <label class="form-label">Final Exam Out Of</label>
+                                </div>
+                                <div class="form-floating form-floating-outline col-md-2">
+                                    <input type="number" name="final_exam_stu_marks[]" class="form-control" placeholder="Final Exam Marks">
+                                    <label>Final Exam Student Marks</label>
+                                </div>
+                                <div class="col-md-1 d-flex align-items-center">
+                                    <button type="button" class="btn btn-danger remove-subject-group d-none">×</button>
+                                </div>
+                            </div>
+                        `);
+                        // Re-initialize select2 if used on subject dropdown after reset
+                        // $('.subject-dropdown').select2({ dropdownParent: $('#addMarksModal') });
+
+                        setTimeout(function () {
+                            window.location.reload(); // Reload the page after successful submission
+                        }, 2000);
+                    }
+                },
+                error: function (xhr) {
+                    $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
+                    if (xhr.status === 422) {
+                        let response = xhr.responseJSON;
+                        if (response.message) {
+                            $('#formAlert').html(response.message);
+                        }
+                        if (response.errors) {
+                            $('.text-danger').text('');
+                            $.each(response.errors, function (key, value) {
+                                // Handle array errors for subject_id, mid_term_stu_marks etc.
+                                if (key.includes('.')) {
+                                    let parts = key.split('.');
+                                    let fieldName = parts[0]; // e.g., 'subject_id'
+                                    let index = parts[1];      // e.g., '0'
+
+                                    // Find the specific input field in the correct group
+                                    $(`[name="${fieldName}[]"]`).eq(index).addClass('is-invalid');
+                                    // You might need a more specific error message container for indexed fields
+                                    // For simplicity, let's just add the class for now.
+                                } else {
+                                    $('#error_' + key).text(value[0]);
+                                    $('#' + key).addClass('is-invalid');
+                                }
+                            });
+                        }
+                    } else {
+                        $('#formAlert').html('An unexpected error occurred. Please try again.');
+                    }
+                }
+            });
+        });
+
+        // Clear validation errors on input/select change
+        $('input, select').on('input change', function () {
+            var field = $(this).attr('id');
+            if (field) { // Check if ID exists (for single fields)
+                $('#error_' + field).text('');
+                $(this).removeClass('is-invalid');
+            } else { // For array fields like subject_id[]
+                $(this).removeClass('is-invalid');
+            }
+        });
+
+        // AJAX for fetching students by session
+        $('#session_id').on('change', function () {
+            var sessionId = $(this).val();
+            $('#student_id').html('<option value="">Loading...</option>');
+            $('#class_id').html('<option value="">Select Class</option>'); // Clear class dropdown
+            updateInitialSubjectDropdown([]); // Clear subjects when session changes
+
+            if (sessionId) {
                 $.ajax({
-                    url: "{{ route('admin.student-marks.store') }}", 
-                    type: "POST",
-                    data: formData,
-                    contentType: false, 
-                    processData: false,
+                    url: "{{ route('admin.get-students-by-session') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { sessionId: sessionId },
                     success: function (response) {
-                        if (response.success === true) {
-                            $('#formAlert')
-                                .removeClass('d-none alert-danger')
-                                .addClass('alert alert-success')
-                                .text(response.message); 
-
-                            $('#StudentMarksStore')[0].reset();
-                             setTimeout(function () {
-                                window.location.reload();
-                            }, 2000);
+                        if (response.success) {
+                            $('#student_id').empty();
+                            $('#student_id').append('<option value="">Select Student</option>');
+                            $.each(response.students, function (key, student) {
+                                $('#student_id').append(new Option(student.name, student.id, false, false));
+                            });
+                            $('#student_id').val(null).trigger('change'); // clear selection and re-trigger select2 update
+                            // Re-initialize select2 for student_id (important if it's within a modal)
+                            $('#student_id').select2({
+                              placeholder: 'Select Student',
+                              allowClear: true,
+                              dropdownParent: $('#addMarksModal'),
+                              minimumResultsForSearch: 0 // Keep this here too for re-initialization
+                            });
                         }
                     },
                     error: function (xhr) {
-                    $('#formAlert').removeClass('d-none alert-success').addClass('alert alert-danger');
-                        if (xhr.status === 422) {
-                            let response = xhr.responseJSON;
-
-                            
-                            if (response.message) {
-                                $('#formAlert').html(response.message);
-                            }
-
-                            // Show field-wise errors if any
-                            if (response.errors) {
-                                $('.text-danger').text('');
-                                $.each(response.errors, function (key, value) {
-                                    $('#error_' + key).text(value[0]);
-                                    $('#' + key).addClass('is-invalid');
-                                });
-                            }
-                        } else {
-                            $('#formAlert').html('An unexpected error occurred. Please try again.');
-                        }
+                        console.error("Error fetching students:", xhr);
+                        $('#student_id').html('<option value="">Error loading students</option>');
                     }
                 });
-            });
+            } else {
+                $('#student_id').html('<option value="">Select Student</option>');
+                // Clear select2 for student_id if session is cleared
+                $('#student_id').select2({
+                    placeholder: 'Select Student',
+                    allowClear: true,
+                    dropdownParent: $('#addMarksModal')
+                });
+            }
         });
 
-        $('input, select').on('input change', function () {
-            var field = $(this).attr('id');
-            $('#error_' + field).text('');
-            $(this).removeClass('is-invalid');
-        });
+        // AJAX for fetching class and subjects by student and session
+        $('#student_id').on('change', function () {
+            var student_id = $(this).val();
+            var session_id = $('#session_id').val();
+            $('#class_id').html('<option value="">Loading...</option>');
+            updateInitialSubjectDropdown([]); // Clear subjects when student changes
 
-        $(document).ready(function() {
-            $('#session_id').on('change', function() {
-                var sessionId = $(this).val();
-                $('#student_id').html('<option value="">Loading...</option>');
-                if (sessionId) {
-                    $.ajax({
-                        url: "{{ route('admin.get-students-by-session') }}",
-                        type: 'GET',
-                        dataType: 'json',
-                        data: { sessionId: sessionId },
-                        success: function(response) {
-                            if(response.success){
-                                $('#student_id').empty();
-                                $('#student_id').append('<option value="">Select Student</option>');
-                                $.each(response.students, function(key, student) {
-                                    $('#student_id').append('<option value="'+student.id+'">'+student.name+'</option>');
-                                });
-                            }
-                        },
-                        error: function(xhr) {
-                            console.error(xhr);
+            if (session_id && student_id) {
+                $.ajax({
+                    url: "{{ route('admin.get-class-by-session-and-student') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { student_id: student_id, session_id: session_id },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#class_id').empty();
+                            $.each(response.classes, function (key, classData) {
+                                $('#class_id').append('<option value="' + classData.id + '" selected>' + classData.name + '</option>');
+                            });
+
+                            // Update the global fetchedSubjects variable with the new subjects
+                            fetchedSubjects = response.subjects;
+                            updateInitialSubjectDropdown(fetchedSubjects);
+
+                        } else {
+                            $('#class_id').html('<option value="">' + response.message + '</option>');
+                            // Also clear subjects if no class found
+                            updateInitialSubjectDropdown([]);
                         }
-                    });
-                } else {
-                    $('#student_id').html('<option value="">Select Student</option>');
-                }
-            });
-            $('#student_id').on('change', function() {
-                var student_id = $(this).val();
-                var session_id = $('#session_id').val();
-                if (session_id && student_id) {
-                    $.ajax({
-                        url: "{{ route('admin.get-class-by-session-and-student') }}",
-                        type: 'GET',
-                        dataType: 'json',
-                        data: { student_id: student_id,session_id:session_id },
-                        success: function(response) {
-                            if(response.success){
-                                $('#class_id').empty();
-                                $.each(response.classes, function(key, classData) {
-                                    $('#class_id').append('<option value="'+classData.id+'" selected>'+classData.name+'</option>');
-                                });
-                                $('#subject_id').empty();
-                                $.each(response.subjects, function(key, subjectData) {
-                                    
-                                    $('#subject_id').append('<option value="'+subjectData.id+'" selected>'+subjectData.name+'</option>');
-                                });
-                            }
-                        },
-                        error: function(xhr) {
-                            console.error(xhr);
-                        }
-                    });
-                } else {
-                    $('#class_id').html('<option value="">Select class</option>');
-                    $('#subject_id').html('<option value="">Select subject</option>');
-                }
-            });
+                    },
+                    error: function (xhr) {
+                        console.error("Error fetching class/subjects:", xhr);
+                        $('#class_id').html('<option value="">Error loading class</option>');
+                        updateInitialSubjectDropdown([]);
+                    }
+                });
+            } else {
+                $('#class_id').html('<option value="">Select class</option>');
+                updateInitialSubjectDropdown([]);
+            }
         });
 
-        // edit marks
+        // Function to update the initial subject dropdown in the first row of subject-marks-group
+        function updateInitialSubjectDropdown(subjects) {
+            let initialSubjectDropdown = $('.subject-marks-group').first().find('.subject-dropdown');
+            initialSubjectDropdown.empty().append('<option value="">Select Subject</option>');
+            $.each(subjects, function (key, subjectData) {
+                initialSubjectDropdown.append('<option value="' + subjectData.id + '">' + subjectData.name + '</option>');
+            });
+        }
+
+
+        // Add More Subject-Marks Fields
+        $('#addMoreSubject').on('click', function () {
+            let wrapper = $('#subject-marks-wrapper');
+            let subjectsUsed = [];
+
+            // Collect subjects already selected in existing dropdowns
+            wrapper.find('.subject-dropdown').each(function () {
+                let val = $(this).val();
+                if (val) subjectsUsed.push(val);
+            });
+
+            // Filter available subjects based on what's already selected
+            let availableSubjects = fetchedSubjects.filter(s => !subjectsUsed.includes(s.id.toString())); // Convert s.id to string for strict comparison
+
+            if (availableSubjects.length === 0) {
+                alert("All available subjects for this class are already selected or no subjects are assigned.");
+                return;
+            }
+
+            // Generate options for the new dropdown
+            let optionsHtml = '<option value="">Select Subject</option>';
+            optionsHtml += availableSubjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+
+            let group = `
+                <div class="row g-3 subject-marks-group mt-3"> <div class="form-floating form-floating-outline col-md-3">
+                        <select name="subject_id[]" class="form-select subject-dropdown">
+                            ${optionsHtml}
+                        </select>
+                        <label class="form-label">Subject</label>
+                    </div>
+                    <div class="form-floating form-floating-outline col-md-2">
+                        <select name="mid_term_out_off[]" class="form-select">
+                            <option value="100">100</option>
+                        </select>
+                        <label class="form-label">Mid Term Out Of</label>
+                    </div>
+                    <div class="form-floating form-floating-outline col-md-2">
+                        <input type="number" name="mid_term_stu_marks[]" class="form-control" placeholder="Mid Term Marks">
+                        <label>Mid Term Student Marks</label>
+                    </div>
+                    <div class="form-floating form-floating-outline col-md-2">
+                        <select name="final_exam_out_off[]" class="form-select">
+                            <option value="100">100</option>
+                        </select>
+                        <label class="form-label">Final Exam Out Of</label>
+                    </div>
+                    <div class="form-floating form-floating-outline col-md-2">
+                        <input type="number" name="final_exam_stu_marks[]" class="form-control" placeholder="Final Exam Marks">
+                        <label>Final Exam Student Marks</label>
+                    </div>
+                    <div class="col-md-1 d-flex align-items-center">
+                        <button type="button" class="btn btn-danger remove-subject-group">×</button>
+                    </div>
+                </div>
+            `;
+            wrapper.append(group);
+            // Show the remove button for new groups
+            $('.subject-marks-group:not(:first-child) .remove-subject-group').removeClass('d-none');
+        });
+
+        // Initialize select2 for student_id on document ready (for initial load)
+        $('#student_id').select2({
+            placeholder: 'Select Student',
+            allowClear: true,
+            dropdownParent: $('#addMarksModal'), // Make sure this matches your modal's ID
+        });
+
+        // Remove Subject-Marks Group
+        $(document).on('click', '.remove-subject-group', function () {
+            $(this).closest('.subject-marks-group').remove();
+            // Re-hide remove button if only one group remains
+            if ($('.subject-marks-group').length === 1) {
+                $('.subject-marks-group .remove-subject-group').addClass('d-none');
+            }
+        });
+
+        // Initially hide remove button if only one group is present
+        if ($('.subject-marks-group').length === 1) {
+            $('.subject-marks-group .remove-subject-group').addClass('d-none');
+        }
+      });
+
+
+        // For edit marks modal
         $(document).ready(function() {
             // Function to load students for the edit modal
             function loadEditStudents(sessionId, selectedStudentId = null, selectedClassId = null, selectedSubjectId = null) {

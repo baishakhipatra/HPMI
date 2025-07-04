@@ -34,6 +34,11 @@
                             </li>
 
                             <li class="mb-2">
+                                <span class="h6 me-1">Designation:</span>
+                                <span>{{ ucwords($employee->designationData->name ?? 'N/A') }}</span>
+                            </li>
+
+                            <li class="mb-2">
                                 <span class="h6 me-1">Address:</span>
                                 <span>{{ ucwords($employee->address ?? 'N/A') }}</span>
                             </li>

@@ -4,7 +4,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin;
 use App\Models\Permission;
-use App\Models\DesignationPermission;
+use App\Models\{DesignationPermission, StudentsMark};
 
 // if(!function_exists('generateEmployeeId')) {
 //     function generateEmployeeId() {
