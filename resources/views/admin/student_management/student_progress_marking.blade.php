@@ -9,7 +9,7 @@
     <div class="col-12">
       <h6 class="text-body-secondary">Learning Perspective Of Conginitive Domain</h6>
         <div class="text-end">
-            <a href="{{ route('admin.studentlist') }}" class="btn btn-sm btn-danger">
+            <a href="{{ route('admin.student.progressmarking.select') }}" class="btn btn-sm btn-danger">
                 <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
             </a>
         </div>
@@ -33,60 +33,7 @@
                 <div class="card-body">
 
                   {{-- Table header --}}
-                  {{-- <div class="row fw-bold text-center mb-2">
-                  <div class="col">Progress Category</div>
-                  <div class="col">Score(1-10)</div> --}}
-                  {{-- <div class="col">Second Phase</div>
-                  <div class="col">Third Phase</div> --}}
-                  {{-- </div> --}}
-
-                  {{-- @foreach ($getDetails as $item_detail)
-                    <div class="row g-2 align-items-center mb-2 dynamic-item">
-                      <div class="col">
-                        <input type="text" class="form-control" disabled value="{{ $item_detail->progress_category }}">
-                      </div>
-
-                      <div class="col">
-                        <select name="formative_first_phase" class="form-select progress-value"
-                            data-phase="formative_first_phase"
-                            data-student="{{ $student->id }}"
-                            data-session="{{ $academic_session_id }}"
-                            data-category="{{ $item_detail->progress_category }}">
-                          <option value="">Select Value</option>
-                          @foreach ($item_detail->pcategory as $pcategory_item)
-                            <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_first_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
-                          @endforeach
-                        </select>
-                      </div> 
-
-                       <div class="col">
-                        <select name="formative_second_phase" class="form-select progress-value"
-                            data-phase="formative_second_phase"
-                            data-student="{{ $student->id }}"
-                            data-session="{{ $academic_session_id }}"
-                            data-category="{{ $item_detail->progress_category }}">
-                          <option value="">Select Value</option>
-                          @foreach ($item_detail->pcategory as $pcategory_item)
-                            <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_second_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
-                          @endforeach
-                        </select>
-                      </div> 
-
-                      <div class="col">
-                        <select name="formative_third_phase" class="form-select progress-value"
-                            data-phase="formative_third_phase"
-                            data-student="{{ $student->id }}"
-                            data-session="{{ $academic_session_id }}"
-                            data-category="{{ $item_detail->progress_category }}">
-                          <option value="">Select Value</option>
-                          @foreach ($item_detail->pcategory as $pcategory_item)
-                            <option value="{{ ucwords($pcategory_item->value) }}" {{ucwords($item_detail->formative_third_phase)==ucwords($pcategory_item->value)?"selected":""}}>{{ ucwords($pcategory_item->value) }}</option>
-                          @endforeach
-                        </select>
-                      </div>
-                    </div>
-                  @endforeach --}}
-
+                  
                   @foreach ($student_progress_category as $fieldName => $values)
                     <div class="mb-4">
                       <h6 class="fw-bold mb-3">{{ ucwords($fieldName) }}</h6>

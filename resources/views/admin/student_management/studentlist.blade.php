@@ -143,12 +143,12 @@
                     </a> --}}
 
                     {{-- Progress Marking --}}
-                    <a href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}"
+                    {{-- <a href="{{ route('admin.student.progressmarkinglist', [$item->id, $current_session]) }}"
                       class="btn btn-sm btn-icon btn-outline-warning"
                       data-bs-toggle="tooltip"
                       title="Student Progress Marking">
                         <i class="ri-file-list-3-line"></i>
-                    </a>
+                    </a> --}}
 
                     {{-- Classwise Comparison --}}
                     <a href="{{ route('admin.student.classcompare', $item->id) }}"

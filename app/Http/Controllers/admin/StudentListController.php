@@ -559,29 +559,7 @@ class StudentListController extends Controller
 
         return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id','student_progress_category','savedScores'));
     }
-    
-    // public function ProgressUpdatePhase(Request $request)
-    // {
-    //     $request->validate([
-    //         'student_id' => 'required|integer',
-    //         'session_id' => 'required|integer',
-    //         'category' => 'required|string',
-    //         'phase' => 'required|string|in:formative_first_phase,formative_second_phase,formative_third_phase',
-    //         'value' => 'required|string'
-    //     ]);
 
-    //     $updated = StudentProgressMarking::where([
-    //         'student_id' => $request->student_id,
-    //         'admission_session_id' => $request->session_id,
-    //         'progress_category' => $request->category,
-    //     ])->update([
-    //         $request->phase => $request->value
-    //     ]);
-
-    //     return response()->json([
-    //         'success' => $updated ? true : false
-    //     ]);
-    // }
 
     public function ProgressUpdatePhase(Request $request)
     {

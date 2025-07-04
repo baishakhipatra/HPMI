@@ -16,10 +16,6 @@ class StudentsMark extends Model
         'class_id',
         'subject_id',
         'student_admission_id',
-        'term_one_out_off',
-        'term_one_stu_marks',
-        'term_two_out_off',
-        'term_two_stu_marks',
         'mid_term_out_off',
         'mid_term_stu_marks',
         'final_exam_out_off',
@@ -28,7 +24,7 @@ class StudentsMark extends Model
 
     public function student()
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Student::class, 'student_id');
     }
 
     public function class()

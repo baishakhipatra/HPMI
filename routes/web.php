@@ -7,7 +7,7 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\admin\{UserListController, TeacherListController, StudentListController, ClassListController ,
                                 SubjectListController ,StudentMarkListController, StudentProgressMarkingController,
                                 ClassComparisonController ,ProgressChartController ,StudentReadmissionController, 
-                                DesignationController};
+                                DesignationController, StudentProgressAddController, ReportController};
 
 //End New Route
 
@@ -201,9 +201,19 @@ Route::prefix('admin')->group(function () {
                 Route::post('/store/{id}', [StudentReadmissionController::class, 'reAdmissionStore'])->name('admin.student.readmission.store')->middleware('check.permission');
             });
 
+
             Route::prefix('student-progress-marking')->group(function(){
-                Route::get('/{student_id}/{session}', [StudentListController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist')->middleware('check.permission');
-                Route::post('/progress-update-phase', [StudentListController::class, 'ProgressUpdatePhase'])->name('admin.student.progress.update.phase');
+                Route::get('/', [StudentProgressAddController::class, 'selectionPage'])->name('admin.student.progressmarking.select');
+                Route::get('/go', [StudentProgressAddController::class, 'goToMarking'])->name('admin.student.progressmarkinglist.redirect');
+                Route::get('/get-classes-by-session', [StudentProgressAddController::class, 'getClassesBySession'])
+                    ->name('admin.getClassesBySession');
+                Route::get('/get-students-by-class', [StudentProgressAddController::class, 'getStudentsByClass'])
+                    ->name('admin.getStudentsByClass');
+                Route::get('/{student_id}/{session}', [StudentProgressAddController::class, 'studentProgressList'])->name('admin.student.progressmarkinglist')->middleware('check.permission');
+                Route::post('/progress-update-phase', [StudentProgressAddController::class, 'ProgressUpdatePhase'])->name('admin.student.progress.update.phase');
+                // Route::get('/student-progress-marking', [StudentProgressAddController::class, 'selectStudentSession'])->name('admin.student.progressmarking.select');
+                // Route::get('/student-progress-marking/go', [StudentProgressAddController::class, 'redirectToMarking'])->name('admin.student.progressmarkinglist.redirect');
+
             });
 
             Route::prefix('studentmark-list')->group(function(){
@@ -279,6 +289,16 @@ Route::prefix('admin')->group(function () {
                 Route::post('/update-permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');
                 Route::post('/permission-ajax', [DesignationController::class, 'updatePermissionAjax'])->name('admin.designation.permissions.ajax');
             });
+        });
+
+        Route::prefix('report')->group(function(){
+            Route::get('/',[ReportController::class, 'index'])->name('admin.report.index');
+            Route::get('/chart-data', [ReportController::class, 'getChartData'])->name('admin.report.getChartData');
+            Route::get('/academic-reports/classes-by-session', [ReportController::class, 'getClassesBySession'])->name('admin.report.getClassesBySession');
+            Route::get('/academic-reports/subjects-by-class', [ReportController::class, 'getSubjectsByClassAndSession'])->name('admin.report.getSubjectsByClassAndSession');
+            Route::get('/academic-reports/students-by-class-session', [ReportController::class, 'getStudentsByClassAndSession'])->name('admin.report.getStudentsByClassAndSession');
+            Route::get('/student-report-card', [ReportController::class, 'getStudentReportCard'])->name('admin.report.getStudentReportCard');
+            Route::get('/export', [ReportController::class, 'export'])->name('admin.report.export');
         });
 
     });

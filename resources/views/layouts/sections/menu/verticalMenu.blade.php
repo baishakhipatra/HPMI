@@ -74,20 +74,20 @@
       </a>
       <ul class="menu-sub">
         @if (hasPermissionByChild('student_list'))
-        <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
-          <a href="{{route('admin.studentlist')}}" class="menu-link">
-            <div>Student List</div>
-          </a>
-        </li>
+          <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
+            <a href="{{route('admin.studentlist')}}" class="menu-link">
+              <div>Student List</div>
+            </a>
+          </li>
         @endif
 
         @if (hasPermissionByChild('student_readmision_list'))
-        <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
-          <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
-            <div>Student Re-admission</div>
-          </a>
-        </li>
-       @endif
+          <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
+            <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
+              <div>Student Re-admission</div>
+            </a>
+          </li>
+        @endif
 
         @if (hasPermissionByChild('student_mark_list'))
           @if($exist_student)
@@ -98,6 +98,19 @@
             </li>
           @endif
         @endif
+
+        {{-- @if (hasPermissionByChild('student_progress_marking_list')) --}}
+        {{-- <li class="menu-item {{ request()->is('admin/student-progress-marking*') ? 'active' : '' }}">
+            <a href="{{ route('admin.student.progressmarkinglist', [$defaultStudentId, $defaultSession]) }}" class="menu-link">
+                Student Progress Marking
+            </a>
+        </li> --}}
+        <li class="menu-item {{ request()->is('admin/student-progress-marking') ? 'active' : '' }}">
+          <a href="{{ route('admin.student.progressmarking.select') }}" class="menu-link">
+              <div>Student Progress Marking</div>
+          </a>
+        </li>
+        {{-- @endif --}}
       </ul>
     </li>
     @endif
@@ -152,6 +165,13 @@
       </ul>
     </li>
     @endif
+
+    <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
+      <a href="{{route('admin.report.index')}}" class="menu-link">
+        <i class="menu-icon tf-icons ri-bar-chart-box-line"></i>
+        <div>Report</div>
+      </a>
+    </li>
     
     <li class="menu-item">
       <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
