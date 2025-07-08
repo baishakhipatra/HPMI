@@ -1,8 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Add your toastFire function if it's custom -->
-{{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -105,7 +101,7 @@
             </div>
         </div>
         <form action="{{ route('admin.studentmarklist')}}" method="GET">
-            <div class="row mb-4">
+            <div class="row mb-4 align-items-center">
                 <div class="col-md-4 mb-2">
                     <input type="text" id="student_name" name="student_name" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
                 </div>
@@ -125,7 +121,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="form-floating form-floating-outline col-md-2 mb-2">
+                <div class="form-floating form-floating-outline col-md-2">
                     <select id="subject_filter" name="subject_filter" class="form-select">
                         <option value="">All Subjects</option>
                         @foreach($subjects as $subject)
@@ -133,9 +129,14 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2 text-end"> 
+                <div class="col-md-1 text-end"> 
                     <button type="submit" class="btn btn-primary">Search</button>
-                    <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2">Reset</a>
+                    
+                </div>
+                <div class="col-md-1 text-end">
+                    <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2" data-bs-toggle="tooltip" data-bs-original-title="Reset">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </a>
                 </div>
             </div>
         </form>
@@ -296,7 +297,7 @@
 
                               <div class="form-floating form-floating-outline col-md-2">
                                   <input type="number" name="mid_term_stu_marks[]" class="form-control" placeholder="Mid Term Marks">
-                                  <label>Mid Term Student Marks</label>
+                                  <label>Mid Term Marks</label>
                               </div>
 
                               <div class="form-floating form-floating-outline col-md-2">
@@ -308,7 +309,7 @@
 
                               <div class="form-floating form-floating-outline col-md-2">
                                   <input type="number" name="final_exam_stu_marks[]" class="form-control" placeholder="Final Exam Marks">
-                                  <label>Final Exam Student Marks</label>
+                                  <label>Final Exam Marks</label>
                               </div>
 
                               <div class="col-md-1 d-flex align-items-center">
@@ -445,11 +446,11 @@
     </div>
     
 @endsection
-{{-- @section('scripts') --}}
+@section('scripts')
 {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
     <script>
-        
-      $(document).ready(function () {
+    var $con = jQuery.noConflict();
+      $con(document).ready(function () {
         // Global variable to store subjects fetched by AJAX for 'Add More' functionality
         let fetchedSubjects = [];
 
@@ -616,7 +617,8 @@
         });
 
         // AJAX for fetching class and subjects by student and session
-        $('#student_id').on('change', function () {
+        $con('#student_id').on('change', function () {
+
             var student_id = $(this).val();
             var session_id = $('#session_id').val();
             $('#class_id').html('<option value="">Loading...</option>');
@@ -752,7 +754,7 @@
 
 
         // For edit marks modal
-        $(document).ready(function() {
+        $con(document).ready(function() {
             // Function to load students for the edit modal
             function loadEditStudents(sessionId, selectedStudentId = null, selectedClassId = null, selectedSubjectId = null) {
                 if (!sessionId) {
@@ -921,7 +923,7 @@
 
         });
 
-        $(document).ready(function () {
+        $con(document).ready(function () {
             $('#editMarksButton').on('click', function (e) {
                 e.preventDefault();
 
@@ -1017,7 +1019,18 @@
                   });
               }
           });
-        }     
+        }
+
+        $con('#student_id').select2({
+            //closeOnSelect: false
+            width: '100%',
+            height: '45px',
+            dropdownParent: $con('#addMarksModal')
+            
+
+        });
+
+
     </script>
-{{-- @endsection --}}
+@endsection
     

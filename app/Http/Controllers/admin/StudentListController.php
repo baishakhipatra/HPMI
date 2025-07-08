@@ -4,8 +4,12 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\StudentsImport;
 use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory,StudentProgressMarking};
 
 class StudentListController extends Controller
@@ -50,6 +54,7 @@ class StudentListController extends Controller
 
 
     public function create(){
+        createNewSession();
         $sessions = AcademicSession::get();
         $classrooms = ClassList::where('status',1)->orderBy('class','ASC')->get();
         return view('admin.student_management.create_student',compact('sessions','classrooms'));
@@ -605,7 +610,21 @@ class StudentListController extends Controller
         return response()->json(['success' => true]);
     }
 
-
+    public function import(Request $request)
+    {
+        dd('check');
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // max 10MB
+        ]);
+        try {
+            Excel::import(new StudentsImport, $request->file('excel_file'));
+            return redirect()->route('admin.studentlist')->with('success', 'Students imported successfully!');
+        } catch (Exception $e) {
+            dd($e->getMessage());
+            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+       
+    }
 
 
 }

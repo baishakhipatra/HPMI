@@ -183,6 +183,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
                 Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete')->middleware('check.permission');
                 Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export')->middleware('check.permission');
+                Route::post('/import', [StudentListController::class, 'import'])->name('admin.student.import');
+
             });
 
             // Route::prefix('admission-history')->group(function(){

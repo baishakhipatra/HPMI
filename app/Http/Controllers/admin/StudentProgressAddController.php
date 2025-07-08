@@ -69,51 +69,123 @@ class StudentProgressAddController extends Controller
         );
     }
 
+    // public function studentProgressList($student_id, $current_session)
+    // {
+    //     $student = Student::with('admissions.session')->find($student_id);
+    //     $AcademicSession = AcademicSession::where('session_name', $current_session)->first();
+    //     if (!$student || !$AcademicSession) {
+    //         abort(404, 'Student not found');
+    //     }
+    //     $academic_session_id = $AcademicSession->id;
+    //     // $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
+    //     //     ->groupBy('value')
+    //     //     ->map(function ($items) {
+    //     //         return $items->pluck('value')->toArray(); // get only values per field
+    //     //     })
+    //     //     ->toArray();
+    //     $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
+    //         ->groupBy('field'); 
+
+    //         foreach($student_progress_category as $key=>$item){
+    //             StudentProgressMarking::updateOrCreate([
+    //                 'student_id' =>$student_id,
+    //                 'admission_session_id' =>$AcademicSession->id,
+    //                 'progress_category' => ucwords($key)
+    //             ],[
+
+    //             ]);
+    //         }
+    //     $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
+
+    //     $savedScores = StudentProgressMarking::where('student_id', $student_id)
+    //         ->where('admission_session_id', $academic_session_id)
+    //         ->get()
+    //         ->groupBy('progress_category')
+    //         ->map(function ($items) {
+    //             return $items->pluck('formative_first_phase', 'progress_value')->toArray();
+    //         })
+    //         ->toArray();
+
+
+    //    // dd($savedScores);
+    //     $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
+    //         return [$admission->session->session_name ?? 'Unknown' => $admission->id];
+    //     })->toArray();
+
+    //     return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id','student_progress_category','savedScores'));
+    // }
     public function studentProgressList($student_id, $current_session)
     {
-        $student = Student::with('admissions.session')->find($student_id);
+        $admin = auth()->guard('admin')->user();
+        $isTeacher = ($admin && $admin->user_type === 'Teacher');
+
+        $student = Student::with(['admissions.session', 'admissions.class'])->find($student_id);
         $AcademicSession = AcademicSession::where('session_name', $current_session)->first();
+
         if (!$student || !$AcademicSession) {
-            abort(404, 'Student not found');
+            abort(404, 'Student or Session not found');
         }
+
         $academic_session_id = $AcademicSession->id;
-        // $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-        //     ->groupBy('value')
-        //     ->map(function ($items) {
-        //         return $items->pluck('value')->toArray(); // get only values per field
-        //     })
-        //     ->toArray();
-        $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-            ->groupBy('field'); 
 
-            foreach($student_progress_category as $key=>$item){
-                StudentProgressMarking::updateOrCreate([
-                    'student_id' =>$student_id,
-                    'admission_session_id' =>$AcademicSession->id,
-                    'progress_category' => ucwords($key)
-                ],[
+        // Get the student’s current admission record for the session
+        $currentAdmission = $student->admissions->where('session_id', $academic_session_id)->first();
 
-                ]);
+        if (!$currentAdmission) {
+            abort(404, 'Admission record not found for selected session.');
+        }
+
+        // If teacher, check if the student belongs to teacher's assigned class
+        if ($isTeacher) {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+
+            if (!in_array($currentAdmission->class_id, $assignedClassIds)) {
+                return redirect()->back()->with('error', 'This student is not assigned under your classes.');
             }
-        $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
+        }
 
-        $savedScores = StudentProgressMarking::where('student_id', $student_id)
+        // Load progress categories
+        $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()->groupBy('field');
+
+        // Ensure all progress fields are created for this student/session
+        foreach ($student_progress_category as $key => $item) {
+            StudentProgressMarking::updateOrCreate(
+                [
+                    'student_id' => $student_id,
+                    'admission_session_id' => $academic_session_id,
+                    'progress_category' => ucwords($key)
+                ],
+                []
+            );
+        }
+
+        // Fetch details and scores
+        $getDetails = StudentProgressMarking::where('student_id', $student_id)
             ->where('admission_session_id', $academic_session_id)
-            ->get()
-            ->groupBy('progress_category')
+            ->get();
+
+        $savedScores = $getDetails->groupBy('progress_category')
             ->map(function ($items) {
                 return $items->pluck('formative_first_phase', 'progress_value')->toArray();
             })
             ->toArray();
 
-
-       // dd($savedScores);
+        // Session dropdown mapping
         $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
             return [$admission->session->session_name ?? 'Unknown' => $admission->id];
         })->toArray();
 
-        return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id','student_progress_category','savedScores'));
+        return view('admin.student_management.student_progress_marking', compact(
+            'sessionMap',
+            'student',
+            'current_session',
+            'getDetails',
+            'academic_session_id',
+            'student_progress_category',
+            'savedScores'
+        ));
     }
+
 
 
     public function ProgressUpdatePhase(Request $request)

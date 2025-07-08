@@ -14,9 +14,12 @@ class DesignationController extends Controller
 
         $keyword = $request->input('keyword');
 
-        $designations =  Designation::when($keyword, function($query, $keyword){
-                            $query->where('name', 'like', '%' . $keyword .'%');
-                            })->orderBy('id','desc')->paginate(10);
+         $designations = Designation::where('id', '!=', 3) 
+                ->when($keyword, function ($query, $keyword) {
+                    $query->where('name', 'like', '%' . $keyword . '%');
+                })
+                ->orderBy('id', 'desc')
+                ->paginate(10);
 
         $editableDesignationDetails = null;
         if($request->has('edit') && is_numeric($request->edit)) {

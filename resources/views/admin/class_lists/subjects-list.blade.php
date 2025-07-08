@@ -105,7 +105,7 @@
           <input type="hidden" name="classId" value="{{$classData->id}}" />
           <div class="mb-3">
             <div class="form-floating form-floating-outline">
-              <select class="form-control js-example-basic-multiple" name="subjectId[]" multiple="multiple">
+              <select class="form-control js-example-basic-multiple" id="subjectDropdown" name="subjectId[]" multiple="multiple">
                 @foreach($allSubjects as $subject)
                 <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
                 @endforeach
@@ -116,7 +116,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary d-block" onClick="addSubject({{$classData->id}})">Add</button>
+          <button type="submit" class="btn btn-primary d-block" >Add</button>
         </form>
       </div>
     </div>
@@ -126,28 +126,9 @@
 @endsection
 @section('scripts')
 <!-- Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 <script>
-  function addSubject(classId) {
-    $.ajax({
-      url: "{{ route('admin.subjectlist.delete')}}",
-      type: 'POST',
-      data: {
-        "id": userId,
-        "_token": '{{ csrf_token() }}',
-      },
-      success: function (data) {
-        if (data.status != 200) {
-          toastFire('error', data.message);
-        } else {
-          toastFire('success', data.message);
-          location.reload();
-        }
-      }
-    });
-  }
-
+ var $con = jQuery.noConflict();
   function deleteClassToSub(userId) {
     //toastFire('success', 'test message');
     Swal.fire({
@@ -181,8 +162,13 @@
     });
   }
 
-  $(document).ready(function () {
-    $('.js-example-basic-multiple').select2();
+ 
+
+  $con(document).ready(function () {
+    $con('#subjectDropdown').select2({
+      placeholder: "Select Subjects",
+      width: '100%'
+    });
   });
 </script>
 @endsection

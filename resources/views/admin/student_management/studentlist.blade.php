@@ -1,5 +1,5 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 
 
 @extends('layouts/contentNavbarLayout')
@@ -21,7 +21,7 @@
     <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
   </div>
 
-  <div class="px-3 py-2">
+  {{-- <div class="px-3 py-2">
     <form action="" method="get">
       <div class="row">
         <div class="col-md-6"></div>
@@ -33,10 +33,10 @@
               <div class="form-group mb-0">
                 <div class="btn-group">
                   <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="menu-icon tf-icons ri-filter-3-line"></i>
+                    <i class="tf-icons ri-filter-3-line"></i>
                   </button>
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
-                    <i class="menu-icon tf-icons ri-close-line"></i>
+                    <i class="tf-icons ri-close-line"></i>
                   </a>
                   <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
                     <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" 
@@ -45,14 +45,82 @@
                       Export
                     </a>
                   </div>
-                  
                 </div>
               </div>
+              
+              <hr>
+
+              <!-- CSV Upload Form (Placed outside of the filter/export button group) -->
+              <form method="POST" action="{{ route('admin.student.import') }}" enctype="multipart/form-data" class="mt-3">
+                  @csrf
+                  <div class="row align-items-end">
+                      <div class="col-md-6">
+                          <label for="csv_file" class="form-label">Upload CSV File</label>
+                          <input type="file" name="csv_file" class="form-control @error('csv_file') is-invalid @enderror" accept=".csv">
+                          @error('csv_file')
+                              <div class="text-danger small">{{ $message }}</div>
+                          @enderror
+                      </div>
+
+                      <div class="col-md-4">
+                          <button type="submit" class="btn btn-success mt-2">
+                              <i class="fas fa-upload"></i> Import Students
+                          </button>
+                      </div>
+                  </div>
+              </form>
             </div>
           </div>
       </div>
     </form>
+  </div> --}}
+  <div class="px-3 py-2">
+    <form action="" method="get">
+        <div class="row">
+            <div class="col-md-6"></div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-end align-items-center"> {{-- Added align-items-center for vertical alignment --}}
+                    <div class="form-group me-2 mb-0">
+                        <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
+                    </div>
+                    <div class="form-group mb-0">
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="tf-icons ri-filter-3-line"></i>
+                            </button>
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                                <i class="tf-icons ri-close-line"></i>
+                            </a>
+                            {{-- Export Button (already present) --}}
+                            <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                                <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
+                                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect"
+                                    data-toggle="tooltip" title="Export Data">
+                                    <i class="tf-icons ri-file-export-line"></i> Export Users {{-- Added icon --}}
+                                </a>
+                            </div>
+
+                            {{-- Removed the extra <hr> and CSV form placement here --}}
+
+                        </div>
+                    </div>
+
+                    {{-- NEW: CSV Import Button and Hidden Form --}}
+                    {{-- This section replaces the original separate CSV form block --}}
+                    <form id="importExcelForm" method="POST" action="{{ route('admin.student.import') }}" enctype="multipart/form-data" style="display:inline;">
+                        @csrf
+                        <input type="file" name="excel_file" id="excel_file_input" accept=".xlsx,.xls,.csv" style="display: none;">
+                        <button type="button" class="btn btn-dark" onclick="document.getElementById('excel_file_input').click();">
+                            <i class="tf-icons ri-upload-line"></i> Import Excel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </form>
   </div>
+
+
 
   <div class="card-body">
     <div class="table-responsive text-nowrap">
@@ -169,7 +237,7 @@
   
 </div>
 @endsection
-
+@section('scripts')
 <script>
   function deleteStudent(studentId) {
     Swal.fire({
@@ -202,4 +270,19 @@
         }
     });
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('excel_file_input');
+    const form = document.getElementById('importExcelForm');
+
+    if (fileInput && form) {
+      fileInput.addEventListener('change', function () {
+        if (fileInput.files.length > 0) {
+          form.submit();
+        }
+      });
+    }
+  });
 </script>
+
+@endsection

@@ -68,6 +68,12 @@ class AdminAuthController extends Controller
             ])->onlyInput('email-username'); //is equal to withInput($request->only('email-username'))
         }
 
+          // Check if user is inactive (status = 0)
+        if ($user->status == 0) {
+            return back()->withErrors([
+                'email-username' => 'Your account is inactive. Please contact the administrator.',
+            ])->onlyInput('email-username');
+        }
         // First try login assuming input is email
         if (Auth::guard('admin')->attempt(['email' => $login_input, 'password' => $password])) {
             return redirect()->route('admin.dashboard');

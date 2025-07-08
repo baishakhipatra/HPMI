@@ -129,6 +129,7 @@ class StudentReadmissionController extends Controller
 
     public function reAdmissionForm($id)
     {
+        createNewSession();
         $student = Student::findOrFail($id);
         $classes = ClassList::all();
         $sessions = AcademicSession::all();

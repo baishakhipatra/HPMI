@@ -1,0 +1,147 @@
+.login-frame {
+    display: block;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.right-image {
+    height: 100%;
+}
+
+.authentication-inner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: #fff;
+}
+
+.login-form-stack {
+    padding: 0 84px;
+}
+
+.app-brand img {
+    height: 108px;
+}
+
+.form-floating-outline .form-control:focus, .form-floating-outline .form-select:focus {
+    border-color: #133C73 !important;
+}
+
+.form-floating>.form-control:focus~label, 
+.form-floating>.form-control:focus:not(:placeholder-shown)~label, 
+.form-floating>.form-select:focus~label, 
+.form-floating>.form-select:focus:not(:placeholder-shown)~label {
+    color: #133C73;
+}
+
+.input-group:not(.input-group-floating):focus-within 
+.form-control, 
+.input-group:not(.input-group-floating):focus-within .input-group-text {
+    border-color: #133C73;
+}
+
+a{
+    color:#f39c12;
+}
+
+a:hover {
+    color:#EA892E;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #133C73;
+    border-color: #133C73;
+}
+
+.btn-primary:hover {
+    background-color: #1D314B !important;
+    border-color: #1D314B !important;
+}
+
+.menu-part {
+    height: 100vh;
+    margin-top: 15px;
+    overflow-y: auto;
+}
+
+.menu .app-brand.demo, .dark-style .menu .app-brand.demo {
+    height: 85px;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.menu-inner {
+    gap: 9px;
+}
+
+.menu-vertical .menu-item .menu-link i {
+    color:#133C73;
+}
+
+.light-style .menu-vertical .menu-item .menu-link:hover {
+    background-color: rgb(243 156 18 / 34%);
+}
+
+.menu-vertical .menu-item .menu-link, .menu-vertical .menu-header, .menu-vertical .menu-block {
+    padding: 12px 1.45rem;
+    margin-block: 0;
+    margin-inline: 1.125rem;
+    border-radius: 0 50rem 50rem 0;
+    margin-left: 0;
+}
+
+.light-style .menu-vertical .menu-item.active>.menu-toggle, .light-style .menu-vertical .menu-item.open>.menu-toggle {
+     background-color: rgb(243 156 18);
+}
+
+.menu-vertical .menu-item .menu-toggle:after {
+    right: 9px;
+}
+
+.text-primary {
+    color: #1D314B !important;
+}
+
+.table>:not(caption)>*>* {
+    background-clip: padding-box;
+    font-size: 13px;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #FA8E29;
+    border-color: #FA8E29;
+}
+
+.menu-vertical .menu-item .menu-link {
+    font-size: 14px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #133C73 !important;
+}
+
+.session-header{
+    border-bottom: 1px solid #f39c12;
+}
+
+.marks-table th {
+    background-color: #f1f1f1;
+    font-weight: 600;
+}
+
+.page-item.active .page-link, .page-item.active .page-link:hover, .page-item.active .page-link:focus, .page-item.active .page-link:disabled, .page-item.active .page-link.disabled, .pagination li.active>a:not(.page-link), .pagination li.active>a:not(.page-link):hover, .pagination li.active>a:not(.page-link):focus, .pagination li.active>a:not(.page-link):disabled, .pagination li.active>a:not(.page-link).disabled {
+    border-color: #f39c12;
+    background-color: #f39c12;
+    color: #133C73;
+}
+
+.page-item .page-link:hover, .page-item .page-link:focus, .pagination li>a:not(.page-link):hover, .pagination li>a:not(.page-link):focus {
+    background-color: rgb(243 156 18 / 34%);
+    color: #133C73;
+}
+
+.label-color {
+    color: #133C73;
+}

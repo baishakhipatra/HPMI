@@ -59,7 +59,7 @@
     </div>
 
     <!-- Avg Performance -->
-    <div class="col-lg-3 col-md-6 col-12 mb-4">
+    {{-- <div class="col-lg-3 col-md-6 col-12 mb-4">
       <div class="card bg-orange text-white" style="background-color: #f39c12;">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
@@ -69,7 +69,7 @@
           <i class="ri-bar-chart-line fs-2 text-white"></i>
         </div>
       </div>
-    </div>
+    </div> --}}
   </div>
 
 </div>

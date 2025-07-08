@@ -65,11 +65,6 @@ class StudentMarkListController extends Controller
         if ($isTeacher) {
             $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->unique()->toArray();
             $query->whereIn('class_id', $assignedClassIds);
-            // Optionally, you might want to filter students within those classes only
-            // $studentIdsInAssignedClasses = StudentAdmission::whereIn('class_id', $assignedClassIds)->pluck('student_id')->unique()->toArray();
-            // $query->whereHas('student', function ($q) use ($studentIdsInAssignedClasses) {
-            //     $q->whereIn('id', $studentIdsInAssignedClasses);
-            // });
         }
 
         // Apply filters from request

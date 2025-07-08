@@ -4,6 +4,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Models\Admin;
 use App\Models\Permission;
+use App\Models\AcademicSession;
+use Carbon\Carbon;
 use App\Models\{DesignationPermission, StudentsMark};
 
 // if(!function_exists('generateEmployeeId')) {
@@ -104,5 +106,27 @@ if(!function_exists('hasPermissionByChild')){
         }else{
             return false;
         }
+    }
+}
+if (!function_exists('createNewSession')) {
+    function createNewSession() {
+        $currentYear = date('Y');
+        $nextYear = $currentYear + 1;
+        $sessionName = $currentYear . '-' . $nextYear;
+
+        // Optional: define start and end date for academic year
+        $startDate = Carbon::create($currentYear, 4, 1);  // e.g. April 1, current year
+        $endDate = Carbon::create($nextYear, 3, 31);      // e.g. March 31, next year
+
+        // Create or update the academic session
+        $session = AcademicSession::updateOrCreate(
+            ['session_name' => $sessionName],
+            [
+                'start_date' => $startDate,
+                'end_date' => $endDate,
+                'is_active' => 1, // or 0 depending on your logic
+            ]
+        );
+        return $session;
     }
 }
