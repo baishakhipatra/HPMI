@@ -1,9 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
-<!-- Select2 JS -->
+
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Create - Teacher')
@@ -70,7 +65,7 @@
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}">
-                    <label>Date of Birth<span class="text-danger">*</span></label>
+                    <label>Date of Birth</label>
                     @error('date_of_birth') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -81,21 +76,21 @@
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="date" name="date_of_joining" class="form-control" value="{{ old('date_of_joining') }}">
-                    <label>Date of Joining<span class="text-danger">*</span></label>
+                    <label>Date of Joining</label>
                     @error('date_of_joining') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <input type="text" name="qualifications" class="form-control" placeholder="Qualifications" value="{{ old('qualifications') }}">
-                    <label>Qualifications<span class="text-danger">*</span></label>
+                    <label>Qualifications</label>
                     @error('qualifications') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
                     <textarea name="address" class="form-control" placeholder="Address" style="height: 70px;">{{ old('address') }}</textarea>
-                    <label>Address<span class="text-danger">*</span></label>
+                    <label>Address</label>
                     @error('address') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
@@ -104,7 +99,7 @@
         <div class="row mb-3">
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
-                    <select name="classes_assigned[]" id="classDropdown" class="form-control" multiple>
+                    <select name="classes_assigned[]" id="classDropdown" class="form-control class_dropdown" multiple="multiple" >
                         {{-- <option value="">-- Select Class --</option> --}}
                         @foreach($classLists as $class)
                             <option value="{{ $class->id }}">{{ $class->class }}</option>
@@ -134,10 +129,11 @@
                         <div class="form-floating form-floating-outline flex-grow-1">
                             <input type="password" id="password" class="form-control" name="password" placeholder="********" />
                             <label for="password">Password<span class="text-danger">*</span></label>
-                            @error('password') <p class="small text-danger">{{ $message }}</p> @enderror
+                            
                         </div>
                         <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
                     </div>
+                    @error('password') <p class="small text-danger">{{ $message }}</p> @enderror
                 </div>
             </div>
         </div>
@@ -152,11 +148,17 @@
 
 </div>
 @endsection
-
+@section('scripts')
 <script>
-    $(document).ready(function () {
 
-      $('#classDropdown').on('change', function () {
+var $jq = jQuery.noConflict();
+
+
+    $jq(document).ready(function () {
+
+    
+
+      $jq('#classDropdown').on('change', function () {
 
         var classIds = $(this).val(); // get multiple selected values
         $('#subjectDropdown').html('<option value="">Loading...</option>');
@@ -180,6 +182,8 @@
 
                     $('#subjectDropdown').append('<option value="' + item.id + '">' + label + '</option>');
                   }
+
+                  //console.log('working');
                 });
               } else {
                 $('#subjectDropdown').html('<option value="">No subjects available</option>');
@@ -191,5 +195,17 @@
           $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
         }
       });
+
+
+
     });
+
+
+  $jq(document).ready(function () {
+    $jq('#classDropdown').select2();
+    $jq('#subjectDropdown').select2();
+  });
 </script>
+
+
+@endsection

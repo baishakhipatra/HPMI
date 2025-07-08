@@ -32,10 +32,10 @@
               <div class="form-group mb-0">
                 <div class="btn-group">
                   <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="menu-icon tf-icons ri-filter-3-line"></i>
+                    <i class="tf-icons ri-filter-3-line"></i>
                   </button>
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
-                    <i class="menu-icon tf-icons ri-close-line"></i>
+                    <i class="tf-icons ri-close-line"></i>
                   </a>
                   <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
                     <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 

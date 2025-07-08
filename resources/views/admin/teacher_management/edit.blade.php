@@ -1,8 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -155,12 +151,30 @@
 </section>
 
 @endsection
-
+@section('scripts')
 <script>
-    $(document).ready(function () {
+    var $jq = jQuery.noConflict();
+    
+
+    $jq(document).ready(function () {
         let selectedSubjects = @json($selectedClassWiseSubjectIds);
         // console.log('selectedSubjectIds', selectedSubjects);
+          // Initial load for pre-selected classes
+        const preSelectedClasses = $('#classDropdown').val();
+        if (preSelectedClasses && preSelectedClasses.length > 0) {
+            fetchSubjects(preSelectedClasses);
+        }
 
+        // On change
+        $('#classDropdown').on('change', function () {
+            let classIds = $(this).val();
+            selectedSubjects = []; // reset selected subjects on change
+            if (classIds.length > 0) {
+                fetchSubjects(classIds);
+            } else {
+                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
+            }
+        });
         function fetchSubjects(classIds) {
             $('#subjectDropdown').html('<option value="">Loading...</option>');
             $.ajax({
@@ -190,21 +204,12 @@
             });
         }
 
-        // Initial load for pre-selected classes
-        const preSelectedClasses = $('#classDropdown').val();
-        if (preSelectedClasses && preSelectedClasses.length > 0) {
-            fetchSubjects(preSelectedClasses);
-        }
+      
+    });
 
-        // On change
-        $('#classDropdown').on('change', function () {
-            let classIds = $(this).val();
-            selectedSubjects = []; // reset selected subjects on change
-            if (classIds.length > 0) {
-                fetchSubjects(classIds);
-            } else {
-                $('#subjectDropdown').html('<option value="">-- Select Subject --</option>');
-            }
-        });
+    $jq(document).ready(function () {
+        $jq('#classDropdown').select2();
+        $jq('#subjectDropdown').select2();
     });
 </script>
+@endsection

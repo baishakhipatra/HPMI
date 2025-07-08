@@ -68,23 +68,21 @@ $container = ($container ?? 'container-xxl');
           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
           <!-- SweetAlert2 -->
-          {{-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> --}}
           <script src="{{ asset('build/assets/sweetalert2@11.js') }}"></script>
-          <!-- Global custom JS -->
-          <script src="{{ asset('build/assets/custom.js') }}"></script>
-
           <!-- Select2 CSS -->
-          {{-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> --}}
-
+          <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+         
           {{-- for icon --}}
           <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
 
           <!-- jQuery (required) -->
-          {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
-
 
           <!-- Select2 JS -->
-          {{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script> --}}
+           <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+          <!-- Global custom JS -->
+          <script src="{{ asset('build/assets/custom.js') }}"></script>
+
+
 
           <!-- Stacked scripts from individual views (optional) -->
           @yield('scripts')
