@@ -128,7 +128,7 @@
                 <h6 class="mt-4">Overall Summary</h6>
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Total Marks Obtained (Final):</strong> <span id="reportTotalMarks"></span></p>
+                        <p><strong>Total Marks Obtained:</strong> <span id="reportTotalMarks"></span></p>
                         <p><strong>Overall Percentage:</strong> <span id="reportAveragePercentage"></span>%</p>
                     </div>
                     <div class="col-md-6">
@@ -157,7 +157,7 @@
     $(function () {
         let performanceChartInstance = null; // For Class Comparison Chart
 
-        // Function to fetch and draw Class Comparison Chart
+
         function fetchChartData() {
             const sessionId = $('#filterSession').val();
             const classId = $('#filterClass').val();
@@ -216,7 +216,7 @@
                     labels: labels,
                     datasets: [
                         { label: 'Average Marks %', data: avgMarks, backgroundColor: '#3b82f6' },
-                        { label: 'Pass Percentage %', data: passPercent, backgroundColor: '#10b981' } // Corrected `passPercent`
+                        { label: 'Pass Percentage %', data: passPercent, backgroundColor: '#10b981' } 
                     ]
                 },
                 options: {
@@ -327,23 +327,92 @@
             }
         }
 
+        // function fetchStudentReportCard() {
+        //     const sessionId = $('#filterSession').val();
+        //     const classId = $('#filterClass').val();
+        //     const studentId = $('#filterStudent').val();
+        //     const subjectId = $('#filterSubject').val(); 
+
+     
+        //     $('#studentReportCardContainer').hide();
+        //     $('#selectStudentMessage').show();
+        //     $('#studentReportErrorMessage').hide().text('');
+
+         
+        //     if (!sessionId || sessionId === '' || !classId || classId === '' || !studentId || studentId === '') {
+        //         $('#selectStudentMessage').show(); 
+        //         return;
+        //     } else {
+        //         $('#selectStudentMessage').hide(); 
+        //     }
+
+        //     $.ajax({
+        //         url: "{{ route('admin.report.getStudentReportCard') }}",
+        //         method: 'GET',
+        //         data: {
+        //             session_id: sessionId,
+        //             class_id: classId,
+        //             student_id: studentId,
+        //             subject_id: subjectId 
+        //         },
+        //         success: function (res) {
+        //             console.log("Student Report Card Response:", res);
+        //             if (res.success && res.data) {
+        //                 const data = res.data;
+        //                 $('#reportStudentName').text(data.student_name);
+        //                 $('#reportSessionName').text(data.session_name);
+        //                 $('#reportClassName').text(data.class_name);
+        //                 $('#reportRollNumber').text(data.roll_number || 'N/A');
+
+        //                 let marksHtml = '';
+        //                 if (data.marks.length > 0) {
+        //                     $.each(data.marks, function(i, mark) {
+        //                         marksHtml += `
+        //                             <tr>
+        //                                 <td>${mark.subject}</td>
+        //                                 <td>${mark.mid_term_marks || 'N/A'}/${mark.mid_term_out_off || 'N/A'}</td>
+        //                                 <td>${mark.final_exam_marks || 'N/A'}/${mark.final_exam_out_off || 'N/A'}</td>
+        //                                 <td><span class="badge bg-${mark.status === 'Pass' ? 'success' : 'danger'}">${mark.status}</span></td>
+        //                             </tr>
+        //                         `;
+        //                     });
+        //                 } else {
+        //                     marksHtml = '<tr><td colspan="4" class="text-center">No marks recorded for this student in the selected criteria.</td></tr>';
+        //                 }
+        //                 $('#studentMarksTableBody').html(marksHtml);
+
+                     
+        //                 $('#reportTotalMarks').text(data.summary.total_marks_obtained || 'N/A');
+        //                 $('#reportAveragePercentage').text(data.summary.overall_percentage || '0');
+        //                 $('#reportOverallStatus').html(`<span class="badge bg-${data.summary.overall_status === 'Pass' ? 'success' : 'danger'}">${data.summary.overall_status}</span>`);
+
+        //                 $('#studentReportCardContainer').show();
+        //             } else {
+        //                 $('#studentReportErrorMessage').text(res.message || 'Failed to load student report card.').show();
+        //             }
+        //         },
+        //         error: function (jqXHR, textStatus, errorThrown) {
+        //             console.error("AJAX Error fetching student report card:", textStatus, errorThrown, jqXHR);
+        //             $('#studentReportErrorMessage').text('Error fetching report card. Check console for details.').show();
+        //         }
+        //     });
+        // }
+
         function fetchStudentReportCard() {
             const sessionId = $('#filterSession').val();
             const classId = $('#filterClass').val();
             const studentId = $('#filterStudent').val();
-            const subjectId = $('#filterSubject').val(); 
+            const subjectId = $('#filterSubject').val();
 
-     
             $('#studentReportCardContainer').hide();
             $('#selectStudentMessage').show();
             $('#studentReportErrorMessage').hide().text('');
 
-         
             if (!sessionId || sessionId === '' || !classId || classId === '' || !studentId || studentId === '') {
-                $('#selectStudentMessage').show(); 
+                $('#selectStudentMessage').show();
                 return;
             } else {
-                $('#selectStudentMessage').hide(); 
+                $('#selectStudentMessage').hide();
             }
 
             $.ajax({
@@ -353,7 +422,7 @@
                     session_id: sessionId,
                     class_id: classId,
                     student_id: studentId,
-                    subject_id: subjectId 
+                    subject_id: subjectId
                 },
                 success: function (res) {
                     console.log("Student Report Card Response:", res);
@@ -380,11 +449,9 @@
                             marksHtml = '<tr><td colspan="4" class="text-center">No marks recorded for this student in the selected criteria.</td></tr>';
                         }
                         $('#studentMarksTableBody').html(marksHtml);
-
-                     
-                        $('#reportTotalMarks').text(data.summary.total_marks_obtained || 'N/A');
-                        $('#reportAveragePercentage').text(data.summary.average_percentage || '0');
-                        $('#reportOverallStatus').html(`<span class="badge bg-${data.summary.pass_status === 'Pass' ? 'success' : 'danger'}">${data.summary.pass_status}</span>`);
+                        $('#reportTotalMarks').text(data.summary.total_marks_obtained); 
+                        $('#reportAveragePercentage').text(data.summary.overall_percentage || '0'); 
+                        $('#reportOverallStatus').html(`<span class="badge bg-${data.summary.overall_status === 'Pass' ? 'success' : 'danger'}">${data.summary.overall_status}</span>`);
 
                         $('#studentReportCardContainer').show();
                     } else {
@@ -463,13 +530,14 @@
     function updateExportLink() {
         const sessionId = $('#filterSession').val();
         const classId = $('#filterClass').val();
+        const studentId = $('#filterStudent').val();
         const subjectId = $('#filterSubject').val();
 
-        const url = `{{ route('admin.report.export') }}?session_id=${sessionId}&class_id=${classId}&subject_id=${subjectId}`;
+        const url = `{{ route('admin.report.export') }}?session_id=${sessionId}&class_id=${classId}&student_id=${studentId}&subject_id=${subjectId}`;
         $('#exportReportBtn').attr('href', url);
     }
 
-    $('#filterSession, #filterClass, #filterSubject').on('change', updateExportLink);
+    $('#filterSession, #filterClass, #filterStudent, #filterSubject').on('change', updateExportLink);
 
     $(document).ready(updateExportLink);
 

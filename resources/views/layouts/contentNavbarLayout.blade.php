@@ -17,6 +17,8 @@ $container = ($container ?? 'container-xxl');
 
 @endphp
 
+<link rel="stylesheet" href="{{ asset('style.css') }}">
+
 @section('layoutContent')
 <div class="layout-wrapper layout-content-navbar {{ $isMenu ? '' : 'layout-without-menu' }}">
   <div class="layout-container">

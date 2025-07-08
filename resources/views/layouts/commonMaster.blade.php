@@ -33,7 +33,7 @@
 
   <!-- Include Scripts -->
   @include('layouts/sections/scripts')
-
+  <link rel="stylesheet" href="{{ asset('style.css') }}">
 </body>
 
 </html>

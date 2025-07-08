@@ -166,6 +166,13 @@
     </li>
     @endif
 
+    <li class="menu-item {{ (request()->is('admin/progress-chart*')) ? 'open' : '' }}">
+      <a href="{{route('admin.progresschart')}}" class="menu-link">
+        <i class="menu-icon tf-icons ri-line-chart-line"></i>
+        <div>Progress Chart</div>
+      </a>
+    </li>
+
     <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
       <a href="{{route('admin.report.index')}}" class="menu-link">
         <i class="menu-icon tf-icons ri-bar-chart-box-line"></i>

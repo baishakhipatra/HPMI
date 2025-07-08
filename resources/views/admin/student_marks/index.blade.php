@@ -682,12 +682,12 @@
             let availableSubjects = fetchedSubjects.filter(s => !subjectsUsed.includes(s.id.toString())); // Convert s.id to string for strict comparison
 
             if (availableSubjects.length === 0) {
-                // alert("All available subjects for this class are already selected or no subjects are assigned.");
+                
                 toastFire('error', "All available subjects for this class are already selected or no subjects are assigned.");
                 return;
             }
 
-            // Generate options for the new dropdown
+           
             let optionsHtml = '<option value="">Select Subject</option>';
             optionsHtml += availableSubjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 

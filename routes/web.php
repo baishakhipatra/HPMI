@@ -273,12 +273,7 @@ Route::prefix('admin')->group(function () {
                
             });
 
-            Route::prefix('progress-chart')->group(function(){
-                Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart')->middleware('check.permission');
-                Route::get('get-students-by-session', [ProgressChartController::class, 'getStudentsBySession'])->name('admin.getStudentsBySession');
-                Route::get('get-class-subject-by-student', [ProgressChartController::class, 'getClassBySessionAndStudent'])->name('admin.getClassBySessionAndStudent');
-                Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
-            });
+
 
             Route::prefix('designations')->group(function(){
                 Route::get('/',[DesignationController::class, 'index'])->name('admin.designation.list')->middleware('check.permission');
@@ -289,6 +284,14 @@ Route::prefix('admin')->group(function () {
                 Route::post('/update-permissions', [DesignationController::class, 'updatePermissions'])->name('admin.designation.permissions.update');
                 Route::post('/permission-ajax', [DesignationController::class, 'updatePermissionAjax'])->name('admin.designation.permissions.ajax');
             });
+        });
+
+
+        Route::prefix('progress-chart')->group(function(){
+            Route::get('/',[ProgressChartController::class, 'index'])->name('admin.progresschart')->middleware('check.permission');
+            Route::get('get-students-by-session', [ProgressChartController::class, 'getStudentsBySession'])->name('admin.getStudentsBySession');
+            Route::get('get-class-subject-by-student', [ProgressChartController::class, 'getClassBySessionAndStudent'])->name('admin.getClassBySessionAndStudent');
+            Route::get('/data',[ProgressChartController::class, 'fetchChartData'])->name('admin.fetchchartdata');
         });
 
         Route::prefix('report')->group(function(){
