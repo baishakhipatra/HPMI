@@ -94,9 +94,9 @@
                             {{-- Export Button (already present) --}}
                             <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
                                 <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
-                                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect"
+                                    class="btn buttons-collection btn-outline-secondary waves-effect"
                                     data-toggle="tooltip" title="Export Data">
-                                    <i class="tf-icons ri-file-export-line"></i> Export Users {{-- Added icon --}}
+                                    Export Student <i class="tf-icons ri-download-line"></i>
                                 </a>
                             </div>
 
@@ -107,13 +107,9 @@
 
                     {{-- NEW: CSV Import Button and Hidden Form --}}
                     {{-- This section replaces the original separate CSV form block --}}
-                    <form id="importExcelForm" method="POST" action="{{ route('admin.student.import') }}" enctype="multipart/form-data" style="display:inline;">
-                        @csrf
-                        <input type="file" name="excel_file" id="excel_file_input" accept=".xlsx,.xls,.csv" style="display: none;">
-                        <button type="button" class="btn btn-dark" onclick="document.getElementById('excel_file_input').click();">
-                            <i class="tf-icons ri-upload-line"></i> Import Excel
-                        </button>
-                    </form>
+                  <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importStudentModal">
+                      <i class="tf-icons ri-upload-line"></i> Import Student
+                  </button>
                 </div>
             </div>
         </div>
@@ -235,6 +231,40 @@
     </div>
   </div>
   
+  <!-- Import Student Modal -->
+<div class="modal fade" id="importStudentModal" tabindex="-1" aria-labelledby="importStudentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="importStudentForm" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="importStudentModalLabel">Import Student CSV</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            <div id="importMessage"></div> <!-- Message Area -->
+            <div class="mb-3">
+              <label for="excel_file" class="form-label">Upload CSV File</label>
+              <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".csv,.xls,.xlsx">
+            </div>
+
+            <div class="mb-3">
+              <a href="{{ asset('assets/csv/student.xlsx') }}" class="btn btn-outline-primary" download>
+                <i class="ri-download-line"></i> Download Sample CSV
+              </a>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-success">Import</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+    </form>
+  </div>
+</div>
+
 </div>
 @endsection
 @section('scripts')
@@ -271,18 +301,45 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    const fileInput = document.getElementById('excel_file_input');
-    const form = document.getElementById('importExcelForm');
+  $(document).ready(function() {
+    $('#importStudentForm').on('submit', function(e) {
+        e.preventDefault();
 
-    if (fileInput && form) {
-      fileInput.addEventListener('change', function () {
-        if (fileInput.files.length > 0) {
-          form.submit();
-        }
-      });
-    }
+        var formData = new FormData(this);
+        $('#importMessage').html('<div class="alert alert-info">Importing...</div>');
+
+        $.ajax({
+            url: "{{ route('admin.student.import') }}",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+              console.log(response);
+              return false;
+                $('#importMessage').html('<div class="alert alert-success">Students imported successfully!</div>');
+                $('#excel_file').val('');
+                // Optionally close modal after short delay
+                setTimeout(function() {
+                    $('#importStudentModal').modal('hide');
+                    location.reload(); // Reload to reflect changes
+                }, 1500);
+            },
+            error: function(xhr) {
+                let errors = xhr.responseJSON?.errors || { error: ['Something went wrong.'] };
+                let errorHtml = '<div class="alert alert-danger"><ul>';
+                $.each(errors, function(key, messages) {
+                    messages.forEach(msg => {
+                        errorHtml += '<li>' + msg + '</li>';
+                    });
+                });
+                errorHtml += '</ul></div>';
+                $('#importMessage').html(errorHtml);
+            }
+        });
+    });
   });
+
 </script>
 
 @endsection

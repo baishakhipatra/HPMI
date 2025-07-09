@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -87,22 +88,32 @@ class StudentMarkListController extends Controller
                 $q->where('session_id', $request->session_filter);
             });
         }
+        
+        // First get all records (you can apply limit if needed for performance)
+        $allMarks = $query->latest('id')->get()
+            ->filter(fn ($item) => $item->studentAdmission !== null);
 
-        $marks = $query->latest('id')->paginate(10);
+        // Group by student-session-class combination
+        $grouped = $allMarks->groupBy(fn ($item) =>
+            $item->studentAdmission->student_id . '_' .
+            $item->studentAdmission->session_id . '_' .
+            $item->studentAdmission->class_id
+        );
 
-        // Group marks for display (ensure studentAdmission is not null before accessing its properties)
-        $groupedMarks = $marks->getCollection()
-            ->filter(fn ($item) => $item->studentAdmission !== null)
-            ->groupBy(fn ($item) =>
-                $item->studentAdmission->student_id . '_' .
-                $item->studentAdmission->session_id . '_' .
-                $item->studentAdmission->class_id
-            );
+        // Paginate by grouped student sections (not individual marks)
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $perPage = 10;
+        $pagedData = $grouped->slice(($currentPage - 1) * $perPage, $perPage);
 
-        $marks->setCollection(collect($groupedMarks)); // Replace the collection with grouped data for pagination awareness
-
+        $groupedMarks = new LengthAwarePaginator(
+            $pagedData,
+            $grouped->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
         return view('admin.student_marks.index', compact(
-            'classes', 'subjects', 'classOptions', 'sessions', 'marks', 'groupedMarks', 'academicSessions'
+            'classes', 'subjects', 'classOptions', 'sessions', 'groupedMarks', 'academicSessions'
         ));
     }
 

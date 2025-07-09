@@ -42,12 +42,34 @@ class Student extends Model
     {
         return $this->hasMany(StudentAdmission::class);
     }
-    public static function generateStudentUid()
+    // public static function generateStudentUid()
+    // {
+    //     do {
+    //         // You can change the format as per your requirement
+    //         $studentId = 'STU' . '-' . strtoupper(Str::random(4));
+    //     } while (self::where('student_id', $studentId)->exists());
+
+    //     return $studentId;
+    // }
+    public static function generateStudentUid($admissionYear, $classAlias, $rollNo)
     {
-        do {
-            // You can change the format as per your requirement
-            $studentId = 'STU' . '-' . strtoupper(Str::random(4));
-        } while (self::where('student_id', $studentId)->exists());
+        // Format year
+        $yearPart = substr($admissionYear, -2); // '2025' => '25'
+
+        // Format roll number (pad to 2 digits)
+        $rollPart = str_pad($rollNo, 2, '0', STR_PAD_LEFT);
+
+        // Build ID
+        $studentId = 'ST-' . $yearPart . strtoupper($classAlias) . $rollPart;
+
+        // Ensure uniqueness
+        $i = 1;
+        $originalId = $studentId;
+        while (self::where('student_id', $studentId)->exists()) {
+            // Append counter if duplicate (e.g., ST-25V23-1)
+            $studentId = $originalId . '-' . $i;
+            $i++;
+        }
 
         return $studentId;
     }

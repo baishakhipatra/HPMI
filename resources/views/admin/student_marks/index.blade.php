@@ -91,9 +91,9 @@
                             'subject_filter' => request('subject_filter'),
                             'session_filter'  => request('session_filter')
                         ]) }}" 
-                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                    data-toggle="tooltip" title="Export Data">
-                        Export
+                    class="btn buttons-collection btn-outline-secondary waves-effect" 
+                    data-toggle="tooltip" title="Export Student Mark">
+                        Export<i class="tf-icons ri-download-line"></i>
                 </a>
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
                 + Add Marks
@@ -117,7 +117,7 @@
                     <select id="class_filter" name="class_filter" class="form-select">
                         <option value="">All Classes</option>
                         @foreach($classOptions as $class)
-                            <option value="{{ $class['id'] }}" {{ request('class_id') == $class['id'] ? 'selected' : '' }}>{{ $class['name'] }}</option>
+                            <option value="{{ $class['id'] }}" {{ request('class_filter') == $class['id'] ? 'selected' : '' }}>{{ $class['name'] }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -125,7 +125,7 @@
                     <select id="subject_filter" name="subject_filter" class="form-select">
                         <option value="">All Subjects</option>
                         @foreach($subjects as $subject)
-                            <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ ucwords($subject->sub_name) }}</option>
+                            <option value="{{ $subject->id }}" {{ request('subject_filter') == $subject->id ? 'selected' : '' }}>{{ ucwords($subject->sub_name) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -221,7 +221,7 @@
               <p class="text-muted">No records found.</p>
               @endforelse
               <div class="d-flex justify-content-end">
-                {{ $marks->links() }}
+                {{ $groupedMarks->links() }}
               </div>
             </div>
           </div>
@@ -446,8 +446,8 @@
     </div>
     
 @endsection
+
 @section('scripts')
-{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
     <script>
     var $con = jQuery.noConflict();
       $con(document).ready(function () {
@@ -588,16 +588,13 @@
                             $('#student_id').empty();
                             $('#student_id').append('<option value="">Select Student</option>');
                             $.each(response.students, function (key, student) {
-                                $('#student_id').append(new Option(student.name, student.id, false, false));
+                                //convert name into ucwords
+                                let name = student.name.toLowerCase().replace(/\b\w/g, function (char) {
+                                    return char.toUpperCase();
+                                });
+                                $('#student_id').append(new Option(name, student.id, false, false));
                             });
                             $('#student_id').val(null).trigger('change'); // clear selection and re-trigger select2 update
-                            // Re-initialize select2 for student_id (important if it's within a modal)
-                            // $('#student_id').select2({
-                            //   placeholder: 'Select Student',
-                            //   allowClear: true,
-                            //   dropdownParent: $('#addMarksModal'),
-                            //   minimumResultsForSearch: 0 // Keep this here too for re-initialization
-                            // });
                         }
                     },
                     error: function (xhr) {

@@ -680,7 +680,7 @@
                                         <td>${mark.subject}</td>
                                         <td>${mark.mid_term_marks || 'N/A'}/${mark.mid_term_out_off || 'N/A'}</td>
                                         <td>${mark.final_exam_marks || 'N/A'}/${mark.final_exam_out_off || 'N/A'}</td>
-                                        <td><span class="badge bg-${mark.status === 'Pass' ? 'success' : 'danger'}">${mark.status}</span></td>
+                                        <td><span class="badge bg-info">${getGradeLabel((+mark.mid_term_marks || 0) + (+mark.final_exam_marks || 0), (+mark.mid_term_out_off || 0) + (+mark.final_exam_out_off || 0))}</td>
                                     </tr>
                                 `;
                             });
@@ -690,7 +690,8 @@
                         $('#studentMarksTableBody').html(marksHtml);
                         $('#reportTotalMarks').text(data.summary.total_marks_obtained); 
                         $('#reportAveragePercentage').text(data.summary.overall_percentage || '0'); 
-                        $('#reportOverallStatus').html(`<span class="badge bg-${data.summary.overall_status === 'Pass' ? 'success' : 'danger'}">${data.summary.overall_status}</span>`);
+                        $('#reportOverallStatus').html(`<span class="badge bg-info">${data.summary.overall_status}</span>`);
+                        
 
                         $('#studentReportCardContainer').show();
                     } else {
@@ -703,6 +704,19 @@
                 }
             });
         }
+
+        function getGradeLabel(obtained, total) {
+            if (total === 0) return 'N/A';
+            const percentage = (obtained / total) * 100;
+
+            if (percentage >= 90) return 'AA - Outstanding';
+            if (percentage >= 80) return 'A+ - Excellent';
+            if (percentage >= 60) return 'A - Very Good';
+            if (percentage >= 50) return 'B+ - Good';
+            if (percentage >= 40) return 'B - Satisfactory';
+            return 'C - Needs Improvement';
+        }
+
 
 
         $('#filterSession').on('change', function () {

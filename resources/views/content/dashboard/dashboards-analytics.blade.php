@@ -2,7 +2,7 @@
 
 @extends('layouts/contentNavbarLayout')
 
-@section('title', 'Dashboard - Analytics')
+@section('title', 'Dashboard')
 
 @section('vendor-style')
 @vite('resources/assets/vendor/libs/apex-charts/apex-charts.scss')
@@ -58,22 +58,61 @@
       </div>
     </div>
 
-    <!-- Avg Performance -->
-    {{-- <div class="col-lg-3 col-md-6 col-12 mb-4">
-      <div class="card bg-orange text-white" style="background-color: #f39c12;">
-        <div class="card-body d-flex justify-content-between align-items-center">
-          <div>
-            <small class="text-white">Avg Performance</small>
-            <h4 class="text-white fw-bold mb-0">58%</h4>
-          </div>
-          <i class="ri-bar-chart-line fs-2 text-white"></i>
-        </div>
-      </div>
-    </div> --}}
   </div>
+
+  <div class="card">
+  <div class="card-header">
+    <h5 class="mb-0">Student Admission Chart</h5>
+  </div>
+  <div class="card-body">
+    <canvas id="admissionChart" height="120"></canvas>
+  </div>
+</div>
 
 </div>
 @endsection
 @section('scripts')
 @vite('resources/assets/js/dashboards-analytics.js')
+
+<script>
+  $(document).ready(function () {
+    $.ajax({
+      url: "{{ route('admin.dashboard.chart-data') }}",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        const ctx = document.getElementById('admissionChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: response.labels,
+            datasets: [{
+              label: 'Total Admissions',
+              data: response.data,
+              backgroundColor: '#42a5f5',
+              borderColor: '#1e88e5',
+              borderWidth: 1,
+              borderRadius: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      },
+      error: function (xhr) {
+        console.error('Error fetching chart data:', xhr);
+      }
+    });
+  });
+</script>
+
 @endsection

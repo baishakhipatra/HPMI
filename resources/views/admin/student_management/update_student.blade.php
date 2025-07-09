@@ -1,5 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Update - student')
@@ -52,8 +50,13 @@
                   @endif
                 </div>
 
+                
+
+          
+                <h4>Personal Details:</h4>
+
                 {{-- Student Name --}}
-                <div class="form-floating form-floating-outline col-md-4">
+                <div class="form-floating form-floating-outline col-md-3">
                   <input type="text" class="form-control" id="student_name" name="student_name" placeholder="Enter full name"
                         value="{{ old('student_name', $student->student_name) }}">
                   <label for="student_name">Name of the Student<span class="text-danger">*</span></label>
@@ -62,7 +65,7 @@
 
                
                 {{-- Date of Birth --}}
-                <div class="form-floating form-floating-outline col-md-4">
+                <div class="form-floating form-floating-outline col-md-3">
                   <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
                         value="{{ old('date_of_birth', $student->date_of_birth) }}">
                   <label for="date_of_birth">Date of Birth<span class="text-danger">*</span></label>
@@ -71,7 +74,7 @@
 
      
                 {{-- Gender --}}
-              <div class="form-floating form-floating-outline col-md-4">
+              <div class="form-floating form-floating-outline col-md-3">
                 <select class="form-select" id="gender" name="gender">
                     <option value="">Select Gender</option>
                     <option value="Male" {{ old('gender', $student->gender) == 'Male' ? 'selected' : '' }}>Male</option>
@@ -82,11 +85,8 @@
                 @error('gender')<small class="text-danger">{{ $message }}</small>@enderror
               </div>
 
-          
-                <h4>Personal Details:</h4>
-
               {{-- Aadhaar No --}}
-              <div class="form-floating form-floating-outline col-md-12">
+              <div class="form-floating form-floating-outline col-md-3">
                 <input type="text" class="form-control" id="aadhar_no" name="aadhar_no" placeholder="Enter your Aadhaar No."
                       value="{{ old('aadhar_no', $student->aadhar_no) }}">
                 <label for="aadhar_no">Aadhaar No.<span class="text-danger">*</span></label>
@@ -169,7 +169,7 @@
 
              
                {{-- Address --}}
-              <div class="form-floating form-floating-outline col-md-6">
+              <div class="form-floating form-floating-outline col-md-4">
                 <textarea class="form-control" id="address" name="address" rows="3"
                           placeholder="Enter address">{{ old('address', $student->address) }}</textarea>
                 <label for="address">Student's Address<span class="text-danger">*</span></label>
@@ -236,7 +236,7 @@
                 </div>
 
 
-                <div class="form-floating form-floating-outline col-md-2">
+                <div class="form-floating form-floating-outline col-md-3">
                     <input type="number" class="form-control" 
                             id="roll_number" name="roll_number" 
                             value="{{ old('roll_number', optional($student->admission)->roll_number) }}">
@@ -245,7 +245,7 @@
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
-                <div class="form-floating form-floating-outline col-md-2">
+                <div class="form-floating form-floating-outline col-md-3">
                     <input type="date" class="form-control" 
                             id="admission_date" name="admission_date" 
                             value="{{ old('admission_date', optional($student->admission)->admission_date ?? null) }}">
@@ -276,6 +276,7 @@
 </section>
 
 @endsection
+@section('scripts')
 <script>
   $(document).ready(function() {
       function loadSections(classId, selectedSection = null) {
@@ -314,3 +315,4 @@
   });
 
 </script>
+@endsection

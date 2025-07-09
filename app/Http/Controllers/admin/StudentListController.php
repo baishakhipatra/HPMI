@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 use App\Imports\StudentsImport;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use Carbon\Carbon;
+
+
 use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory,StudentProgressMarking};
 
 class StudentListController extends Controller
@@ -119,7 +124,13 @@ class StudentListController extends Controller
         ]);
 
         try {
-            $generatedId = Student::generateStudentUid();
+            // Prepare values for student_id generation
+            $admissionYear  = date('Y', strtotime($request->admission_date));
+            $class          = ClassList::find($request->class_id);
+            $classAlias     = $class->class;
+            $rollNo         = $request->roll_number;
+
+            $generatedId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
 
             $imagePath = null;
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
@@ -342,103 +353,7 @@ class StudentListController extends Controller
         ]);
     }
 
-    // public function admissionHistory($id)
-    // {
-    //     $student = Student::findOrFail($id);
-    //     $sessions = AcademicSession::all();
-    //     $classes = ClassList::all();
-    //     $admissionHistories = StudentAdmission::with(['student','class','session'])
-    //                         ->where('student_id', $id)
-    //                         ->orderBy('created_at', 'desc')
-    //                         ->get();
-    //     return view('admin.student_management.admission_history',compact('student','admissionHistories','sessions','classes'));
-    // }
-
     
-    // public function admissionhistoryUpdate(Request $request)
-    // {
-    //     // dd($request->all());
-    //     $request->validate([
-    //         'id' => 'required|exists:student_admissions,id',
-    //         'session_id' => 'required|integer',
-    //         'class_id' => 'required|integer',
-    //         'section_id' => 'required',
-    //         'roll_number' => 'required|numeric',
-    //         'admission_date' => 'required|date',
-    //     ]);
-
-    //     $history = StudentAdmission::findOrFail($request->id);
-
-    //     $alreadyAdmitted = StudentAdmission::where('student_id', $history->student_id)
-    //         ->where('session_id', $request->session_id)
-    //         ->where('id', '!=', $history->id)
-    //         ->exists();
-
-    //     if ($alreadyAdmitted) {
-    //         return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
-    //             ->withInput();
-    //     }
-    //     $history->update([
-    //         'session_id' => $request->session_id,
-    //         'class_id' => $request->class_id,
-    //         'section' => $request->section_id,
-    //         'roll_number' => $request->roll_number,
-    //         'admission_date' => $request->admission_date,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Admission history updated successfully.');
-    // }
-
-
-    // public function reAdmissionForm($id)
-    // {
-    //     $student = Student::findOrFail($id);
-    //     $classes = ClassList::all();
-    //     $sessions = AcademicSession::all();
-
-    //     return view('admin.student_management.re-admission', compact('student','classes','sessions'));
-    // }
-
-    // public function reAdmissionStore(Request $request, $id)
-    // {
-    //     $student = Student::findOrFail($id);
-    //     //dd($request->all());
-    //     $request->validate([
-    //         'session_id' => 'required',
-    //         'class_id'  => 'required',
-    //         'section_id'  => 'required',
-    //         //'roll_number' => 'required',
-    //         'roll_number' => [
-    //             'required',
-    //             'integer',
-    //             Rule::unique('student_admissions')->where(function ($query) use ($request) {
-    //                 return $query->where('class_id', $request->class_id)
-    //                             ->where('section', $request->section_id);
-    //             }),
-    //         ],
-    //         'admission_date' => 'required|date',
-    //     ]);
-
-    //     $alreadyAdmitted = StudentAdmission::where('student_id', $student->id)
-    //                     ->where('session_id', $request->session_id)
-    //                     ->exists();
-
-    //     if ($alreadyAdmitted) {
-    //         return redirect()->back()->withErrors(['session_id' => 'Student already admitted in this session.'])
-    //                                 ->withInput();
-    //     }
-
-    //     StudentAdmission::create([
-    //         'student_id' => $student->id,
-    //         'session_id' => $request->session_id,
-    //         'class_id'  => $request->class_id,
-    //         'section' => $request->section_id,
-    //         'roll_number' => $request->roll_number,
-    //         'admission_date' => $request->admission_date,
-    //     ]);
-    //     return redirect()->route('admin.student.admissionhistory', $student->id)->with('success', 'Re-admission Done Successfully');
-    // }
-
 
     public function export(Request $request)
     {
@@ -612,19 +527,140 @@ class StudentListController extends Controller
 
     public function import(Request $request)
     {
-        dd('check');
-        $request->validate([
-            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240', // max 10MB
+        $validator = Validator::make($request->all(), [
+            'excel_file' => 'required|file|mimes:xlsx,xls,csv|max:10240',
         ]);
-        try {
-            Excel::import(new StudentsImport, $request->file('excel_file'));
-            return redirect()->route('admin.studentlist')->with('success', 'Students imported successfully!');
-        } catch (Exception $e) {
-            dd($e->getMessage());
-            return redirect()->back()->with('error', 'Import failed: ' . $e->getMessage());
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
-       
+
+        try {
+            $file = $request->file('excel_file');
+            $data = Excel::toArray([], $file);
+            $rows = $data[0];
+
+            $skippedRows = [];
+            $successCount = 0;
+            foreach (array_slice($rows, 1) as $index => $row) {
+               
+                $rowNumber = $index + 2;
+                $row = array_map('trim', $row);
+
+                if (count($row) < 18) {
+                    $skippedRows[] = "Row $rowNumber: Incomplete data (less than 18 columns)";
+                    continue;
+                }
+
+                // Required field checks
+                $requiredIndexes = [0, 2, 5, 6, 7, 8, 17]; // name, phone, admission date, section, aadhaar, dob, session
+                $missingFields = [];
+
+                foreach ($requiredIndexes as $i) {
+                    if (!isset($row[$i]) || $row[$i] === '') {
+                        $missingFields[] = "Column index $i";
+                    }
+                }
+
+                if (!empty($missingFields)) {
+                    $skippedRows[] = "Row $rowNumber: Missing fields - " . implode(', ', $missingFields);
+                    continue;
+                }
+    
+                // Parse dates
+                try {
+                    $admission_date = Carbon::instance(Date::excelToDateTimeObject($row[5]))->format('Y-m-d');
+                    $date_of_birth  = Carbon::instance(Date::excelToDateTimeObject($row[17]))->format('Y-m-d');
+                } catch (\Exception $e) {
+                    $skippedRows[] = "Row $rowNumber: Invalid date format - " . $e->getMessage();
+                    continue;
+                }
+              
+                // Uniqueness checks
+           
+                if (Student::where('phone_number', $row[2])->exists()) {
+                    $skippedRows[] = "Row $rowNumber: Duplicate phone number";
+                    continue;
+                }
+          
+                if (!empty($row[1]) && Student::where('email', $row[1])->exists()) {
+                    $skippedRows[] = "Row $rowNumber: Duplicate email";
+                    continue;
+                }
+                            
+                if (Student::where('aadhar_no', $row[7])->exists()) {
+                    $skippedRows[] = "Row $rowNumber: Duplicate Aadhaar";
+                    continue;
+                }
+               
+                $session = AcademicSession::where('session_name', $row[17])->first();
+                if(!$session) {
+                    $session = createNewSession($row[17]);
+                    if(!$session) {
+                        $skippedRows[] = "Row $rowNumber: Failed to create academic session '$row[17]'";
+                        continue;
+                    }
+                }
+
+                $class = ClassList::where('class', $row[3])->first();
+                if (!$class) {
+                    $skippedRows[] = "Row $rowNumber: Class '{$row[3]}' not found";
+                    continue;
+                }
+
+                $admissionYear = date('Y', strtotime($admission_date));
+                $classAlias = $class->class; // may need to convert to Roman
+                $rollNo = $row[4];
+                $studentUniqueId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
+
+                // Save student
+                $student = Student::create([
+                    'student_id'     => $studentUniqueId,
+                    'student_name'   => $row[0],
+                    'email'          => $row[1] ?? null,
+                    'phone_number'   => $row[2],
+                    'class'          => $class->class,
+                    'roll_number'    => $rollNo,
+                    'admission_date' => $admission_date,
+                    'section'        => $row[6],
+                    'aadhar_no'      => $row[7],
+                    'gender'         => $row[8],
+                    'parent_name'    => $row[9] ?? null,
+                    'address'        => $row[10] ?? null,
+                    'father_name'    => $row[11] ?? null,
+                    'mother_name'    => $row[12] ?? null,
+                    'divyang'        => $row[13] ?? 'No',
+                    'blood_group'    => $row[14] ?? null,
+                    'height'         => $row[15] ?? null,
+                    'weight'         => $row[16] ?? null,
+                    'date_of_birth'  => $date_of_birth,
+                    // Add more fields here if needed
+                ]);
+                //save studentadmission
+                $admission = StudentAdmission::create([
+                    'student_id'     => $student->id,
+                    'session_id'     => $session->id,
+                    'class_id'       => $class->id,
+                    'section'        => $row[6],
+                    'roll_number'    => $rollNo,
+                    'admission_date' => $admission_date,
+                ]);
+
+                $student->update(['student_admission_id' => $admission->id]);
+                $successCount++;
+            }
+
+            return response()->json([
+                'message' => "$successCount student(s) imported successfully.",
+                'errors' => $skippedRows,
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Import error: ' . $e->getMessage());
+            dd($e->getMessage());
+            return response()->json([
+                'errors' => ['error' => ['Unexpected error during import. Please check the file.']]
+            ], 500);
+        }
     }
-
-
 }

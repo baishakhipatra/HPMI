@@ -69,13 +69,82 @@ if (!function_exists('generateTeacherId')) {
 
 function calculateGrade($total)
 {
-    if($total >= 90) return 'A+';
-    if($total >= 80) return 'A';
-    if($total >= 70) return 'B+';
-    if($total >= 60) return 'B';
-    if($total >= 50) return 'C';
-    return 'F';
+    if($total >= 90) return 'AA';
+    if($total >= 80) return 'A+';
+    if($total >= 60) return 'A';
+    if($total >= 50) return 'B+';
+    if($total >= 40) return 'B';
+    return 'C';
 }
+
+//  Add this for status label
+function calStatusLabel($percentage)
+{
+    if ($percentage >= 90) {
+        return 'Outstanding';
+    } elseif ($percentage >= 80) {
+        return 'Excellent';
+    } elseif ($percentage >= 60) {
+        return 'Very Good';
+    } elseif ($percentage >= 50) {
+        return 'Good';
+    } elseif ($percentage >= 40) {
+        return 'Satisfactory';
+    } else {
+        return 'Needs Improvement';
+    }
+}
+
+//Add this for grade label
+function calGradeLabel($percentage) 
+{
+     if ($percentage >= 90) {
+        return 'AA';
+    } elseif ($percentage >= 80) {
+        return 'A+';
+    } elseif ($percentage >= 60) {
+        return 'A';
+    } elseif ($percentage >= 50) {
+        return 'B+';
+    } elseif ($percentage >= 40) {
+        return 'B';
+    } else {
+        return 'C';
+    }
+
+}
+
+//for generate roman number converter
+function toRoman($number)
+{
+    $map = [
+        'M' => 1000,
+        'CM' => 900,
+        'D' => 500,
+        'CD' => 400,
+        'C' => 100,
+        'XC' => 90,
+        'L' => 50,
+        'XL' => 40,
+        'X' => 10,
+        'IX' => 9,
+        'V' => 5,
+        'IV' => 4,
+        'I' => 1
+    ];
+    $returnValue = '';
+    while ($number > 0) {
+        foreach ($map as $roman => $int) {
+            if($number >= $int) {
+                $number -= $int;
+                $returnValue .= $roman;
+                break;
+            }
+        }
+    }
+    return $returnValue;
+}
+
 
 if(!function_exists('hasPermissionByParent')){
     function hasPermissionByParent($parentName){
@@ -108,6 +177,8 @@ if(!function_exists('hasPermissionByChild')){
         }
     }
 }
+
+//for generate new session
 if (!function_exists('createNewSession')) {
     function createNewSession() {
         $currentYear = date('Y');

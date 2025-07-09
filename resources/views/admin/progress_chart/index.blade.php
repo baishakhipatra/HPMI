@@ -1,5 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -123,7 +122,7 @@
 </div>
 
 @endsection
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@section('scripts')
 <script>
     
     $(document).ready(function () {
@@ -329,3 +328,4 @@
         $('#session_id, #class_id, #subject_id, #student_id, #chart_type').on('change', fetchChartData);
     });
 </script>
+@endsection

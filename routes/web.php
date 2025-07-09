@@ -140,6 +140,7 @@ Route::prefix('admin')->group(function () {
     // Protected admin dashboard
     Route::middleware('admin', 'prevent-back-history')->group(function () {
         Route::get('/dashboard', [Analytics::class, 'index'])->name('admin.dashboard');
+        Route::get('/chart-data', [Analytics::class, 'getStudentAdmissionChartData'])->name('admin.dashboard.chart-data');
         Route::get('/profile', [AdminAuthController::class, 'profile'])->name('admin.profile');
         Route::post('/update-profile', [AdminAuthController::class, 'updateProfile'])->name('admin.profile.update');
         //usermanagement/userlist

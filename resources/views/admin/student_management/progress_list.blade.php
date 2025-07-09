@@ -92,7 +92,7 @@
                     @csrf
 
                     <div class="form-floating form-floating-outline mb-3">
-                    <input type="text" name="field" class="form-control" placeholder="Enter Field Name" value="{{ old('field', $updateData->field) }}">
+                    <input type="text" name="field" class="form-control" placeholder="Enter Field Name" value="{{ ucwords(old('field', $updateData->field)) }}">
                     <label>Field Name</label>
                     @error('field') <p class="text-danger small">{{ $message }}</p> @enderror
                     </div>
@@ -102,7 +102,7 @@
                     @foreach($updateDataValues as $valueItem)
                     <div class="input-group mb-2 existing-value">
                     <div class="form-floating form-floating-outline flex-grow-1">
-                        <input type="text" name="existing_value[{{ $valueItem->id }}]" class="form-control" value="{{ $valueItem->value }}" placeholder="Enter Value">
+                        <input type="text" name="existing_value[{{ $valueItem->id }}]" class="form-control" value="{{ ucwords($valueItem->value) }}" placeholder="Enter Value">
                         <label>Value</label>
                     </div>
                     <button type="button" class="btn btn-outline-danger remove-existing-value ms-2" data-id="{{ $valueItem->id }}">

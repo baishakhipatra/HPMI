@@ -1,5 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -27,7 +26,7 @@
                                 @if($student->image)
                                     <img src="{{ asset($student->image) }}" alt="Student Photo" class="img-fluid rounded shadow" style="max-height: 150px;">
                                 @else
-                                    <div class="text-muted">No Photo</div>
+                                    <img src="{{ asset('assets/img/placeholder.jpg') }}" alt="no-image" class="img-fluid rounded shadow" style="max-height: 150px;">
                                 @endif
                                 <div class="mt-2 fw-semibold">{{ ucwords($student->student_name ?? 'N/A') }}</div>
                             </div>
@@ -58,8 +57,8 @@
                                     @endphp
 
                                     @foreach($details as $label => $value)
-                                        <div class="col-md-6 mb-3">
-                                            <strong class="text-muted">{{ $label }}:</strong>
+                                        <div class="col-md-3 mb-3">
+                                            <strong class="label-color">{{ $label }}:</strong>
                                             <div>{{ $value }}</div>
                                         </div>
                                     @endforeach
@@ -74,4 +73,7 @@
     </section>
 </section>
 
+@endsection
+
+@section('scripts')
 @endsection
