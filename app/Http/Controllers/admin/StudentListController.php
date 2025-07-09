@@ -543,7 +543,6 @@ class StudentListController extends Controller
             $skippedRows = [];
             $successCount = 0;
             foreach (array_slice($rows, 1) as $index => $row) {
-               
                 $rowNumber = $index + 2;
                 $row = array_map('trim', $row);
 
@@ -570,7 +569,7 @@ class StudentListController extends Controller
                 // Parse dates
                 try {
                     $admission_date = Carbon::instance(Date::excelToDateTimeObject($row[5]))->format('Y-m-d');
-                    $date_of_birth  = Carbon::instance(Date::excelToDateTimeObject($row[17]))->format('Y-m-d');
+                    $date_of_birth  = Carbon::instance(Date::excelToDateTimeObject($row[18]))->format('Y-m-d');
                 } catch (\Exception $e) {
                     $skippedRows[] = "Row $rowNumber: Invalid date format - " . $e->getMessage();
                     continue;
@@ -613,32 +612,40 @@ class StudentListController extends Controller
                 $rollNo = $row[4];
                 $studentUniqueId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
 
-                // Save student
-                $student = Student::create([
-                    'student_id'     => $studentUniqueId,
-                    'student_name'   => $row[0],
-                    'email'          => $row[1] ?? null,
-                    'phone_number'   => $row[2],
-                    'class'          => $class->class,
-                    'roll_number'    => $rollNo,
-                    'admission_date' => $admission_date,
-                    'section'        => $row[6],
-                    'aadhar_no'      => $row[7],
-                    'gender'         => $row[8],
-                    'parent_name'    => $row[9] ?? null,
-                    'address'        => $row[10] ?? null,
-                    'father_name'    => $row[11] ?? null,
-                    'mother_name'    => $row[12] ?? null,
-                    'divyang'        => $row[13] ?? 'No',
-                    'blood_group'    => $row[14] ?? null,
-                    'height'         => $row[15] ?? null,
-                    'weight'         => $row[16] ?? null,
-                    'date_of_birth'  => $date_of_birth,
-                    // Add more fields here if needed
-                ]);
+                $student_exist = Student::select('id')->where([
+                    'phone_number' => $row[2],
+                    'aadhar_no' => $row[7],
+                ])->first();
+
+                if ($student_exist) {
+                    $student_id = $student_exist->id;
+                } else {
+                    // Save student
+                    $student = Student::create([
+                        'student_id'     => $studentUniqueId,
+                        'student_name'   => $row[0],
+                        'email'          => $row[1] ?? null,
+                        'phone_number'   => $row[2],
+                        'aadhar_no'      => $row[7],
+                        'gender'         => $row[8],
+                        'parent_name'    => $row[9] ?? null,
+                        'address'        => $row[10] ?? null,
+                        'father_name'    => $row[11] ?? null,
+                        'mother_name'    => $row[12] ?? null,
+                        'divyang'        => $row[13] ?? 'No',
+                        'blood_group'    => $row[14] ?? null,
+                        'height'         => $row[15] ?? null,
+                        'weight'         => $row[16] ?? null,
+                        'date_of_birth'  => $date_of_birth,
+                        // Add more fields here if needed
+                    ]);
+                    $student_id = $student->id;
+                }
+
+                
                 //save studentadmission
                 $admission = StudentAdmission::create([
-                    'student_id'     => $student->id,
+                    'student_id'     => $student_id,
                     'session_id'     => $session->id,
                     'class_id'       => $class->id,
                     'section'        => $row[6],
