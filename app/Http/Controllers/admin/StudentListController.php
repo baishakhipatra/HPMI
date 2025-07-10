@@ -125,12 +125,14 @@ class StudentListController extends Controller
 
         try {
             // Prepare values for student_id generation
-            $admissionYear  = date('Y', strtotime($request->admission_date));
+            $session = AcademicSession::find($request->session_id);
+            $admissionYear  = $session->session_name;
             $class          = ClassList::find($request->class_id);
             $classAlias     = $class->class;
             $rollNo         = $request->roll_number;
 
             $generatedId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
+            //dd($generatedId);
 
             $imagePath = null;
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
@@ -525,6 +527,7 @@ class StudentListController extends Controller
         return response()->json(['success' => true]);
     }
 
+
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -536,93 +539,111 @@ class StudentListController extends Controller
         }
 
         try {
+            DB::beginTransaction();
+
             $file = $request->file('excel_file');
             $data = Excel::toArray([], $file);
             $rows = $data[0];
 
             $skippedRows = [];
             $successCount = 0;
+
             foreach (array_slice($rows, 1) as $index => $row) {
-               
                 $rowNumber = $index + 2;
                 $row = array_map('trim', $row);
 
-                if (count($row) < 18) {
-                    $skippedRows[] = "Row $rowNumber: Incomplete data (less than 18 columns)";
+                //  Skip completely empty rows
+                if (empty(array_filter($row))) {
                     continue;
                 }
 
-                // Required field checks
-                $requiredIndexes = [0, 2, 5, 6, 7, 8, 17]; // name, phone, admission date, section, aadhaar, dob, session
+                //  Early check for column count
+                if (count($row) < 18) {
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Incomplete data (less than 18 columns)"]
+                    ]);
+                }
+
+                // Required field check
+                $requiredIndexes = [0, 2, 5, 6, 7, 8, 17];
                 $missingFields = [];
 
                 foreach ($requiredIndexes as $i) {
-                    if (!isset($row[$i]) || $row[$i] === '') {
+                    if (!isset($row[$i]) || trim($row[$i]) === '') {
                         $missingFields[] = "Column index $i";
                     }
                 }
 
                 if (!empty($missingFields)) {
-                    $skippedRows[] = "Row $rowNumber: Missing fields - " . implode(', ', $missingFields);
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Missing fields - " . implode(', ', $missingFields)]
+                    ]);
                 }
-    
-                // Parse dates
+
                 try {
                     $admission_date = Carbon::instance(Date::excelToDateTimeObject($row[5]))->format('Y-m-d');
-                    $date_of_birth  = Carbon::instance(Date::excelToDateTimeObject($row[17]))->format('Y-m-d');
+                    $date_of_birth  = Carbon::instance(Date::excelToDateTimeObject($row[18]))->format('Y-m-d');
                 } catch (\Exception $e) {
-                    $skippedRows[] = "Row $rowNumber: Invalid date format - " . $e->getMessage();
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Invalid date format - " . $e->getMessage()]
+                    ], 200);
                 }
-              
-                // Uniqueness checks
-           
+
                 if (Student::where('phone_number', $row[2])->exists()) {
-                    $skippedRows[] = "Row $rowNumber: Duplicate phone number";
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Duplicate phone number"]
+                    ], 200);
                 }
-          
+
                 if (!empty($row[1]) && Student::where('email', $row[1])->exists()) {
-                    $skippedRows[] = "Row $rowNumber: Duplicate email";
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Duplicate email"]
+                    ], 200);
                 }
-                            
+
                 if (Student::where('aadhar_no', $row[7])->exists()) {
-                    $skippedRows[] = "Row $rowNumber: Duplicate Aadhaar";
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Duplicate Aadhaar"]
+                    ], 200);
                 }
-               
-                $session = AcademicSession::where('session_name', $row[17])->first();
-                if(!$session) {
-                    $session = createNewSession($row[17]);
-                    if(!$session) {
-                        $skippedRows[] = "Row $rowNumber: Failed to create academic session '$row[17]'";
-                        continue;
+
+                $sessionName = trim($row[17]);
+
+                $session = AcademicSession::where('session_name', $sessionName)->first();
+                if (!$session) {
+                    $session = createNewExistingSession($sessionName);
+                    if (!$session) {
+                        return response()->json([
+                            'message' => 'CSV failed to import.',
+                            'errors' => ["Row $rowNumber: Failed to create academic session '$sessionName'"]
+                        ], 200);
                     }
                 }
 
                 $class = ClassList::where('class', $row[3])->first();
                 if (!$class) {
-                    $skippedRows[] = "Row $rowNumber: Class '{$row[3]}' not found";
-                    continue;
+                    return response()->json([
+                        'message' => 'CSV failed to import.',
+                        'errors' => ["Row $rowNumber: Class '{$row[3]}' not found"]
+                    ], 200);
                 }
 
-                $admissionYear = date('Y', strtotime($admission_date));
-                $classAlias = $class->class; // may need to convert to Roman
+                $admissionYear = $session->session_name;
+                $classAlias = $class->class;
                 $rollNo = $row[4];
                 $studentUniqueId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
 
-                // Save student
                 $student = Student::create([
                     'student_id'     => $studentUniqueId,
                     'student_name'   => $row[0],
                     'email'          => $row[1] ?? null,
                     'phone_number'   => $row[2],
-                    'class'          => $class->class,
-                    'roll_number'    => $rollNo,
-                    'admission_date' => $admission_date,
-                    'section'        => $row[6],
                     'aadhar_no'      => $row[7],
                     'gender'         => $row[8],
                     'parent_name'    => $row[9] ?? null,
@@ -634,9 +655,8 @@ class StudentListController extends Controller
                     'height'         => $row[15] ?? null,
                     'weight'         => $row[16] ?? null,
                     'date_of_birth'  => $date_of_birth,
-                    // Add more fields here if needed
                 ]);
-                //save studentadmission
+
                 $admission = StudentAdmission::create([
                     'student_id'     => $student->id,
                     'session_id'     => $session->id,
@@ -650,17 +670,20 @@ class StudentListController extends Controller
                 $successCount++;
             }
 
-            return response()->json([
-                'message' => "$successCount student(s) imported successfully.",
-                'errors' => $skippedRows,
-            ]);
+            DB::commit();
 
-        } catch (\Exception $e) {
-            \Log::error('Import error: ' . $e->getMessage());
-            dd($e->getMessage());
             return response()->json([
-                'errors' => ['error' => ['Unexpected error during import. Please check the file.']]
+                'message' => 'CSV imported successfully.',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Import error: ' . $e->getMessage());
+            return response()->json([
+                'errors' => ['Unexpected error during import. Please check the file.']
             ], 500);
         }
     }
+
+
+   
 }

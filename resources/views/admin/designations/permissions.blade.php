@@ -19,16 +19,18 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Manage Permissions for: {{ $designation->name }}</h4>
+            <h4 class="fw-bold mb-0">Manage Permissions for: {{ ucwords($designation->name)}}</h4>
             <a href="{{ route('admin.designation.list') }}" class="btn btn-sm btn-danger">
-                <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
+                <i class="menu-icon tf-icons ri-arrow-left-line"></i>
+                Back
+            </a>
         </div>
         <form method="POST" action="{{ route('admin.designation.permissions.update') }}">
             @csrf
             <input type="hidden" name="designation_id" value="{{ $designation->id }}">
     
             @foreach($permissions->groupBy('parent_name') as $group => $groupPermissions)
-                <div class="card-header" style="background: #f4f0ff;">
+                <div class="card-header" style="background: #cedaff;">
                     <h5 class="text-primary mb-0">{{ ucwords(str_replace('_', ' ', $group)) }}</h5>
                 </div>
 

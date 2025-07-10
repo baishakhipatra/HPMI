@@ -1,6 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('build/assets/sweetalert2@11.js') }}"></script>
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -104,7 +102,7 @@
 </div>
 @endsection
 
-
+@section('scripts')
 <script>
     $(document).ready(function () {
         let studentId = {{ $student->id }};
@@ -263,3 +261,4 @@
 });
 
 </script>
+@endsection

@@ -13,7 +13,7 @@
 
         <div class="card">
           <!-- Card Header -->
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="card-header d-flex align-items-center justify-content-between mb-3">
             <h4 class="mb-0 text-primary">Edit Teacher</h5>
             <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
               <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
@@ -96,7 +96,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
-                        <textarea name="address" class="form-control" placeholder="Address" style="height: 100px">{{ old('address', $data->address) }}</textarea>
+                        <textarea name="address" class="form-control" placeholder="Address">{{ old('address', $data->address) }}</textarea>
                         <label>Address</label>
                         @error('address') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
@@ -135,7 +135,7 @@
 
                     <input type="hidden" name="id" value="{{ $data->id }}">
 
-                    <div class="text-end">
+                    <div class="text-start">
                       <button type="submit" class="btn btn-primary px-4 py-2">Update</button>
                     </div>
                 </form>

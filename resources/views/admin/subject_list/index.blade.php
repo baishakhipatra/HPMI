@@ -1,7 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Add your toastFire function if it's custom -->
+
 
 
 @extends('layouts/contentNavbarLayout')
@@ -21,13 +18,15 @@
         {{-- Subjects List --}}
         <div class="col-md-8">
             <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <!-- <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 text-primary">Subject List</h5>
-            </div>
+            </div> -->
             <div class="px-3 py-2">
                 <form method="GET" action="">
-                <div class="row">
-                    <div class="col-md-6"></div>
+                <div class="row card-header">
+                    <div class="col-md-6">
+                        <h4 class="mb-0 text-primary">Subject List</h5>
+                    </div>
                     <div class="col-md-6">
                     <div class="d-flex justify-content-end">
                         <div class="form-group me-2 mb-0">
@@ -213,7 +212,7 @@
     </div>
 
 @endsection
-
+@section('scripts')
 <script>
     function updateSubjectForm() {
         $(".text-danger").text('');
@@ -268,3 +267,4 @@
     }
 
 </script>
+@endsection

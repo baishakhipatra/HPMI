@@ -301,12 +301,13 @@
     });
   }
 
-  $(document).ready(function() {
-    $('#importStudentForm').on('submit', function(e) {
+  $(document).ready(function () {
+    $('#importStudentForm').on('submit', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
-        $('#importMessage').html('<div class="alert alert-info">Importing...</div>');
+        let $box = $('#importMessage');
+        $box.html('<div class="alert alert-info">Importing...</div>');
 
         $.ajax({
             url: "{{ route('admin.student.import') }}",
@@ -314,31 +315,33 @@
             data: formData,
             contentType: false,
             processData: false,
-            success: function(response) {
-              console.log(response);
-              return false;
-                $('#importMessage').html('<div class="alert alert-success">Students imported successfully!</div>');
-                $('#excel_file').val('');
-                // Optionally close modal after short delay
-                setTimeout(function() {
-                    $('#importStudentModal').modal('hide');
-                    location.reload(); // Reload to reflect changes
-                }, 1500);
-            },
-            error: function(xhr) {
-                let errors = xhr.responseJSON?.errors || { error: ['Something went wrong.'] };
-                let errorHtml = '<div class="alert alert-danger"><ul>';
-                $.each(errors, function(key, messages) {
-                    messages.forEach(msg => {
-                        errorHtml += '<li>' + msg + '</li>';
+            success: function (response) {
+                if (response.errors && response.errors.length > 0) {
+                    let html = `<div class="alert alert-danger"><strong>${response.message}</strong><ul>`;
+                    response.errors.forEach(function (err) {
+                        html += `<li>${err}</li>`;
                     });
-                });
-                errorHtml += '</ul></div>';
-                $('#importMessage').html(errorHtml);
+                    html += '</ul></div>';
+                    $box.html(html);
+                } else {
+                    $box.html('<div class="alert alert-success">CSV imported successfully!</div>');
+                    $('#importStudentForm')[0].reset();
+
+                    setTimeout(function () {
+                        $('#importStudentModal').modal('hide');
+                        window.location.href = "{{ route('admin.studentlist') }}";
+                    }, 2000);
+                }
+            },
+            error: function (xhr) {
+                let response = xhr.responseJSON;
+                let msg = response?.errors?.[0] || 'Something went wrong.';
+                $box.html(`<div class="alert alert-danger">${msg}</div>`);
             }
         });
     });
   });
+
 
 </script>
 

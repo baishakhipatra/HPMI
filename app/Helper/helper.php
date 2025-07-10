@@ -201,3 +201,38 @@ if (!function_exists('createNewSession')) {
         return $session;
     }
 }
+if (!function_exists('createNewExistingSession')) {
+    function createNewExistingSession($value)
+    {
+        // Sanitize and parse the session string (e.g., '2027-2028')
+        $value = trim($value);
+        $years = explode('-', $value);
+
+        // Validate the format
+        if (count($years) !== 2 || !is_numeric($years[0]) || !is_numeric($years[1])) {
+            return null; // Invalid format
+        }
+
+        $startYear = (int) $years[0];
+        $endYear   = (int) $years[1];
+
+        // Use full year format: '2027-2028'
+        $sessionName = $startYear . '-' . $endYear;
+
+        // Define session period (e.g., Apr 1 to Mar 31)
+        $startDate = Carbon::create($startYear, 4, 1);
+        $endDate   = Carbon::create($endYear, 3, 31);
+
+        // Create or update the academic session
+        $session = AcademicSession::updateOrCreate(
+            ['session_name' => $sessionName],
+            [
+                'start_date' => $startDate,
+                'end_date'   => $endDate,
+                'is_active'  => 1, // Set to 0 if inactive by default
+            ]
+        );
+
+        return $session;
+    }
+}

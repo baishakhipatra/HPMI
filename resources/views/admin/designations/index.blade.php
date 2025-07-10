@@ -21,33 +21,33 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0 text-primary">Designation List</h5>
-                </div>
-                <div class="px-3 py-2">
-                    <form method="GET" action="">
-                        <div class="row">
-                            <div class="col-md-6"></div>
-                            <div class="col-md-6">
-                                <div class="d-flex justify-content-end">
-                                    <div class="form-group me-2 mb-0">
-                                        <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" 
-                                            value="{{ request()->input('keyword') }}" placeholder="Search something...">
-                                    </div>
-                                    <div class="form-group mb-0">
-                                    <div class="btn-group">
-                                        <button type="submit" class="btn btn-sm btn-primary">
-                                            <i class="ri-filter-3-line"></i>
-                                        </button>
-                                        <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
-                                            <i class="ri-close-line"></i>
-                                        </a>
-                                    </div>
+                    <h4 class="mb-0 fw-bold">Designation List</h4>
+                    <div class="px-3 py-2 col-8">
+                        <form method="GET" action="">
+                            <div class="row align-items-center">
+                                <div class="col-md-12 p-0">
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <div class="form-group me-2 mb-0">
+                                            <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" 
+                                                value="{{ request()->input('keyword') }}" placeholder="Search something...">
+                                        </div>
+                                        <div class="form-group mb-0">
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                <i class="ri-filter-3-line"></i>
+                                            </button>
+                                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
+                                                <i class="ri-close-line"></i>
+                                            </a>
+                                        </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
+
 
                 <div class="card-body">
                     <div class="table-responsive text-nowrap">

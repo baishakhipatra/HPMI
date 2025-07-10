@@ -93,13 +93,19 @@ class ReportController extends Controller
             return response()->json(['classes' => []]);
         }
 
-        $classIds = StudentAdmission::where('session_id', $request->session_id)
-                                    ->pluck('class_id')
-                                    ->unique();
+        $admin = auth()->guard('admin')->user();
+        $query = StudentAdmission::where('session_id', $request->session_id);
+
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            $query->whereIn('class_id', $assignedClassIds);
+        }
+
+        $classIds = $query->pluck('class_id')->unique();
 
         $classes = ClassList::whereIn('id', $classIds)
-                            ->select('id', 'class as name')
-                            ->get();
+            ->select('id', 'class as name')
+            ->get();
 
         return response()->json(['classes' => $classes]);
     }
@@ -109,6 +115,16 @@ class ReportController extends Controller
        
         if (!$request->filled('class_id') || !$request->filled('session_id')) {
             return response()->json(['subjects' => []]);
+        }
+
+       $admin = auth()->guard('admin')->user();
+
+        // Teacher class access check
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            if (!in_array($request->class_id, $assignedClassIds)) {
+                return response()->json(['subjects' => []], 403);
+            }
         }
 
         $studentIdsInSession = StudentAdmission::where('session_id', $request->session_id)->pluck('student_id');
@@ -133,10 +149,19 @@ class ReportController extends Controller
         }
 
         
+        $admin = auth()->guard('admin')->user();
+
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            if (!in_array($request->class_id, $assignedClassIds)) {
+                return response()->json(['students' => []], 403);
+            }
+        }
+
         $studentIds = StudentAdmission::where('session_id', $request->session_id)
-                                    ->where('class_id', $request->class_id)
-                                    ->pluck('student_id')
-                                    ->unique();
+            ->where('class_id', $request->class_id)
+            ->pluck('student_id')
+            ->unique();
 
       
         $students = Student::whereIn('id', $studentIds)
@@ -145,121 +170,6 @@ class ReportController extends Controller
 
         return response()->json(['students' => $students]);
     }
-
-
-    // public function getStudentReportCard(Request $request)
-    // {
-  
-    //     if (!$request->filled('session_id') || !$request->filled('class_id') || !$request->filled('student_id')) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Please select a Session, Class, and Student.'
-    //         ]);
-    //     }
-
-    //     $sessionId = $request->session_id;
-    //     $classId = $request->class_id;
-    //     $studentId = $request->student_id;
-    //     $subjectId = $request->subject_id; 
-
-    //     $student = Student::find($studentId);
-    //     if (!$student) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Student not found.'
-    //         ]);
-    //     }
-
-     
-    //     $admission = StudentAdmission::with(['academicSession', 'class'])
-    //                                 ->where('student_id', $studentId)
-    //                                 ->where('session_id', $sessionId)
-    //                                 ->where('class_id', $classId)
-    //                                 ->first();
-
-    //     if (!$admission) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Student admission record not found for the selected session and class.'
-    //         ]);
-    //     }
-
-
-    //     $marksQuery = StudentsMark::with('subjectlist') 
-    //                             ->where('student_id', $studentId)
-    //                             ->where('class_id', $classId);
-
-    //     if ($subjectId) {
-    //         $marksQuery->where('subject_id', $subjectId);
-    //     }
-
-    //     $marks = $marksQuery->get();
-
-    //     $reportCardData = [
-    //         'student_name' => $student->student_name,
-    //         'session_name' => $admission->academicSession->session_name ?? 'N/A',
-    //         'class_name' => $admission->class->class ?? 'N/A',
-    //         'roll_number' => $admission->roll_number, 
-    //         'marks' => [], 
-    //         'summary' => [
-    //             'total_marks_obtained' => 0,
-    //             'total_out_of_marks' => 0,
-    //             'average_percentage' => 0,
-    //             'pass_status' => 'Fail' 
-    //         ]
-    //     ];
-
-    //     $totalMidTermMarks = 0;
-    //     $totalFinalExamMarks = 0;
-    //     $totalMidTermOutOff = 0;
-    //     $totalFinalExamOutOff = 0;
-    //     $passedSubjectsCount = 0;
-    //     $totalSubjectsCount = $marks->count();
-
-    //     foreach ($marks as $mark) {
-    //         $subjectName = $mark->subjectlist->sub_name ?? 'Unknown Subject';
-
-            
-    //         $totalMidTermMarks += $mark->mid_term_stu_marks;
-    //         $totalFinalExamMarks += $mark->final_exam_stu_marks;
-    //         $totalMidTermOutOff += $mark->mid_term_out_off;
-    //         $totalFinalExamOutOff += $mark->final_exam_out_off;
-
-    //         $subjectPass = $mark->final_exam_stu_marks >= 50; 
-    //         if ($subjectPass) {
-    //             $passedSubjectsCount++;
-    //         }
-
-    //         $reportCardData['marks'][] = [
-    //             'subject' => $subjectName,
-    //             'mid_term_marks' => $mark->mid_term_stu_marks,
-    //             'mid_term_out_off' => $mark->mid_term_out_off,
-    //             'final_exam_marks' => $mark->final_exam_stu_marks,
-    //             'final_exam_out_off' => $mark->final_exam_out_off,
-    //             'status' => $subjectPass ? 'Pass' : 'Fail',
-    //         ];
-    //     }
-
-    //     $overallTotalObtained = $totalMidTermMarks + $totalFinalExamMarks;
-    //     $overallTotalOutOff = $totalMidTermOutOff + $totalFinalExamOutOff;
-
-    //     $reportCardData['summary']['total_marks_obtained'] = $overallTotalObtained;
-    //     $reportCardData['summary']['total_out_of_marks'] = $overallTotalOutOff;
-
-    //     if ($overallTotalOutOff > 0) {
-    //         $reportCardData['summary']['average_percentage'] = round(($overallTotalObtained / $overallTotalOutOff) * 100, 2);
-    //     }
-   
-    //     if ($reportCardData['summary']['average_percentage'] >= 50) {
-    //         $reportCardData['summary']['pass_status'] = 'Pass';
-    //     }
-       
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $reportCardData
-    //     ]);
-    // }
 
 
     public function getStudentReportCard(Request $request)
@@ -388,123 +298,6 @@ class ReportController extends Controller
 
 
 
-    // public function export(Request $request)
-    // {
-    //     $sessionId = $request->input('session_id');
-    //     $classId = $request->input('class_id');
-    //     $subjectId = $request->input('subject_id');
-    //     $studentId = $request->input('student_id');
-
-    //     $query = StudentsMark::with(['student', 'class', 'subjectlist']);
-
-    //     if ($sessionId) {
-    //         $studentIdsInSession = StudentAdmission::where('session_id', $sessionId)->pluck('student_id');
-    //         $query->whereIn('student_id', $studentIdsInSession);
-    //     }
-
-    //     if ($classId) {
-    //         $query->where('class_id', $classId);
-    //     }
-    //     if ($studentId) {
-    //         $query->where('student_id', $studentId);
-            
-    //     }
-
-    //     if ($subjectId) {
-    //         $query->where('subject_id', $subjectId);
-    //     }
-
-    //     $marks = $query->get();
-
-    //     if ($marks->count() > 0) {
-    //         $delimiter = ",";
-
-    //         $totalMarksObtained = 0;
-    //         $totalPossibleMarks = 0;
-
-    //         foreach ($marks as $mark) {
-                
-    //             $totalMarksObtained += ($mark->mid_term_stu_marks ?? 0);
-    //             $totalMarksObtained += ($mark->final_exam_stu_marks ?? 0);
-
-                
-    //             $totalPossibleMarks += ($mark->mid_term_out_off ?? 0);
-    //             $totalPossibleMarks += ($mark->final_exam_out_off ?? 0);
-    //         }
-
-    //         $overallPercentage = ($totalPossibleMarks > 0) ? ($totalMarksObtained / $totalPossibleMarks) * 100 : 0;
-            
-    //         $overallPercentage = round($overallPercentage, 2);
-    //         $overallStatus = ($overallPercentage >= 50) ? 'Pass' : 'Fail'; 
-
-    //         $firstMark = $marks->first();
-    //         $studentNameForFile = 'report'; 
-    //         if ($firstMark && $firstMark->student && $firstMark->student->student_name) {
-    //             $studentNameForFile = str_replace(' ', '_', $firstMark->student->student_name);
-    //         }
-    //        $filename = "student_report_card_" . $studentNameForFile . "_" . date('Y-m-d') . ".csv"; 
-
-    //         $f = fopen('php://memory', 'w');
-
-    //         $headers = [
-    //             'Student Name',
-    //             'Class',
-    //             'Subject',
-    //             'Mid Term Marks',
-    //             'Mid Term Out Of',
-    //             'Final Exam Marks',
-    //             'Final Exam Out Of',
-    //             'Status' 
-    //         ];
-    //         fputcsv($f, $headers, $delimiter);
-
-       
-    //         foreach ($marks as $mark) {
-    //             $studentName = $mark->student->student_name ?? 'N/A';
-    //             $className = $mark->class->class ?? 'N/A';
-    //             $subjectName = $mark->subjectlist->sub_name ?? 'N/A';
-
-    //             $midMarks = $mark->mid_term_stu_marks ?? 0;
-    //             $midOutOf = $mark->mid_term_out_off ?? 0;
-    //             $finalMarks = $mark->final_exam_stu_marks ?? 0;
-    //             $finalOutOf = $mark->final_exam_out_off ?? 0;
-
-    //             $subjectStatus = (($finalMarks + $midMarks) / ($midOutOf + $finalOutOf) * 100 >= 50) ? 'Pass' : 'Fail'; // Example subject status logic
-
-    //             $line = [
-    //                 $studentName,
-    //                 $className,
-    //                 $subjectName,
-    //                 $midMarks,
-    //                 $midOutOf,
-    //                 $finalMarks,
-    //                 $finalOutOf,
-    //                 $subjectStatus
-    //             ];
-
-    //             fputcsv($f, $line, $delimiter);
-    //         }
-
-    //         fputcsv($f, [], $delimiter);
-
-         
-    //         fputcsv($f, ['Total Marks Obtained (Combined):', "$totalMarksObtained / $totalPossibleMarks", '', '', '', '', '', ''], $delimiter);
-
-   
-    //         fputcsv($f, ['Overall Percentage:', "$overallPercentage%", '', '', '', '', '', ''], $delimiter);
-
-    //         fputcsv($f, ['Status:', $overallStatus, '', '', '', '', '', ''], $delimiter);
-
-
-    //         fseek($f, 0);
-    //         header('Content-Type: text/csv');
-    //         header('Content-Disposition: attachment; filename="' . $filename . '";');
-    //         fpassthru($f);
-    //         exit;
-    //     } else {
-    //         return redirect()->back()->with('error', 'No records found for the selected student/filters to export.');
-    //     }
-    // }
     public function export(Request $request)
     {
         $sessionId = $request->input('session_id');
@@ -557,55 +350,74 @@ class ReportController extends Controller
 
             $filename = "student_report_card_" . $studentNameForFile . "_" . date('Y-m-d') . ".csv";
             $f = fopen('php://memory', 'w');
+            // Step 1: Get session names for student_ids
+            $studentSessions = StudentAdmission::with('session')
+                ->whereIn('student_id', $marks->pluck('student_id')->unique())
+                ->get()
+                ->mapWithKeys(function ($admission) {
+                    return [$admission->student_id => $admission->session->session_name ?? 'N/A'];
+                });
 
-            //  Updated CSV headers (removed Out Of columns)
-            $headers = [
-                'Student Name',
-                'Class',
-                'Subject',
-                'Mid Term Marks',
-                'Final Exam Marks',
-                'Grade',
-                'Status'
-            ];
-            fputcsv($f, $headers, $delimiter);
+            // Step 2: Group marks by session name
+            $marksGroupedBySession = $marks->groupBy(function ($mark) use ($studentSessions) {
+                return $studentSessions[$mark->student_id] ?? 'N/A';
+            })->sortKeys(); 
 
-            foreach ($marks as $mark) {
-                $studentName = $mark->student->student_name ?? 'N/A';
-                $className = $mark->class->class ?? 'N/A';
-                $subjectName = $mark->subjectlist->sub_name ?? 'N/A';
+            // Step 3: Write session-wise CSV
+            foreach ($marksGroupedBySession as $sessionName => $sessionMarks) {
+                // Session title row
+                fputcsv($f, ["Session: $sessionName"], $delimiter);
 
-                $midMarks = $mark->mid_term_stu_marks ?? 0;
-                $midOutOf = $mark->mid_term_out_off ?? 0;
-                $finalMarks = $mark->final_exam_stu_marks ?? 0;
-                $finalOutOf = $mark->final_exam_out_off ?? 0;
-
-                $totalSubjectObtained = $midMarks + $finalMarks;
-                $totalSubjectOutOf = $midOutOf + $finalOutOf;
-                $subjectPercentage = ($totalSubjectOutOf > 0) ? ($totalSubjectObtained / $totalSubjectOutOf) * 100 : 0;
-                $subjectPercentage = round($subjectPercentage, 2);
-
-                $grade = calGradeLabel($subjectPercentage);
-                $status = calStatusLabel($subjectPercentage);
-
-                $line = [
-                    $studentName,
-                    $className,
-                    $subjectName,
-                    $midMarks,
-                    $finalMarks,
-                    $grade,
-                    $status
+                // Table headers under each session
+                $headers = [
+                    'Student Name',
+                    'Class',
+                    'Subject',
+                    'Mid Term Marks',
+                    'Final Exam Marks',
+                    'Grade',
+                    'Status'
                 ];
+                fputcsv($f, $headers, $delimiter);
 
-                fputcsv($f, $line, $delimiter);
+                foreach ($sessionMarks as $mark) {
+                    $studentName = $mark->student->student_name ?? 'N/A';
+                    $className = $mark->class->class ?? 'N/A';
+                    $subjectName = $mark->subjectlist->sub_name ?? 'N/A';
+
+                    $midMarks = $mark->mid_term_stu_marks ?? 0;
+                    $midOutOf = $mark->mid_term_out_off ?? 0;
+                    $finalMarks = $mark->final_exam_stu_marks ?? 0;
+                    $finalOutOf = $mark->final_exam_out_off ?? 0;
+
+                    $totalSubjectObtained = $midMarks + $finalMarks;
+                    $totalSubjectOutOf = $midOutOf + $finalOutOf;
+                    $subjectPercentage = ($totalSubjectOutOf > 0) ? ($totalSubjectObtained / $totalSubjectOutOf) * 100 : 0;
+                    $subjectPercentage = round($subjectPercentage, 2);
+
+                    $grade = calGradeLabel($subjectPercentage);
+                    $status = calStatusLabel($subjectPercentage);
+
+                    $line = [
+                        $studentName,
+                        $className,
+                        $subjectName,
+                        $midMarks,
+                        $finalMarks,
+                        $grade,
+                        $status
+                    ];
+
+                    fputcsv($f, $line, $delimiter);
+                }
+
+                // Add blank row between sessions
+                fputcsv($f, [], $delimiter);
             }
-
-            fputcsv($f, [], $delimiter); // Blank row
 
             fputcsv($f, ['Total Marks Obtained:', $totalMarksObtained, '', '', '', '', ''], $delimiter);
             fputcsv($f, ['Overall Percentage:', "$overallPercentage%", '', '', '', '', ''], $delimiter);
-            fputcsv($f, ['Overall Status:', $overallStatus, '', '', '', '', ''], $delimiter);
+            // fputcsv($f, ['Overall Status:', $overallStatus, '', '', '', '', ''], $delimiter);
 
             fseek($f, 0);
             header('Content-Type: text/csv');

@@ -7,118 +7,119 @@
 @section('content')
 
 
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="mb-0 text-primary">Progress Charts</h3>
-            <small class="text-muted">Visual representation of student performance trends</small>
-        </div>
-
+<div class="card">
+    <div class="card-header">
+        <h4 class="mb-0 fw-bold">Progress Charts</h3>
+        <p class="text-muted">Visual representation of student performance trends</p>
     </div>
-    <div class="row mb-4">
-        <div class="form-floating form-floating-outline col-md-3">
-            <select id="chart_type" class="form-select">
-                <option value="academic">Academic Performance</option>
-                <option value="qualitative">Qualitative Progress</option>
-            </select>
-            <label for="chart_type">Chart Type</label>
-        </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="form-floating form-floating-outline col-md-3">
+                <select id="chart_type" class="form-select">
+                    <option value="academic">Academic Performance</option>
+                    <option value="qualitative">Qualitative Progress</option>
+                </select>
+                <label for="chart_type">Chart Type</label>
+            </div>
 
-        <div class="form-floating form-floating-outline col-md-2">
+            <div class="form-floating form-floating-outline col-md-2">
 
-            <select id="session_id" class="form-select">
-                <option value="">Select Session</option>
-                @foreach($sessions as $session)
-                    <option value="{{ $session['id'] }}">{{ $session['name'] }}</option>
-                @endforeach
-            </select>
-            <label for="session_id">Session</label>
-        </div>
+                <select id="session_id" class="form-select">
+                    <option value="">Select Session</option>
+                    @foreach($sessions as $session)
+                        <option value="{{ $session['id'] }}">{{ $session['name'] }}</option>
+                    @endforeach
+                </select>
+                <label for="session_id">Session</label>
+            </div>
+
+        
+            <div class="form-floating form-floating-outline col-md-2">
+                <select id="student_id" class="form-select">
+                    <option value="">Select Student</option>
+                </select>
+                <label for="student_id">Student</label>
+            </div>
 
     
-        <div class="form-floating form-floating-outline col-md-2">
-            <select id="student_id" class="form-select">
-                <option value="">Select Student</option>
-            </select>
-            <label for="student_id">Student</label>
-        </div>
-
-   
-        <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
-            <select id="class_id" class="form-select">
-                <option value="">Select Class</option>
-            </select>
-            <label for="class_id">Class</label>
-        </div>
-
-
-        <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
-            <select id="subject_id" class="form-select">
-                <option value="">Select Subject</option>
-            </select>
-            <label for="subject_id">Subject</label>
-        </div>
-
-    </div>
-
-    <div id="academicCharts" class="row mb-4">
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="mb-3">Academic Performance Trend</h5>
-                <canvas id="lineChart" height="200"></canvas>
+            <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
+                <select id="class_id" class="form-select">
+                    <option value="">Select Class</option>
+                </select>
+                <label for="class_id">Class</label>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card p-3 shadow-sm">
-                <h5 class="mb-3">Subject-wise Performance</h5>
-                <canvas id="barChart" height="200"></canvas>
+
+
+            <div class="form-floating form-floating-outline col-md-2 class-subject-toggle">
+                <select id="subject_id" class="form-select">
+                    <option value="">Select Subject</option>
+                </select>
+                <label for="subject_id">Subject</label>
             </div>
+
         </div>
     </div>
 
-    <div id="qualitativeCharts" class="row mb-4 d-none">
-        <div class="col-md-6 d-flex">
-            <div class="card p-3 shadow-sm w-100 h-100">
-                <h5 class="mb-3">Qualitative Progress Trend</h5>
-                <canvas id="qualLineChart" height="300"></canvas>
+    <div class="card-body">
+        <div id="academicCharts" class="row mb-4">
+            <div class="col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="mb-3">Academic Performance Trend</h5>
+                    <canvas id="lineChart" height="200"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="mb-3">Subject-wise Performance</h5>
+                    <canvas id="barChart" height="200"></canvas>
+                </div>
             </div>
         </div>
-        <div class="col-md-6 d-flex">
-            <div class="card p-3 shadow-sm w-100 h-100" style="display: flex; justify-content: center; align-items: center;">
-                <div style="width: 400px; height: 400px;">
-                    <canvas id="radarChart"></canvas>
+
+        <div id="qualitativeCharts" class="row mb-4 d-none">
+            <div class="col-md-6 d-flex">
+                <div class="card p-3 shadow-sm w-100 h-100">
+                    <h5 class="mb-3">Qualitative Progress Trend</h5>
+                    <canvas id="qualLineChart" height="300"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6 d-flex">
+                <div class="card p-3 shadow-sm w-100 h-100" style="display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 400px; height: 400px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <p class="text-muted mb-1"> Students Tracked</p>
+                    <h4 id="studentsTracked">0</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <p class="text-muted mb-1"> Subjects Monitored</p>
+                    <h4 id="subjectsMonitored">0</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <p class="text-muted mb-1"> Avg Performance</p>
+                    <h4 id="avgPerformance">0%</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 shadow-sm">
+                    <p class="text-muted mb-1"> Avg Progress</p>
+                    <h4 id="avgProgress">0%</h4>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <div class="row">
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Students Tracked</p>
-                <h4 id="studentsTracked">0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Subjects Monitored</p>
-                <h4 id="subjectsMonitored">0</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Avg Performance</p>
-                <h4 id="avgPerformance">0%</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center p-3 shadow-sm">
-                <p class="text-muted mb-1"> Avg Progress</p>
-                <h4 id="avgProgress">0%</h4>
-            </div>
-        </div>
-    </div>
 </div>
 
 @endsection

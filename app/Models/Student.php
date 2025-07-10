@@ -42,15 +42,7 @@ class Student extends Model
     {
         return $this->hasMany(StudentAdmission::class);
     }
-    // public static function generateStudentUid()
-    // {
-    //     do {
-    //         // You can change the format as per your requirement
-    //         $studentId = 'STU' . '-' . strtoupper(Str::random(4));
-    //     } while (self::where('student_id', $studentId)->exists());
-
-    //     return $studentId;
-    // }
+  
     public static function generateStudentUid($admissionYear, $classAlias, $rollNo)
     {
         // Format year

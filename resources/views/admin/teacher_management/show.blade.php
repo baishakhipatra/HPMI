@@ -1,5 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
 @extends('layouts/contentNavbarLayout')
 
@@ -13,48 +12,52 @@
             <div class="col-12">
                 <div class="card">
                     <!-- Card Header -->
-                    <div class="card-header">
-                        <h4 class="mb-0 text-primary">Teacher Details</h5>
-                        {{-- Back Button --}}
-                        <div class="text-end">
-                        <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
-                            <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
+                    <div class="card-header mb-3">
+                        <div class="row align-items-center justify-content-between">
+                            <div class="col-auto">
+                                <h4 class="mb-0 text-primary">Teacher Details</h5>
+                            </div>
+                            <div class="col-auto">
+                                <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
+                                    <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back
+                                </a>
+                            </div>
                         </div>
                         
-                    {{-- </div>
+                    </div>
 
-                    <div class="card-body pt-12"> --}}
+                    <div class="card-body">
 
-                        <ul class="list-unstyled mb-4">
+                        <ul class="common-list grid-list mb-4">
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Full Name:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Full Name:</span>
                                 <span>{{ ucwords($teacher->name ?? 'N/A') }}</span>
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Address:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Address:</span>
                                 <span>{{ ucwords($teacher->address ?? 'N/A') }}</span>
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Date of Birth:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Date of Birth:</span>
                                 <span>{{date('d-m-Y',strtotime($teacher->date_of_birth))}}</span>
                                 
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Date of Joining:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Date of Joining:</span>
                                 <span>{{date('d-m-Y',strtotime($teacher->date_of_joining))}}</span>
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Qualifications:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Qualifications:</span>
                                 <span>{{ ucwords($teacher->qualifications ?? 'N/A') }}</span>
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Classes:</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Classes:</span>
                                 @if(!empty($classes))
                                     <ul class="mb-0">
                                         @foreach($classes as $eachClassItem)
@@ -66,8 +69,8 @@
                                 @endif
                             </li>
 
-                            <li class="mb-2">
-                                <span class="h6 me-1">Subjects (Class-wise):</span>
+                            <li>
+                                <span class="h6 me-1 label-color">Subjects (Class-wise):</span>
                                 @if(!empty($subjects))
                                     <ul class="mb-0">
                                         @foreach($subjects as $eachSubjectItem)
@@ -89,4 +92,6 @@
     </section>
 </section>
 
+@endsection
+@section('scripts')
 @endsection

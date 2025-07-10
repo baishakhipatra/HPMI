@@ -38,9 +38,9 @@
                   </a>
                   <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
                     <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 
-                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                      class="btn buttons-collection btn-outline-secondary waves-effect" 
                       data-toggle="tooltip" title="Export Data">
-                      Export
+                      Export<i class="tf-icons ri-download-line"></i>
                     </a>
                   </div>
                 </div>
@@ -81,7 +81,7 @@
                 }
                 $subjects[] = 'Class ' . $clasName . ' - ' . ucfirst($subjectName);
               }
-              // dd($subjects);
+             
             @endphp
             <tr>
               <td>{{ $item->user_id}}</td>
@@ -89,32 +89,6 @@
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
               <td>{{ $item->date_of_joining}}</td>
-              {{-- <td>
-                @if(count($classes) > 0)
-                  <ul class="mb-0">
-                      @foreach($classes as $eachClassItem)
-                        <li>{{ $eachClassItem ?? '-' }}</li>
-                      @endforeach
-                  </ul>
-                @else
-                    -
-                @endif
-              </td>
-             
-              <td>
-                @if(count($subjects) > 0)
-                    <ul class="mb-0">
-                        @foreach($subjects as $eachSubjectItem)
-                            <li>
-                                {{ $eachSubjectItem }}
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    -
-                @endif
-              </td> --}}
-
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
@@ -145,8 +119,7 @@
       </table>
       {{ $admins->links() }}
     </div>
-  </div>
-  
+  </div>  
 </div>
 @endsection
 @section('scripts')

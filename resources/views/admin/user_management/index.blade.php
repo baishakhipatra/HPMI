@@ -36,9 +36,9 @@
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
                   <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
-                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                    class="btn buttons-collection btn-outline-secondary waves-effect" 
                     data-toggle="tooltip" title="Export Data">
-                    Export
+                    Export<i class="tf-icons ri-download-line"></i>
                   </a>
                 </div>
               </div>
@@ -79,23 +79,6 @@
               </td>
               {{-- Edit and delete --}}
               <td>
-                {{-- <div class="dropdown">
-                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
-                  </button>
-                  <div class="dropdown-menu">
-                   
-                    <a class="dropdown-item" href="{{ route('admin.employee.show', $item->id) }}" title="View" data-bs-toggle="tooltip">
-                      <i class="ri-eye-line me-1"></i> View
-                    </a>
-                    <a class="dropdown-item" href="{{ route('admin.employee.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
-                        <i class="ri-pencil-line me-1"></i> Edit
-                    </a>
-                    <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
-                        <i class="ri-delete-bin-6-line me-1"></i> Delete
-                    </a>
-                  </div>
-                </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                   <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
                     data-bs-toggle="tooltip" title="View">                  

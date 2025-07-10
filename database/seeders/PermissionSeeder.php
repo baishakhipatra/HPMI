@@ -57,6 +57,7 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'student_management', 'name' => 'edit_student', 'route' => 'admin.studentedit'],
             ['parent_name' => 'student_management', 'name' => 'delete_student', 'route' => 'admin.studentdelete'],
             ['parent_name' => 'student_management', 'name' => 'export_student_list', 'route' => 'admin.student.export'],
+            ['parent_name' => 'student_management', 'name' => 'import_student_list', 'route' => 'admin.student.import'],
 
             ['parent_name' => 'student_management', 'name' => 'student_progress_marking', 'route' => 'admin.student.progressmarkinglist'],
             ['parent_name' => 'student_management', 'name' => 'student_class_wise_comparison', 'route' => 'admin.student.classcompare'],
@@ -69,6 +70,10 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'student_management', 'name' => 'edit_student_mark', 'route' => 'admin.student-marks.update'],
             ['parent_name' => 'student_management', 'name' => 'delete_student_mark', 'route' => 'admin.student-marks.delete'],
             ['parent_name' => 'student_management', 'name' => 'export_student_mark_list', 'route' => 'admin.student-marks.export'],
+
+            ['parent_name' => 'report_management', 'name' => 'report_list', 'route' => 'admin.report.index'],
+            ['parent_name' => 'report_management', 'name' => 'report_card', 'route' => 'admin.report.getStudentReportCard'],
+            ['parent_name' => 'report_management', 'name' => 'export_report_list', 'route' => 'admin.report.export'],
 
         ];
         foreach ($permissions as $permission) {
