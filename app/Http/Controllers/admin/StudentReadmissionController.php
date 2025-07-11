@@ -29,35 +29,66 @@ class StudentReadmissionController extends Controller
     // }
 
 
-    public function index(Request $request)
-    {
-        $students = collect();
+    public function index(Request $request) {
+        $students  = collect();
         $selectedStudent = null;
         $admissionHistories = [];
 
-        if ($request->filled('keyword')) {
-            $students = Student::where('student_name', 'like', '%' . $request->keyword . '%')->get();
+        $admin = auth()->guard('admin')->user();
 
-            // Auto-select if only one student found and no student_id sent
-            if ($students->count() === 1 && !$request->filled('student_id')) {
+        if($request->filled('keyword')) {
+            $keyword = $request->keyword;
+
+            //Build base query
+            $query = Student::query();
+
+            //apply restriction
+            if($admin && $admin->user_type === 'Teacher') {
+                $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+
+                $query->whereHas('admissions', function ($q) use ($assignedClassIds) {
+                    $q->whereIn('class_id', $assignedClassIds);
+                });
+            }
+
+            $query->where('student_name', 'like', '%' . $keyword . '%');
+
+            $students = $query->get();
+
+            if($students->count() === 1 && !$request->filled('student_id')) {
                 $selectedStudent = $students->first();
             }
 
-            // If student_id is sent, select based on that
-            if ($request->filled('student_id')) {
+            // If student_id passed, get exact student
+            if($request->filled('student_id')) {
                 $selectedStudent = Student::where('student_id', $request->student_id)->first();
             }
 
-            if ($selectedStudent) {
+            //Load admission histories only if a valid student is selected
+            if($selectedStudent) {
                 $admissionHistories = StudentAdmission::with(['session', 'class'])
-                    ->where('student_id', $selectedStudent->id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                                        ->where('student_id', $selectedStudent->id)
+                                        ->orderBy('created_at', 'desc')
+                                        ->get();
             }
         }
 
         return view('admin.student_management.index', compact('students', 'selectedStudent', 'admissionHistories'));
     }
+
+    public function autocomplete(Request $request)
+    {
+        $keyword = $request->get('keyword');
+
+        $students = Student::query()
+            ->where('student_name', 'like', $keyword . '%')
+            ->select('student_id', 'student_name')
+            ->limit(10)
+            ->get();
+
+        return response()->json($students);
+    }
+
 
 
 

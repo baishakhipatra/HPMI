@@ -178,6 +178,7 @@ if(!function_exists('hasPermissionByChild')){
     }
 }
 
+
 //for generate new session
 if (!function_exists('createNewSession')) {
     function createNewSession() {

@@ -28,13 +28,15 @@
 
                     <div class="col-md-6">
 
-                        <input type="text" name="keyword" class="form-control" placeholder="Enter student name..." value="{{ request('keyword') }}">
+                        {{-- <input type="text" name="keyword" class="form-control" placeholder="Enter student name..." value="{{ request('keyword') }}"> --}}
 
+                        <select id="student_keyword" name="student_id" class="form-control" style="width: 100%;"></select>
+                        <div id="student_suggestions" class="list-group position-absolute w-50" style="z-index: 1000;"></div>
                     </div>
 
                     <div class="col-md-4 d-flex justify-content-start align-items-center gap-2">
 
-                        <button type="submit" class="btn btn-primary">Search</button>
+                        {{-- <button type="submit" class="btn btn-primary">Search</button> --}}
 
                         <a href="{{ route('admin.student.readmission.index') }}" class="btn btn-secondary">Reset</a>
 
@@ -47,8 +49,6 @@
         </div>
 
     </div>
-
-
 
     @if(request()->filled('keyword'))
 
@@ -74,7 +74,7 @@
 
                             <button type="submit" class="btn btn-outline-dark btn-sm">
 
-                                {{ $stu->student_name }} ({{ $stu->student_id }}) - DOB: {{date('d-m-Y',strtotime($stu->date_of_birth))}}
+                                {{ ucwords($stu->student_name) }} ({{ $stu->student_id }}) - DOB: {{date('d-m-Y',strtotime($stu->date_of_birth))}}
 
                             </button>
 
@@ -93,8 +93,6 @@
         @endif
 
     @endif
-
-
 
     @if($selectedStudent)
 
@@ -170,8 +168,56 @@
 
     @endif
 
-
-
 @endsection
+
 @section('scripts')
+<script>
+    function toUcwords(str) {
+        return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+    }
+   
+    
+    var $jq = jQuery.noConflict();
+
+    $jq(document).ready(function () {
+        $jq('#student_keyword').select2({
+            placeholder: 'Search student name...',
+            minimumInputLength: 1,
+            ajax: {
+                url: '{{ route("admin.student.readmission.autocomplete") }}',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        keyword: params.term
+                    };
+                },
+                processResults: function (data) {
+                    
+                    return {
+                        results: data.map(function (student) {
+                            let nameUcwords = toUcwords(student.student_name);
+                            return {
+                                id: nameUcwords, // Use name as ID too
+                                text: `${nameUcwords} (${student.student_id})`
+                            };
+                        })
+                    };
+                },
+                cache: true
+            }
+        });
+
+        // Auto-submit with just keyword
+        $jq('#student_keyword').on('select2:select', function (e) {
+            const selectedName = e.params.data.id;
+
+            // Redirect to readmission?keyword=SelectedName
+            const url = new URL("{{ route('admin.student.readmission.index') }}", window.location.origin);
+            url.searchParams.set("keyword", selectedName);
+            window.location.href = url.toString();
+        });
+    });
+</script>
+
 @endsection

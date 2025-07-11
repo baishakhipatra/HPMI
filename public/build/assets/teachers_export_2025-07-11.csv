@@ -1,0 +1,9 @@
+"Teacher ID",Name,Email,Phone,"Date of Birth","Date of Joining",Address,Qualification,"Subjects (Class-wise)",Classes
+TEACH0001,"Nilanjan Das",nil@gmail.com,8412364789,2007-03-08,2025-07-01,kolkata,btech,"V - History, VI - Geography, VI - Bengali, VI - Life Science","V, VI"
+TEACH0002,"Sumana Das",sumana@gmail.com,8412365478,1981-07-22,2025-07-01,barrackpore,"msc,phd","V - History, V - Geography, VI - Bengali","V, VI"
+TEACH0003,"Subhra Sanyal",san@outlook.com,8436741325,2023-02-08,2025-07-03,kolkata,BSC,"X - History, X - Geography, XI - History, XI - Geography","X, XI"
+TEACH0004,test,new@yahoo.com,9136548720,2024-02-08,2025-07-04,jj,bb,"V - History, V - Geography, V - English, V - Life Science, VI - History, VI - Geography, VI - Bengali, VI - English, VI - Life Science","V, VI"
+TEACH0005,"santanu roy",santanu@mail.com,9136548725,2025-07-01,2025-07-11,hh,BBA,"V - Geography, VI - Bengali","V, VI"
+TEACH0006,Joy,joy@techmantra.co,9674030434,,,,,"V - History, V - Geography",V
+TEACH0007,"Bijoy Mondal",joymondal03@gmail.com,8910240518,1990-05-04,,,,"V - History",V
+TEACH0008,"arpan de",arpan@gmail.com,9412346123,2020-02-11,2025-07-18,kolkata,BSC,"VI - History, VI - Geography, IX - Bengali","VI, IX"

@@ -17,68 +17,17 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Student List</h3>
-    <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
+    <h4 class="fw-bold mb-0">Student List</h4>
+    @if (hasPermissionByChild('create_student'))
+      <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
+    @endif
   </div>
 
-  {{-- <div class="px-3 py-2">
-    <form action="" method="get">
-      <div class="row">
-        <div class="col-md-6"></div>
-          <div class="col-md-6">  
-            <div class="d-flex justify-content-end">
-              <div class="form-group me-2 mb-0">
-                <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
-              </div>
-              <div class="form-group mb-0">
-                <div class="btn-group">
-                  <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="tf-icons ri-filter-3-line"></i>
-                  </button>
-                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
-                    <i class="tf-icons ri-close-line"></i>
-                  </a>
-                  <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
-                    <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" 
-                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                      data-toggle="tooltip" title="Export Data">
-                      Export
-                    </a>
-                  </div>
-                </div>
-              </div>
-              
-              <hr>
-
-              <!-- CSV Upload Form (Placed outside of the filter/export button group) -->
-              <form method="POST" action="{{ route('admin.student.import') }}" enctype="multipart/form-data" class="mt-3">
-                  @csrf
-                  <div class="row align-items-end">
-                      <div class="col-md-6">
-                          <label for="csv_file" class="form-label">Upload CSV File</label>
-                          <input type="file" name="csv_file" class="form-control @error('csv_file') is-invalid @enderror" accept=".csv">
-                          @error('csv_file')
-                              <div class="text-danger small">{{ $message }}</div>
-                          @enderror
-                      </div>
-
-                      <div class="col-md-4">
-                          <button type="submit" class="btn btn-success mt-2">
-                              <i class="fas fa-upload"></i> Import Students
-                          </button>
-                      </div>
-                  </div>
-              </form>
-            </div>
-          </div>
-      </div>
-    </form>
-  </div> --}}
   <div class="px-3 py-2">
     <form action="" method="get">
         <div class="row">
-            <div class="col-md-6"></div>
-            <div class="col-md-6">
+            <div class="col-md-3"></div>
+            <div class="col-md-9">
                 <div class="d-flex justify-content-end align-items-center"> {{-- Added align-items-center for vertical alignment --}}
                     <div class="form-group me-2 mb-0">
                         <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
@@ -91,14 +40,16 @@
                             <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                                 <i class="tf-icons ri-close-line"></i>
                             </a>
-                            {{-- Export Button (already present) --}}
-                            <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
-                                <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
-                                    class="btn buttons-collection btn-outline-secondary waves-effect"
-                                    data-toggle="tooltip" title="Export Data">
-                                    Export Student <i class="tf-icons ri-download-line"></i>
-                                </a>
-                            </div>
+                            {{-- Export Button (already present) --}}                           
+                              <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                                @if (hasPermissionByChild('export_student_list'))
+                                  <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
+                                      class="btn buttons-collection btn-outline-secondary waves-effect"
+                                      data-toggle="tooltip" title="Export Data">
+                                      Export Student <i class="tf-icons ri-download-line"></i>
+                                  </a>
+                                @endif
+                              </div>                          
 
                             {{-- Removed the extra <hr> and CSV form placement here --}}
 
@@ -107,9 +58,11 @@
 
                     {{-- NEW: CSV Import Button and Hidden Form --}}
                     {{-- This section replaces the original separate CSV form block --}}
-                  <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importStudentModal">
-                      <i class="tf-icons ri-upload-line"></i> Import Student
-                  </button>
+                    @if (hasPermissionByChild('import_student_list'))
+                      <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importStudentModal">
+                          <i class="tf-icons ri-upload-line"></i> Import Student
+                      </button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -177,26 +130,32 @@
                 </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                     {{-- Edit --}}
-                    <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
-                      data-bs-toggle="tooltip" title="View">                  
-                      <i class="ri-eye-line"></i>
-                    </a>
+                    @if (hasPermissionByChild('details_student'))
+                      <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                        data-bs-toggle="tooltip" title="View">                  
+                        <i class="ri-eye-line"></i>
+                      </a>
+                    @endif
 
-                    <a href="{{ route('admin.studentedit', $item->id) }}"
-                      class="btn btn-sm btn-icon btn-outline-dark"
-                      data-bs-toggle="tooltip"
-                      title="Edit">
-                        <i class="ri-pencil-line"></i>
-                    </a>
+                    @if (hasPermissionByChild('edit_student'))
+                      <a href="{{ route('admin.studentedit', $item->id) }}"
+                        class="btn btn-sm btn-icon btn-outline-dark"
+                        data-bs-toggle="tooltip"
+                        title="Edit">
+                          <i class="ri-pencil-line"></i>
+                      </a>
+                    @endif
 
                     {{-- Delete --}}
-                    <a href="javascript:void(0);"
-                      class="btn btn-sm btn-icon btn-outline-danger"
-                      onclick="deleteStudent({{ $item->id }})"
-                      data-bs-toggle="tooltip"
-                      title="Delete">
-                        <i class="ri-delete-bin-6-line"></i>
-                    </a>
+                    @if (hasPermissionByChild('delete_student'))
+                      <a href="javascript:void(0);"
+                        class="btn btn-sm btn-icon btn-outline-danger"
+                        onclick="deleteStudent({{ $item->id }})"
+                        data-bs-toggle="tooltip"
+                        title="Delete">
+                          <i class="ri-delete-bin-6-line"></i>
+                      </a>
+                    @endif
 
                     {{-- Admission History --}}
                     {{-- <a href="{{ route('admin.student.admissionhistory', $item->id) }}"
@@ -215,12 +174,14 @@
                     </a> --}}
 
                     {{-- Classwise Comparison --}}
-                    <a href="{{ route('admin.student.classcompare', $item->id) }}"
-                      class="btn btn-sm btn-icon btn-outline-primary"
-                      data-bs-toggle="tooltip"
-                      title="Class Wise Comparison">
-                        <i class="ri-bar-chart-grouped-line"></i>
-                    </a>
+                    @if (hasPermissionByChild('student_class_wise_comparison'))
+                      <a href="{{ route('admin.student.classcompare', $item->id) }}"
+                        class="btn btn-sm btn-icon btn-outline-primary"
+                        data-bs-toggle="tooltip"
+                        title="Class Wise Comparison">
+                          <i class="ri-bar-chart-grouped-line"></i>
+                      </a>
+                    @endif
                 </div>
               </td>
             </tr>
@@ -301,6 +262,44 @@
     });
   }
 
+  // $(document).ready(function() {
+  //   $('#importStudentForm').on('submit', function(e) {
+  //       e.preventDefault();
+
+  //       var formData = new FormData(this);
+  //       $('#importMessage').html('<div class="alert alert-info">Importing...</div>');
+
+  //       $.ajax({
+  //           url: "{{ route('admin.student.import') }}",
+  //           type: "POST",
+  //           data: formData,
+  //           contentType: false,
+  //           processData: false,
+  //           success: function(response) {
+  //             // console.log(response);
+  //             return false;
+  //               $('#importMessage').html('<div class="alert alert-success">Students imported successfully!</div>');
+  //               $('#excel_file').val('');
+  //               // Optionally close modal after short delay
+  //               setTimeout(function() {
+  //                   $('#importStudentModal').modal('hide');
+  //                   location.reload(); // Reload to reflect changes
+  //               }, 1500);
+  //           },
+  //           error: function(xhr) {
+  //               let errors = xhr.responseJSON?.errors || { error: ['Something went wrong.'] };
+  //               let errorHtml = '<div class="alert alert-danger"><ul>';
+  //               $.each(errors, function(key, messages) {
+  //                   messages.forEach(msg => {
+  //                       errorHtml += '<li>' + msg + '</li>';
+  //                   });
+  //               });
+  //               errorHtml += '</ul></div>';
+  //               $('#importMessage').html(errorHtml);
+  //           }
+  //       });
+  //   });
+  // });
   $(document).ready(function () {
     $('#importStudentForm').on('submit', function (e) {
         e.preventDefault();
@@ -340,7 +339,7 @@
             }
         });
     });
-  });
+});
 
 
 </script>

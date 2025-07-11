@@ -72,7 +72,6 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'student_management', 'name' => 'export_student_mark_list', 'route' => 'admin.student-marks.export'],
 
             ['parent_name' => 'report_management', 'name' => 'report_list', 'route' => 'admin.report.index'],
-            ['parent_name' => 'report_management', 'name' => 'report_card', 'route' => 'admin.report.getStudentReportCard'],
             ['parent_name' => 'report_management', 'name' => 'export_report_list', 'route' => 'admin.report.export'],
 
         ];

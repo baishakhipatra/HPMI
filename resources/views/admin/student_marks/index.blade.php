@@ -80,29 +80,34 @@
 
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h3 class="mb-0">Marks Management</h3>
+            <div class="card-header">
+                <h4 class="fw-bold mb-0">Marks Management</h4>
                 <small class="text-muted">Manage student marks</small>
             </div>
             <div>
-                <a href="{{ route('admin.student-marks.export', [
-                            'student_name' => request('student_name'),
-                            'class_filter' => request('class_filter'),
-                            'subject_filter' => request('subject_filter'),
-                            'session_filter'  => request('session_filter')
-                        ]) }}" 
-                    class="btn buttons-collection btn-outline-secondary waves-effect" 
-                    data-toggle="tooltip" title="Export Student Mark">
-                        Export<i class="tf-icons ri-download-line"></i>
-                </a>
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
-                + Add Marks
-                </button>
+                @if (hasPermissionByChild('export_student_mark_list'))
+                    <a href="{{ route('admin.student-marks.export', [
+                                'student_name' => request('student_name'),
+                                'class_filter' => request('class_filter'),
+                                'subject_filter' => request('subject_filter'),
+                                'session_filter'  => request('session_filter')
+                            ]) }}" 
+                        class="btn buttons-collection btn-outline-secondary waves-effect btn-sm" 
+                        data-toggle="tooltip" title="Export Student Mark">
+                            Export <i class="tf-icons ri-download-line"></i>
+                    </a>
+                @endif
+
+                @if (hasPermissionByChild('create_student_mark'))
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
+                    + Add Marks
+                    </button>
+                @endif
             </div>
         </div>
         <form action="{{ route('admin.studentmarklist')}}" method="GET">
             <div class="row mb-4 align-items-center">
-                <div class="col-md-4 mb-2">
+                <div class="col-md-4">
                     <input type="text" id="student_name" name="student_name" class="form-control" placeholder="Search by student name..." value="{{ request('student_name') }}">
                 </div>
                 <div class="form-floating form-floating-outline col-md-2">
@@ -129,15 +134,13 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-1 text-end"> 
-                    <button type="submit" class="btn btn-primary">Search</button>
-                    
-                </div>
-                <div class="col-md-1 text-end">
-                    <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2" data-bs-toggle="tooltip" data-bs-original-title="Reset">
+                <div class="col-md-2 "> 
+                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    <a href="{{ route('admin.studentmarklist') }}" class="btn btn-secondary ms-2 btn-sm" data-bs-toggle="tooltip" data-bs-title="Reset">
                         <i class="fa-solid fa-arrows-rotate"></i>
                     </a>
                 </div>
+            
             </div>
         </form>
 
@@ -196,19 +199,23 @@
                         <td class="actions-cell">
                           <div class="btn-group" role="group" aria-label="Mark Actions">
                             {{-- Edit Button --}}
-                            <button type="button"
-                              class="btn btn-sm btn-icon btn-outline-dark editMarksBtn"
-                              data-url="{{ route('admin.student-marks.getData', $mark->id) }}"
-                              data-bs-toggle="tooltip"  title="Edit">                                 
-                              <i class="ri-pencil-line"></i>
-                            </button>
+                            @if (hasPermissionByChild('edit_student_mark'))
+                                <button type="button"
+                                class="btn btn-sm btn-icon btn-outline-dark editMarksBtn"
+                                data-url="{{ route('admin.student-marks.getData', $mark->id) }}"
+                                data-bs-toggle="tooltip"  title="Edit">                                 
+                                <i class="ri-pencil-line"></i>
+                                </button>
+                            @endif
 
                             {{-- Delete Button --}}
-                            <button type="button"
-                              class="btn btn-sm btn-icon btn-outline-danger"
-                              onclick="deleteMark({{ $mark->id }})" data-bs-toggle="tooltip" title="Delete">
-                              <i class="ri-delete-bin-6-line"></i>
-                            </button>
+                            @if (hasPermissionByChild('delete_student_mark'))
+                                <button type="button"
+                                class="btn btn-sm btn-icon btn-outline-danger"
+                                onclick="deleteMark({{ $mark->id }})" data-bs-toggle="tooltip" title="Delete">
+                                <i class="ri-delete-bin-6-line"></i>
+                                </button>
+                            @endif
                           </div>
                         </td>
                       </tr>

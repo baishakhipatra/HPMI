@@ -13,31 +13,31 @@ use App\Models\{Admin, Designation};
 class UserListController extends Controller
 {
     //
-    public function index(Request $request) 
+   public function index(Request $request) 
     {
-        //dd($request->all());
-        // if (Auth::guard('admin')->user()->user_type !== 'Admin') {
-        //     abort(403, 'Unauthorized access.');
-        // }
-
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Employee')->orWhere('designation_id', '2');
+
+        $query = Admin::where(function ($q) {
+            $q->where('user_type', 'Employee')
+            ->orWhere('designation_id', '2');
+        });
 
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
-                $subQuery->where('name', 'like', '%'. $keyword . '%')
-                            ->orWhere('email', 'like', '%'. $keyword . '%')
-                            ->orWhere('mobile', 'like', '%'. $keyword . '%')
-                            ->orWhere('qualifications', 'like', '%' . $keyword . '%')
-                            ->orWhere('address', 'like', '%' . $keyword . '%')  
-                            ->orWhere('user_id', 'like', '%' . $keyword .  '%');                         
+                $subQuery->where('name', 'like', '%' . $keyword . '%')
+                        ->orWhere('email', 'like', '%' . $keyword . '%')
+                        ->orWhere('mobile', 'like', '%' . $keyword . '%')
+                        ->orWhere('qualifications', 'like', '%' . $keyword . '%')
+                        ->orWhere('address', 'like', '%' . $keyword . '%')
+                        ->orWhere('user_id', 'like', '%' . $keyword . '%');
             });
         });
-        
+
         $admins = $query->latest('id')->paginate(10);
 
         return view('admin.user_management.index', compact('admins'));
     }
+
     public function create(){
         $user_id = generateEmployeeId();
         $designations = Designation::whereNotIn('id', [1, 3])->where('status', 1)->get();

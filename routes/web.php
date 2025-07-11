@@ -184,7 +184,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
                 Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete')->middleware('check.permission');
                 Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export')->middleware('check.permission');
-                Route::post('/import', [StudentListController::class, 'import'])->name('admin.student.import');
+                Route::post('/import', [StudentListController::class, 'import'])->name('admin.student.import')->middleware('check.permission');
 
             });
 
@@ -198,6 +198,7 @@ Route::prefix('admin')->group(function () {
 
             Route::prefix('readmission')->group(function () {
                 Route::get('/', [StudentReadmissionController::class, 'index'])->name('admin.student.readmission.index')->middleware('check.permission');
+                Route::get('/autocomplete', [StudentReadmissionController::class, 'autocomplete'])->name('admin.student.readmission.autocomplete');
                 Route::get('/history', [StudentReadmissionController::class, 'admissionHistory'])->name('admin.student.admissionhistory');
                 Route::post('/update', [StudentReadmissionController::class, 'admissionhistoryUpdate'])->name('admin.student.admissionhistoryUpdate');
                 Route::get('/form/{id}', [StudentReadmissionController::class, 'reAdmissionForm'])->name('admin.student.readmission');
@@ -298,13 +299,13 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::prefix('report')->group(function(){
-            Route::get('/',[ReportController::class, 'index'])->name('admin.report.index');
+            Route::get('/',[ReportController::class, 'index'])->name('admin.report.index')->middleware('check.permission');
             Route::get('/chart-data', [ReportController::class, 'getChartData'])->name('admin.report.getChartData');
             Route::get('/academic-reports/classes-by-session', [ReportController::class, 'getClassesBySession'])->name('admin.report.getClassesBySession');
             Route::get('/academic-reports/subjects-by-class', [ReportController::class, 'getSubjectsByClassAndSession'])->name('admin.report.getSubjectsByClassAndSession');
             Route::get('/academic-reports/students-by-class-session', [ReportController::class, 'getStudentsByClassAndSession'])->name('admin.report.getStudentsByClassAndSession');
             Route::get('/student-report-card', [ReportController::class, 'getStudentReportCard'])->name('admin.report.getStudentReportCard');
-            Route::get('/export', [ReportController::class, 'export'])->name('admin.report.export');
+            Route::get('/export', [ReportController::class, 'export'])->name('admin.report.export')->middleware('check.permission');
         });
 
     });

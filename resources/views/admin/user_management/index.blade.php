@@ -15,7 +15,9 @@
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="mb-0 text-primary">Employee List</h3>
-    <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
+    @if (hasPermissionByChild('create_employee'))
+      <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
+    @endif
   </div>
 
   <div class="px-3 py-2">
@@ -35,11 +37,15 @@
                   <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
                     <i class="menu-icon tf-icons ri-close-line"></i>
                   </a>
-                  <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
-                    class="btn buttons-collection btn-outline-secondary waves-effect" 
-                    data-toggle="tooltip" title="Export Data">
-                    Export<i class="tf-icons ri-download-line"></i>
-                  </a>
+                  @if (hasPermissionByChild('export_employee_list'))
+                    <div>
+                      <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
+                        class="btn buttons-collection btn-outline-secondary waves-effect" 
+                        data-toggle="tooltip" title="Export Data">
+                        Export<i class="tf-icons ri-download-line"></i>
+                      </a>
+                    </div>
+                  @endif
                 </div>
               </div>
             </div>
@@ -77,21 +83,35 @@
                     <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
                   </div>
               </td>
-              {{-- Edit and delete --}}
+              {{-- View, Edit and delete --}}
               <td>
                 <div class="btn-group" role="group" aria-label="Action Buttons">
-                  <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
-                    data-bs-toggle="tooltip" title="View">                  
-                    <i class="ri-eye-line"></i>
-                  </a>
-                  <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
-                    data-bs-toggle="tooltip"  title="Edit">
-                    <i class="ri-pencil-line"></i>
-                  </a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteUser({{ $item->id }})"     
-                    data-bs-toggle="tooltip" title="Delete">
-                    <i class="ri-delete-bin-6-line"></i>
-                  </a>
+                  @if (hasPermissionByChild('employee_details'))
+                    <div>
+                      <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                        data-bs-toggle="tooltip" title="View">                  
+                        <i class="ri-eye-line"></i>
+                      </a>
+                    </div>
+                  @endif
+                  
+                  @if (hasPermissionByChild('edit_employee'))
+                    <div>
+                      <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
+                        data-bs-toggle="tooltip"  title="Edit">
+                        <i class="ri-pencil-line"></i>
+                      </a>
+                    </div>
+                  @endif
+                  
+                  @if (hasPermissionByChild('delete_employee'))
+                    <div>
+                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteUser({{ $item->id }})"     
+                        data-bs-toggle="tooltip" title="Delete">
+                        <i class="ri-delete-bin-6-line"></i>
+                      </a>
+                    </div>    
+                  @endif           
                 </div>
               </td>
  

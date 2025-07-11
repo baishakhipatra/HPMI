@@ -2,6 +2,18 @@ body {
     background: linear-gradient(180deg, #FAFBFF 0%, #E9EFFB 100%);
 }
 
+.bg-primary {
+    background-color: #FF7556 !important;
+}
+
+.bg-success {
+    background-color: #39A1EA !important;
+}
+
+.bg-purple {
+    background-color: #29AB91 !important;
+}
+
 .login-frame {
     display: block;
     overflow: hidden;
@@ -120,8 +132,13 @@ a:hover {
 
 .btn-danger {
     color: #fff;
-    background-color: #FA8E29;
-    border-color: #FA8E29;
+    background-color: #FF7556;
+    border-color: #FF7556;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #F16646 !important;
+    border-color: #F16646 !important;
 }
 
 .menu-vertical .menu-item .menu-link {
@@ -225,4 +242,13 @@ a:hover {
 
 .layout-navbar.navbar-detached.container-xxl {
     background: #4f5f9b;
-}
+}
+
+.card {
+    background-clip: padding-box;
+    box-shadow: 0 .25rem .625rem #e0e8fb;
+    border-radius: 16px;
+}
+
+
+

@@ -102,7 +102,22 @@ class StudentListController extends Controller
             'admission_date'  => 'required|date',
             'class_id'        => 'required|exists:class_lists,id',
             'section_id'      => 'required|string',
-            'roll_number'     => 'required|integer',
+            // 'roll_number'     => 'required|integer',
+            'roll_number'     => [
+                    'required',
+                    'integer',
+                    function ($attribute, $value, $fail) use ($request) {
+                        $exists = StudentAdmission::where('session_id', $request->session_id)
+                            ->where('class_id', $request->class_id)
+                            ->where('section', $request->section_id)
+                            ->where('roll_number', $value)
+                            ->exists();
+
+                        if ($exists) {
+                            $fail("The roll number {$value} already exists for this class, section, and session.");
+                        }
+                    },
+                ],
             'session_id'      => 'required|exists:academic_sessions,id',
 
             // Optional fields
@@ -201,7 +216,7 @@ class StudentListController extends Controller
     }
 
   
-   public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         $request->validate([
             'student_name'    => 'required|string|max:255',
@@ -227,15 +242,23 @@ class StudentListController extends Controller
             'admission_date'  => 'required|date',
             'class_id'        => 'required|exists:class_lists,id',
             'section_id'      => 'required|string',
-            'roll_number'     => [
+            'roll_number' => [
                 'nullable',
                 'integer',
-                Rule::unique('student_admissions')
-                    ->ignore($request->admission_id)
-                    ->where(function ($query) use ($request) {
-                        return $query->where('class_id', $request->class_id)
-                                    ->where('section', $request->section_id);
-                    }),
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        $exists = StudentAdmission::where('session_id', $request->session_id)
+                            ->where('class_id', $request->class_id)
+                            ->where('section', $request->section_id)
+                            ->where('roll_number', $value)
+                            ->where('id', '!=', $request->admission_id) // exclude current
+                            ->exists();
+
+                        if ($exists) {
+                            $fail("Roll number {$value} already exists for this class, section, and session.");
+                        }
+                    }
+                },
             ],
             'aadhar_no' => [
                 'nullable',
@@ -637,6 +660,20 @@ class StudentListController extends Controller
                 $admissionYear = $session->session_name;
                 $classAlias = $class->class;
                 $rollNo = $row[4];
+
+                // Roll number duplicate check
+                $section = $row[6];
+                $rollExists = StudentAdmission::where('session_id', $session->id)
+                                    ->where('class_id', $class->id)
+                                    ->where('section', $section)
+                                    ->where('roll_number', $rollNo)
+                                    ->exists();
+                if($rollExists) {
+                    return response()->json([
+                        'message' => 'CSV failed to import',
+                        'errors'  => ["Row $rowNumber: Roll number $rollNo already exists in session '{$session->session_name}', class '{$class->class}', section '$section'."]
+                    ],200);
+                }
                 $studentUniqueId = Student::generateStudentUid($admissionYear, $classAlias, $rollNo);
 
                 $student = Student::create([

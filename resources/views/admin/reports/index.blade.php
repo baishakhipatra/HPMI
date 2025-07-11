@@ -121,7 +121,7 @@
                 <div class="d-flex justify-content-between align-items-center mb-2">
 
                     <h5>Individual Student Reports</h5>
-
+                    @if (hasPermissionByChild('export_report_list'))
                     <a href=""
 
                         id="exportReportBtn"
@@ -131,6 +131,7 @@
                         <i class="ri-download-2-line me-2"></i> Export Report Card
 
                     </a>
+                    @endif
 
                 </div>
 

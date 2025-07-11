@@ -4,78 +4,86 @@
 @section('title', 'Progress Marking Categories')
 
 @section('content')
-    <div class="container-fluid">
     <div class="row">
         <div class="col-8">
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="mb-0 text-primary">Progress Marking Categories</h5>
-            </div>
-            <div class="card-body">
-            <table class="table table-sm table-hover">
-                <thead>
-                    <tr class="text-center">
-                        <th>#</th>
-                        <th>Field</th>
-                        <th>Values</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @php $grouped = $progressList->groupBy('field'); @endphp
-                @forelse ($grouped as $field => $items)
-                @php $first = $items->first(); @endphp
-                    <tr>
-                        <td class="text-center">{{ $loop->iteration }}</td>
-                        <td class="text-center">
-                        <p class="text-muted mb-0">{{ ucwords($field) }}</p>
-                        </td>
-                        <td class="text-center">
-                        <div class="d-flex flex-column align-items-center">
-                            @foreach($items as $item)
-                            <span class="badge bg-dark-primary text-primary mb-1">{{ ucwords($item->value) }}</span>
-                            @endforeach
-                        </div>
-                        </td>
-                        <td class="text-center">
-                            <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
-                                <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{ $first->id }}"
-                                {{ $first->status ? 'checked' : '' }}
-                                onclick="statusToggle('{{ route('admin.student.progressstatus', $first->id) }}', this)">
-                                <label class="form-check-label" for="customSwitch{{ $first->id }}"></label>
-                            </div>
-                        </td>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="fw-bold mb-0">Progress Marking Categories</h5>
+                </div>
 
-                        <td>
-                            <div class="btn-group" role="group" aria-label="Action Buttons">
-                                {{-- Edit Button --}}
-                                <a href="{{ route('admin.student.progresslist', ['update_id' => $first->id]) }}"
-                                class="btn btn-sm btn-icon btn-outline-dark" data-bs-toggle="tooltip" title="Edit">
-                                <i class="ri-pencil-line"></i>
-                                </a>
+                <div class="card-body">
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr class="text-center">
+                                <th>#</th>
+                                <th>Field</th>
+                                <th>Values</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @php $grouped = $progressList->groupBy('field'); @endphp
+                        @forelse ($grouped as $field => $items)
+                        @php $first = $items->first(); @endphp
+                            <tr>
+                                <td class="text-center">{{ $loop->iteration }}</td>
+                                <td class="text-center">
+                                <p class="text-muted mb-0">{{ ucwords($field) }}</p>
+                                </td>
+                                <td class="text-center">
+                                <div class="d-flex flex-column align-items-center">
+                                    @foreach($items as $item)
+                                    <span class="badge bg-dark-primary text-primary mb-1">{{ ucwords($item->value) }}</span>
+                                    @endforeach
+                                </div>
+                                </td>
+                                <td class="text-center">
+                                    <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
+                                        <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{ $first->id }}"
+                                        {{ $first->status ? 'checked' : '' }}
+                                        onclick="statusToggle('{{ route('admin.student.progressstatus', $first->id) }}', this)">
+                                        <label class="form-check-label" for="customSwitch{{ $first->id }}"></label>
+                                    </div>
+                                </td>
 
-                                {{-- Delete Button --}}
-                                <button type="button"
-                                    class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteItem({{ $first->id }})"                              
-                                    data-bs-toggle="tooltip" title="Delete">                                   
-                                    <i class="ri-delete-bin-6-line"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                <tr>
-                    <td colspan="100%" class="text-center">No records found</td>
-                </tr>
-                @endforelse
-                </tbody>
-            </table>
-                <div class="d-flex justify-content-center">
-                    {{-- {{ $progressList->links() }} --}}
-                </div>  
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Action Buttons">
+                                        {{-- Edit Button --}}
+                                        @if (hasPermissionByChild('edit_progress_marking'))
+                                            <div>
+                                                <a href="{{ route('admin.student.progresslist', ['update_id' => $first->id]) }}"
+                                                class="btn btn-sm btn-icon btn-outline-dark" data-bs-toggle="tooltip" title="Edit">
+                                                <i class="ri-pencil-line"></i>
+                                                </a>
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- Delete Button --}}
+                                        @if (hasPermissionByChild('delete_progress_marking'))
+                                            <div>
+                                                <button type="button"
+                                                class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteItem({{ $first->id }})"                              
+                                                data-bs-toggle="tooltip" title="Delete">                                   
+                                                <i class="ri-delete-bin-6-line"></i>
+                                                </button>
+                                            </div>                                        
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                        <tr>
+                            <td colspan="100%" class="text-center">No records found</td>
+                        </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                    <div class="d-flex justify-content-center">
+                        {{-- {{ $progressList->links() }} --}}
+                    </div>  
+                </div>
             </div>
-        </div>
         </div>
 
 
@@ -90,35 +98,35 @@
                     @csrf
 
                     <div class="form-floating form-floating-outline mb-3">
-                    <input type="text" name="field" class="form-control" placeholder="Enter Field Name" value="{{ ucwords(old('field', $updateData->field)) }}">
-                    <label>Field Name</label>
-                    @error('field') <p class="text-danger small">{{ $message }}</p> @enderror
+                        <input type="text" name="field" class="form-control" placeholder="Enter Field Name" value="{{ ucwords(old('field', $updateData->field)) }}">
+                        <label>Field Name</label>
+                        @error('field') <p class="text-danger small">{{ $message }}</p> @enderror
                     </div>
 
                     <input type="hidden" name="deleted_value_ids" id="deleted_value_ids" value="">
 
                     @foreach($updateDataValues as $valueItem)
                     <div class="input-group mb-2 existing-value">
-                    <div class="form-floating form-floating-outline flex-grow-1">
-                        <input type="text" name="existing_value[{{ $valueItem->id }}]" class="form-control" value="{{ ucwords($valueItem->value) }}" placeholder="Enter Value">
-                        <label>Value</label>
-                    </div>
-                    <button type="button" class="btn btn-outline-danger remove-existing-value ms-2" data-id="{{ $valueItem->id }}">
-                        <i class="ri-close-line"></i>
-                    </button>
+                        <div class="form-floating form-floating-outline flex-grow-1">
+                            <input type="text" name="existing_value[{{ $valueItem->id }}]" class="form-control" value="{{ ucwords($valueItem->value) }}" placeholder="Enter Value">
+                            <label>Value</label>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger remove-existing-value ms-2" data-id="{{ $valueItem->id }}">
+                            <i class="ri-close-line"></i>
+                        </button>
                     </div>
                     @endforeach
 
                     <div id="value-container">
-                    <div class="input-group mb-2">
-                        <div class="form-floating form-floating-outline flex-grow-1">
-                        <input type="text" name="value[]" class="form-control" placeholder="Enter Value">
-                        <label>Value</label>
+                        <div class="input-group mb-2">
+                            <div class="form-floating form-floating-outline flex-grow-1">
+                            <input type="text" name="value[]" class="form-control" placeholder="Enter Value">
+                            <label>Value</label>
+                            </div>
+                            <button type="button" class="btn btn-outline-secondary add-value ms-2">
+                            <i class="ri-add-line"></i>
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-outline-secondary add-value ms-2">
-                        <i class="ri-add-line"></i>
-                        </button>
-                    </div>
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -171,8 +179,10 @@
                             @endforeach
                         </div>
 
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                        <div class="d-flex">
+                            @if (hasPermissionByChild('create_progress_marking'))
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            @endif
                         </div>
                     </form>
                 </div>
@@ -191,7 +201,6 @@
                 </button>
             </div>
         </template>
-    </div>
     </div>
 @endsection
 @section('scripts')

@@ -2,7 +2,7 @@
 
   <!-- ! Hide app brand if navbar-full -->
   <div class="app-brand demo">
-    <a href="{{url('/')}}" class="app-brand-link">
+    {{-- <a href="{{url('/')}}" class="app-brand-link"> --}}
       {{--<span class="app-brand-logo demo me-1">
             @include('_partials.macros',["height"=>20])
             </span> --}}
@@ -167,15 +167,18 @@
       </li>
       @endif
 
-      <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
-        <a href="{{route('admin.report.index')}}" class="menu-link">
-          <i class="menu-icon fa-solid fa-chart-pie"></i>
-          <div>Report</div>
-        </a>
-      </li>
+      {{-- Report Management --}}
+      @if (hasPermissionByParent('report_management'))
+        <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
+          <a href="{{route('admin.report.index')}}" class="menu-link">
+            <i class="menu-icon fa-solid fa-chart-pie"></i>
+            <div>Report</div>
+          </a>
+        </li>
+      @endif
       
       <li class="menu-item">
-        <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
+        <a class="btn btn-danger d-flex rounded-0" href="{{ route('admin.logout') }}"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
               <small class="align-middle">Logout</small>
               <i class="ri-logout-box-r-line ms-2 ri-16px"></i>
