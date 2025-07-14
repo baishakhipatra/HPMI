@@ -9,25 +9,6 @@ use Illuminate\Validation\Rule;
 
 class StudentReadmissionController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     $student = null;
-    //     $admissionHistories = [];
-
-    //     if ($request->has('keyword')) {
-    //         $student = Student::where('student_name', 'like', '%' . $request->keyword . '%')->first();
-
-    //         if ($student) {
-    //             $admissionHistories = StudentAdmission::with(['session', 'class'])
-    //                                 ->where('student_id', $student->id)
-    //                                 ->orderBy('created_at', 'desc')
-    //                                 ->get();
-    //         }
-    //     }
-
-    //     return view('admin.student_management.index', compact('student', 'admissionHistories'));
-    // }
-
 
     public function index(Request $request) {
         $students  = collect();
