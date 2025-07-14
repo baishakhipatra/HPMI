@@ -19,19 +19,22 @@ class Analytics extends Controller
             $assignedClassIds = TeacherClass::where('teacher_id', $user->id)
                                 ->pluck('class_id')
                                 ->unique();
+            $totalClasses = count($assignedClassIds);
+         
+            
+             $totalStudents = Student::whereHas('admission', function ($q) use ($assignedClassIds) {
+                            $q->whereIn('class_id', $assignedClassIds);
+                        })
+                        ->whereNull('deleted_at')
+                        ->count();
 
-            $totalClasses = $assignedClassIds->count();
-          
-            $uniqueStudentsInAssignedClasses = StudentAdmission::whereIn('class_id', $assignedClassIds)
-                                                ->pluck('student_id') // Pluck the unique identifier for students
-                                                ->unique(); // Get only unique student IDs
-            $totalStudents = $uniqueStudentsInAssignedClasses->count();
+                                    // dd($totalStudents);
 
             $totalTeachers = 1;
         } else {
-            $totalStudents = StudentAdmission::count();
+            $totalStudents = Student::whereNull('deleted_at')->count();
             $totalClasses = ClassList::count();
-            $totalTeachers = Admin::where('user_type', 'Teacher')->count(); // <-- Also change here if fetching count of all teachers
+            $totalTeachers = Admin::where('user_type', 'Teacher')->count(); 
         }
         return view('content.dashboard.dashboards-analytics', compact(
             'totalStudents', 'totalClasses', 'totalTeachers', 'user'));
