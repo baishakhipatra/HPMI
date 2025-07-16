@@ -8,8 +8,7 @@ use App\Models\{Admin, DesignationPermission, Designation, Permission};
 
 class DesignationController extends Controller
 {
-    //
-
+    
     public function index(Request $request) {
 
         $keyword = $request->input('keyword');
