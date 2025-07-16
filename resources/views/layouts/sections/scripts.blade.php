@@ -1,3 +1,8 @@
+{{-- <head>
+  @vite([
+  'resources/css/style.css'
+  ])
+</head> --}}
 
 @vite([
   'resources/assets/vendor/libs/jquery/jquery.js',

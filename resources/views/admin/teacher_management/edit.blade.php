@@ -6,21 +6,20 @@
 
 @section('content')
 
-<section class="content">
-  <div class="container-fluid">
+<div class="card">
     <div class="row">
-      <div class="col-12">
+        <div class="col-12">
 
         <div class="card">
-          <!-- Card Header -->
-          <div class="card-header d-flex align-items-center justify-content-between mb-3">
-            <h4 class="mb-0 text-primary">Edit Teacher</h5>
+            <!-- Card Header -->
+            <div class="card-header d-flex align-items-center justify-content-between mb-3">
+            <h4 class="fw-bold mb-0">Edit Teacher</h4>
             <a href="{{ route('admin.teacher.index') }}" class="btn btn-sm btn-danger">
-              <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
+                <i class="tf-icons ri-arrow-left-line"></i> Back
             </a>
-          </div>
+            </div>
 
-          <!-- Card Body -->
+            <!-- Card Body -->
             <div class="card-body">
                 <form action="{{ route('admin.teacher.update') }}" method="POST">
                     @csrf
@@ -28,7 +27,7 @@
 
                     {{-- Row 1: Name, Teacher ID, Type --}}
                     <div class="row mb-3">
-                          <div class="col-md-4">
+                            <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="user_id" value="{{ old('user_id', $data->user_id) }}" class="form-control" readonly>
                         <label>Teacher ID</label>
@@ -43,7 +42,7 @@
                         @error('name') <p class="text-danger small">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                  
+                    
                     <div class="col-md-4">
                         <div class="form-floating form-floating-outline">
                         <input type="text" name="user_type" value="{{ old('user_type', $data->user_type) }}" class="form-control" readonly>
@@ -104,7 +103,7 @@
                     </div>
 
                     {{-- Row 4: Subject Taught, Class Assigned --}}
-                  
+                    
                     {{-- Pass $classLists and $selectedClassIds, $selectedSubjectIds from controller --}}
                     <div class="row mb-3">
                         <div class="col-md-4">
@@ -136,19 +135,18 @@
                     <input type="hidden" name="id" value="{{ $data->id }}">
 
                     <div class="text-start">
-                      <button type="submit" class="btn btn-primary px-4 py-2">Update</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Update</button>
                     </div>
                 </form>
             </div>
 
-          <!-- End Card Body -->
+            <!-- End Card Body -->
 
         </div>
 
-      </div>
+        </div>
     </div>
-  </div>
-</section>
+</div>
 
 @endsection
 @section('scripts')

@@ -20,7 +20,7 @@
 
   <div class="row">
     <!-- Total Students -->
-    <div class="col-lg-3 col-md-6 col-12 mb-4">
+    <div class="col-lg-4 col-md-6 col-12 mb-4">
       <div class="card bg-primary text-white">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Total Classes -->
-    <div class="col-lg-3 col-md-6 col-12 mb-4">
+    <div class="col-lg-4 col-md-6 col-12 mb-4">
       <div class="card bg-success text-white">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
@@ -46,7 +46,7 @@
     </div>
 
     <!-- Teachers -->
-    <div class="col-lg-3 col-md-6 col-12 mb-4">
+    <div class="col-lg-4 col-md-6 col-12 mb-4">
       <div class="card bg-purple text-white" style="background-color: #9b59b6;">
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>

@@ -15,7 +15,7 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Teacher List</h3>
+    <h4 class="fw-bold mb-0">Teacher List</h4>
     @if (hasPermissionByChild('create_teacher'))
       <a href="{{ route('admin.teacher.create') }}" class="btn btn-primary btn-sm">+ Add Teacher</a>
     @endif
@@ -26,26 +26,26 @@
       <div class="row">
         <div class="col-md-6"></div>
           <div class="col-md-6">  
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
               <div class="form-group me-2 mb-0">
                 <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
               </div>
               <div class="form-group mb-0">
                 <div class="btn-group">
-                  <button type="submit" class="btn btn-sm btn-primary">
+                  <button type="submit" class="btn btn-sm btn-primary waves-effect waves-light">
                     <i class="tf-icons ri-filter-3-line"></i>
                   </button>
-                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                  <a href="{{ url()->current() }}" class="btn btn-sm btn-danger waves-effect waves-light" data-toggle="tooltip" title="Clear filter">
                     <i class="tf-icons ri-close-line"></i>
                   </a>
                   @if (hasPermissionByChild('export_teacher_list'))
-                    <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                    
                       <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 
-                        class="btn buttons-collection btn-outline-secondary waves-effect" 
+                        class="btn btn-sm btn-success waves-effect waves-light" 
                         data-toggle="tooltip" title="Export Data">
-                        Export<i class="tf-icons ri-download-line"></i>
+                        <i class="tf-icons ri-download-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                 </div>
               </div>
@@ -105,30 +105,30 @@
               <td>               
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                   @if (hasPermissionByChild('details_teacher'))
-                    <div>
-                      <a href="{{ route('admin.teacher.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                    
+                      <a href="{{ route('admin.teacher.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
                         data-bs-toggle="tooltip" title="View">                  
                         <i class="ri-eye-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                  
                   @if (hasPermissionByChild('edit_teacher'))
-                    <div>
-                      <a href="{{ route('admin.teacher.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
+                    
+                      <a href="{{ route('admin.teacher.edit', $item->id) }}" class="btn btn-sm btn-icon btn-dark"                     
                         data-bs-toggle="tooltip"  title="Edit">
                         <i class="ri-pencil-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                   
                   @if (hasPermissionByChild('delete_teacher'))
-                    <div>
-                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteTeacher({{ $item->id }})"     
+                    
+                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-danger" onclick="deleteTeacher({{ $item->id }})"     
                         data-bs-toggle="tooltip" title="Delete">
                         <i class="ri-delete-bin-6-line"></i>
                       </a>
-                    </div> 
+                     
                   @endif               
                 </div>
               </td> 

@@ -7,8 +7,8 @@
 
 <div class="card p-4">
   <div class="card-header d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0 text-primary">Create Teacher</h3>
-    <a href="{{ route('admin.teacher.index') }}" class="btn btn-danger">
+    <h4 class="fw-bold mb-0">Create Teacher</h4>
+    <a href="{{ route('admin.teacher.index') }}" class="btn btn-danger btn-sm">
       <i class="ri-arrow-left-line"></i> Back
     </a>
   </div>
@@ -136,7 +136,7 @@
 
         {{-- Submit --}}
         <div class="text-start">
-            <button type="submit" class="btn btn-primary px-4 py-2">Create</button>
+            <button type="submit" class="btn btn-primary btn-sm">Create</button>
         </div>
          
     </form>
