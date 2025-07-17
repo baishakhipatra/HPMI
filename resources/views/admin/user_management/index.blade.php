@@ -14,37 +14,37 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Employee List</h3>
+    <h4 class="fw-bold mb-0">Employee List</h4>
     @if (hasPermissionByChild('create_employee'))
       <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
     @endif
   </div>
 
-  <div class="px-3 py-2">
+  <div class="card-header pt-0 pb-0">
     <form action="" method="get">
       <div class="row">
         <div class="col-md-6"></div>
           <div class="col-md-6">  
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
               <div class="form-group me-2 mb-0">
                 <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
               </div>
               <div class="form-group mb-0">
                 <div class="btn-group">
                   <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="menu-icon tf-icons ri-filter-3-line"></i>
+                    <i class=" tf-icons ri-filter-3-line"></i>
                   </button>
-                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
-                    <i class="menu-icon tf-icons ri-close-line"></i>
+                  <a href="{{ url()->current() }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Clear filter">
+                    <i class=" tf-icons ri-close-line"></i>
                   </a>
                   @if (hasPermissionByChild('export_employee_list'))
-                    <div>
+                    
                       <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
-                        class="btn buttons-collection btn-outline-secondary waves-effect" 
+                        class="btn btn-sm btn-success" 
                         data-toggle="tooltip" title="Export Data">
-                        Export<i class="tf-icons ri-download-line"></i>
+                        <i class="tf-icons ri-download-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                 </div>
               </div>
@@ -83,34 +83,34 @@
                     <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
                   </div>
               </td>
-              {{-- View, Edit and delete --}}
+              {{-- Edit and delete --}}
               <td>
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                   @if (hasPermissionByChild('employee_details'))
-                    <div>
-                      <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                    
+                      <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
                         data-bs-toggle="tooltip" title="View">                  
                         <i class="ri-eye-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                   
                   @if (hasPermissionByChild('edit_employee'))
-                    <div>
-                      <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
+                    
+                      <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-dark"                     
                         data-bs-toggle="tooltip"  title="Edit">
                         <i class="ri-pencil-line"></i>
                       </a>
-                    </div>
+                    
                   @endif
                   
                   @if (hasPermissionByChild('delete_employee'))
-                    <div>
-                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteUser({{ $item->id }})"     
+                    
+                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-danger" onclick="deleteUser({{ $item->id }})"     
                         data-bs-toggle="tooltip" title="Delete">
                         <i class="ri-delete-bin-6-line"></i>
                       </a>
-                    </div>    
+                       
                   @endif           
                 </div>
               </td>

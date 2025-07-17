@@ -67,11 +67,11 @@ a:hover {
 
 .btn-primary {
     color: #fff;
-    background-color: #133C73;
-    border-color: #133C73;
+    background-color: #405189;
+    border-color: #405189;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:focus {
     background-color: #1D314B !important;
     border-color: #1D314B !important;
 }
@@ -250,5 +250,29 @@ a:hover {
     border-radius: 16px;
 }
 
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th, .table thead tr th {
+    background-color: #EFF3FC;
+}
 
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th:first-child {
+    border-top-left-radius:8px;
+}
+
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th:last-child {
+    border-top-right-radius:8px;
+}
+
+.btn-group .btn-success {
+    border-right: 1px solid #29AB91;
+    border-left: 1px solid #29AB91;
+}
+
+.btn-success {
+        background-color: #29AB91;
+    border-color: #29AB91;
+}
+
+.btn-sm i {
+    font-size:0.8125rem;
+}
 

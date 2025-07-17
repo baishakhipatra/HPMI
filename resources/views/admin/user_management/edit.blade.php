@@ -12,10 +12,10 @@
 
         <div class="card">
           <!-- Card Header -->
-          <div class="card-header d-flex align-items-center justify-content-between">
-            <h4 class="mb-0 text-primary">Edit Employee</h5>
-            <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger">
-              <i class="menu-icon tf-icons ri-arrow-left-line"></i></i> Back
+          <div class="card-header d-flex align-items-center justify-content-between mb-4">
+            <h4 class="fw-bold mb-0">Edit Employee</h5>
+            <a href="{{ route('admin.employee.index') }}" class="btn btn-sm btn-danger btn-sm">
+              <i class="tf-icons ri-arrow-left-line"></i> Back
             </a>
           </div>
 
@@ -118,9 +118,9 @@
                 </div>
               </div>
 
-              <div class="text-end">
+              <div class="text-start">
                 <input type="hidden" name="id" value="{{$data->id}}">
-                <button type="submit" class="btn btn-primary px-4 py-2">
+                <button type="submit" class="btn btn-primary btn-sm">
                   Update
                 </button>
               </div>

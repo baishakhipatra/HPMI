@@ -6,9 +6,9 @@
 @section('content')
 
 <div class="card p-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Create Employee</h3>
-    <a href="{{ route('admin.employee.index') }}" class="btn btn-danger">
+  <div class="card-header d-flex justify-content-between align-items-center mb-4">
+    <h4 class="fw-bold mb-0">Create Employee</h4>
+    <a href="{{ route('admin.employee.index') }}" class="btn btn-danger btn-sm">
       <i class="ri-arrow-left-line"></i> Back
     </a>
   </div>
@@ -119,8 +119,8 @@
         </div>
       </div>
 
-      <div class="text-end">
-        <button type="submit" class="btn btn-primary px-4 py-2">Create</button>
+      <div class="text-start">
+        <button type="submit" class="btn btn-primary btn-sm">Create</button>
       </div>
       
     </form>
