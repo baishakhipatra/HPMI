@@ -3,8 +3,8 @@
 return [
   "creatorName" => "ThemeSelection",
   "creatorUrl" => "https://themeselection.com",
-  "templateName" => "HPMI",
-  "titleName" => "Holy Palace Multipurpose Institute",
+  "templateName" => "Ayachak Ashram",
+  "titleName" => "Ayachak Ashram",
   "templateSuffix" => "Bootstrap Dashboard FREE",
   "templateVersion" => "2.0.0",
   "templateFree" => true,

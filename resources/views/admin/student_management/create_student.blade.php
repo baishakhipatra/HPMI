@@ -27,7 +27,7 @@
         @csrf
           <div class="row g-3">
             <div class="mb-4 border p-3 col-md-8">
-              <h5 class="mb-3"><strong>Name of the School:</strong> Holy Palace Multipurpose Institute</h5>
+              <h5 class="mb-3"><strong>Name of the School:</strong> Ayachak Ashram</h5>
               <p class="mb-1"><strong>Village/Ward:</strong> T114 Teghoria Main Road</p>
               <p class="mb-1"><strong>Circle:</strong> ———</p>
               <p class="mb-1"><strong>District:</strong> Kolkata</p>

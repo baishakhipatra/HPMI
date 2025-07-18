@@ -13,7 +13,7 @@ class DesignationController extends Controller
 
         $keyword = $request->input('keyword');
 
-         $designations = Designation::where('id', '!=', 3) 
+        $designations = Designation::where('id', '!=', 3) 
                 ->when($keyword, function ($query, $keyword) {
                     $query->where('name', 'like', '%' . $keyword . '%');
                 })
