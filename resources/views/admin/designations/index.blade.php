@@ -36,7 +36,7 @@
                                             <button type="submit" class="btn btn-sm btn-primary">
                                                 <i class="ri-filter-3-line"></i>
                                             </button>
-                                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
+                                            <a href="{{ url()->current() }}" class="btn btn-sm btn-danger" title="Clear filter">
                                                 <i class="ri-close-line"></i>
                                             </a>
                                         </div>
@@ -77,7 +77,7 @@
                                             <a href="{{ route('admin.designation.permissions', $item->id) }}">
                                                 <span class="badge bg-label-danger mb-0 cursor-pointer">Permission</span>
                                             </a>
-                                            <a href="{{ route('admin.designation.list', ['edit' => $item->id]) }}" class="btn btn-sm btn-icon btn-outline-dark" title="Edit">
+                                            <a href="{{ route('admin.designation.list', ['edit' => $item->id]) }}" class="btn btn-sm btn-icon btn-dark" title="Edit">
                                                 <i class="ri-pencil-line"></i>
                                             </a>
                                         </td>
@@ -113,7 +113,7 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary d-block ">Create</button>
+                            <button type="submit" class="btn btn-primary d-block btn-sm ">Create</button>
                         </form>
                     </div>
                 </div>
@@ -137,10 +137,10 @@
                             </div>
 
                             <div class="d-flex justify-content-between">
-                                <a href="{{ route('admin.designation.list') }}" class="btn btn-danger">
-                                    <i class="ri-arrow-left-line"></i> Back
+                                <a href="{{ route('admin.designation.list') }}" class="btn btn-danger btn-sm">
+                                 Back
                                 </a>
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-primary btn-sm">Update</button>
                             </div>
                         </form>
                     </div>

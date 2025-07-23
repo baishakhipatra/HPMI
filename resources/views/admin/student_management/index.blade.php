@@ -1,54 +1,44 @@
 @extends('layouts/contentNavbarLayout')
 
-
-
 @section('title', 'Student - List')
-
-
 
 @section('content')
 
+<div class="card">
 
+    <div class="card-header">
+        <h4 class="fw-bold mb-0">Search Student for Re-admission</h4>
+    </div>
 
+    <div class="card-body">
 
+        <form method="GET" action="{{ route('admin.student.readmission.index') }}">
 
-    <div class="card">
+            <div class="row">
 
-        <div class="card-header">
+                <div class="col-md-6">
 
-            <h5>Search Student for Re-admission</h5>
+                    {{-- <input type="text" name="keyword" class="form-control" placeholder="Enter student name..." value="{{ request('keyword') }}"> --}}
 
-        </div>
+                    <select id="student_keyword" name="student_id" class="form-control" style="width: 100%;"></select>
+                    <div id="student_suggestions" class="list-group position-absolute w-50" style="z-index: 1000;"></div>
+                </div>
 
-        <div class="card-body">
+                <div class="col-md-4 d-flex justify-content-start align-items-center gap-2">
 
-            <form method="GET" action="{{ route('admin.student.readmission.index') }}">
+                    {{-- <button type="submit" class="btn btn-primary">Search</button> --}}
 
-                <div class="row">
-
-                    <div class="col-md-6">
-
-                        {{-- <input type="text" name="keyword" class="form-control" placeholder="Enter student name..." value="{{ request('keyword') }}"> --}}
-
-                        <select id="student_keyword" name="student_id" class="form-control" style="width: 100%;"></select>
-                        <div id="student_suggestions" class="list-group position-absolute w-50" style="z-index: 1000;"></div>
-                    </div>
-
-                    <div class="col-md-4 d-flex justify-content-start align-items-center gap-2">
-
-                        {{-- <button type="submit" class="btn btn-primary">Search</button> --}}
-
-                        <a href="{{ route('admin.student.readmission.index') }}" class="btn btn-secondary">Reset</a>
-
-                    </div>
+                    <a href="{{ route('admin.student.readmission.index') }}" class="btn btn-secondary">Reset</a>
 
                 </div>
 
-            </form>
+            </div>
 
-        </div>
+        </form>
 
     </div>
+
+</div>
 
     @if(request()->filled('keyword'))
 

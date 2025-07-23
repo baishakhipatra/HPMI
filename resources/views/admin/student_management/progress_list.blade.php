@@ -50,24 +50,24 @@
                                 <td>
                                     <div class="btn-group" role="group" aria-label="Action Buttons">
                                         {{-- Edit Button --}}
-                                        @if (hasPermissionByChild('edit_progress_marking'))
-                                            <div>
+                                        @if (hasPermissionByChild('edit_category_marking'))
+                                            
                                                 <a href="{{ route('admin.student.progresslist', ['update_id' => $first->id]) }}"
-                                                class="btn btn-sm btn-icon btn-outline-dark" data-bs-toggle="tooltip" title="Edit">
+                                                class="btn btn-sm btn-icon btn-dark" data-bs-toggle="tooltip" title="Edit">
                                                 <i class="ri-pencil-line"></i>
                                                 </a>
-                                            </div>
+                                            
                                         @endif
                                         
                                         {{-- Delete Button --}}
-                                        @if (hasPermissionByChild('delete_progress_marking'))
-                                            <div>
+                                        @if (hasPermissionByChild('delete_category_marking'))
+                                            
                                                 <button type="button"
-                                                class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteItem({{ $first->id }})"                              
+                                                class="btn btn-sm btn-icon btn-danger" onclick="deleteItem({{ $first->id }})"                              
                                                 data-bs-toggle="tooltip" title="Delete">                                   
                                                 <i class="ri-delete-bin-6-line"></i>
                                                 </button>
-                                            </div>                                        
+                                                                                   
                                         @endif
                                     </div>
                                 </td>
@@ -130,8 +130,8 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                    <a href="{{ route('admin.student.progresslist') }}" class="btn btn-danger">Back</a>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('admin.student.progresslist') }}" class="btn btn-danger btn-sm">Back</a>
+                    <button type="submit" class="btn btn-primary btn-sm">Update</button>
                     </div>
                 </form>
                 </div>
@@ -180,8 +180,8 @@
                         </div>
 
                         <div class="d-flex">
-                            @if (hasPermissionByChild('create_progress_marking'))
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                            @if (hasPermissionByChild('create_category_marking'))
+                                <button type="submit" class="btn btn-primary btn-sm">Submit</button>
                             @endif
                         </div>
                     </form>

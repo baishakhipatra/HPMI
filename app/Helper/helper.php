@@ -153,7 +153,7 @@ if(!function_exists('hasPermissionByParent')){
         if (!$user || !$user->designationData) {
             return false;
         }
-        $permission_id = Permission::where('parent_name', $parentName)->value('id');
+        $permission_id = Permission::where('parent_name', $parentName)->where('name', $parentName)->value('id');
         if($permission_id){
             return DesignationPermission::where('permission_id', $permission_id)->where('designation_id', $user->designationData->id)->exists();
         }else{

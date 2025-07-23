@@ -30,14 +30,20 @@
             <input type="hidden" name="designation_id" value="{{ $designation->id }}">
     
             @foreach($permissions->groupBy('parent_name') as $group => $groupPermissions)
+                @php
+                   $parentPermissionId = App\Models\Permission::where('parent_name', $group)->where('name',$group)->first();
+                @endphp 
                 <div class="card-header" style="background: #cedaff;">
+                    @if($parentPermissionId)
+                        <input type="checkbox" class="form-check-input" value="{{ $parentPermissionId->id }}" id="perm_{{ $parentPermissionId->id }}" {{ in_array($parentPermissionId->id, $assignedPermissions) ? 'checked' : '' }} onchange="updatePermissionAjax(this, {{ $designation->id }})">
+                    @endif
                     <h5 class="text-primary mb-0">{{ ucwords(str_replace('_', ' ', $group)) }}</h5>
                 </div>
 
                 <div class="card-body mt-2">
                     <div class="row">
-                        @php $chunked = $groupPermissions->chunk(8); @endphp
-
+                        @php $chunked = $groupPermissions->chunk(8); 
+                        @endphp
                         @foreach($chunked as $chunk)
                             <div class="col-md-6">
                                 @foreach($chunk as $permission)

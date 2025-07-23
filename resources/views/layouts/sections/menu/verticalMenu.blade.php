@@ -106,11 +106,21 @@
                   Progress Marking
               </a>
           </li> --}}
+          @if (hasPermissionByChild('student_progress_marking'))
           <li class="menu-item {{ request()->is('admin/student-progress-marking') ? 'active' : '' }}">
             <a href="{{ route('admin.student.progressmarking.select') }}" class="menu-link">
                 <div>Progress Marking</div>
             </a>
           </li>
+          @endif
+
+          @if (hasPermissionByChild('progress_chart'))
+          <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
+            <a href="{{route('admin.progresschart')}}" class="menu-link">
+              <div>Progress Chart</div>
+            </a>
+          </li>
+          @endif
           {{-- @endif --}}
         </ul>
       </li>
@@ -140,26 +150,26 @@
           </li>
           @endif
 
-          @if (hasPermissionByChild('progress_marking_list'))
+          @if (hasPermissionByChild('category_marking_list'))
           <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
             <a href="{{route('admin.student.progresslist')}}" class="menu-link">
-              <div>Progress Marking Category</div>
+              <div>Progress Category</div>
             </a>
           </li>
           @endif
 
-          @if (hasPermissionByChild('progress_chart'))
+          {{-- @if (hasPermissionByChild('progress_chart'))
           <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
             <a href="{{route('admin.progresschart')}}" class="menu-link">
               <div>Progress Chart</div>
             </a>
           </li>
-          @endif
+          @endif --}}
 
           @if (hasPermissionByChild('designations'))
           <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
             <a href="{{route('admin.designation.list')}}" class="menu-link">
-              <div>Designations</div>
+              <div>Role Management</div>
             </a>
           </li>
           @endif

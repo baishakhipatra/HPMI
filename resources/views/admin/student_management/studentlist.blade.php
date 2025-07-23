@@ -1,7 +1,3 @@
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
-
-
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Student - List')
@@ -18,12 +14,65 @@
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h4 class="fw-bold mb-0">Student List</h4>
-    @if (hasPermissionByChild('create_student'))
-      <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
-    @endif
+    <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
   </div>
 
-  <div class="px-3 py-2">
+  {{-- <div class="px-3 py-2">
+    <form action="" method="get">
+      <div class="row">
+        <div class="col-md-3"></div>
+          <div class="col-md-9">  
+            <div class="d-flex justify-content-end">
+              <div class="form-group me-2 mb-0">
+                <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
+              </div>
+              <div class="form-group mb-0">
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-sm btn-primary">
+                    <i class="tf-icons ri-filter-3-line"></i>
+                  </button>
+                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                    <i class="tf-icons ri-close-line"></i>
+                  </a>
+                  <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                    <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}" 
+                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
+                      data-toggle="tooltip" title="Export Data">
+                      Export
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              <hr>
+
+              <!-- CSV Upload Form (Placed outside of the filter/export button group) -->
+              <form method="POST" action="{{ route('admin.student.import') }}" enctype="multipart/form-data" class="mt-3">
+                  @csrf
+                  <div class="row align-items-end">
+                      <div class="col-md-6">
+                          <label for="csv_file" class="form-label">Upload CSV File</label>
+                          <input type="file" name="csv_file" class="form-control @error('csv_file') is-invalid @enderror" accept=".csv">
+                          @error('csv_file')
+                              <div class="text-danger small">{{ $message }}</div>
+                          @enderror
+                      </div>
+
+                      <div class="col-md-4">
+                          <button type="submit" class="btn btn-success mt-2">
+                              <i class="fas fa-upload"></i> Import Students
+                          </button>
+                      </div>
+                  </div>
+              </form>
+            </div>
+          </div>
+      </div>
+    </form>
+  </div> --}}
+
+
+  <div class="card-header pt-0 pb-0">
     <form action="" method="get">
         <div class="row">
             <div class="col-md-3"></div>
@@ -34,23 +83,23 @@
                     </div>
                     <div class="form-group mb-0">
                         <div class="btn-group">
-                            <button type="submit" class="btn btn-sm btn-primary">
+                            <button type="submit" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Reset">
                                 <i class="tf-icons ri-filter-3-line"></i>
                             </button>
-                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Clear Filter">
                                 <i class="tf-icons ri-close-line"></i>
                             </a>
-                            {{-- Export Button (already present) --}}                           
-                              <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
-                                @if (hasPermissionByChild('export_student_list'))
-                                  <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
-                                      class="btn buttons-collection btn-outline-secondary waves-effect"
-                                      data-toggle="tooltip" title="Export Data">
-                                      Export Student <i class="tf-icons ri-download-line"></i>
-                                  </a>
-                                @endif
-                              </div>                          
-
+                            {{-- Export Button (already present) --}}
+                            
+                                <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
+                                    class="btn btn-success waves-effect btn-sm"
+                                    data-toggle="tooltip" title="Export Data">
+                                    <i class="tf-icons ri-download-line"></i>
+                                </a>
+                            
+                            <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#importStudentModal">
+                                <i class="tf-icons ri-upload-line"></i>
+                            </button>
                             {{-- Removed the extra <hr> and CSV form placement here --}}
 
                         </div>
@@ -58,11 +107,7 @@
 
                     {{-- NEW: CSV Import Button and Hidden Form --}}
                     {{-- This section replaces the original separate CSV form block --}}
-                    @if (hasPermissionByChild('import_student_list'))
-                      <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importStudentModal">
-                          <i class="tf-icons ri-upload-line"></i> Import Student
-                      </button>
-                    @endif
+                  
                 </div>
             </div>
         </div>
@@ -130,32 +175,26 @@
                 </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                     {{-- Edit --}}
-                    @if (hasPermissionByChild('details_student'))
-                      <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
-                        data-bs-toggle="tooltip" title="View">                  
-                        <i class="ri-eye-line"></i>
-                      </a>
-                    @endif
+                    <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
+                      data-bs-toggle="tooltip" title="View">                  
+                      <i class="ri-eye-line"></i>
+                    </a>
 
-                    @if (hasPermissionByChild('edit_student'))
-                      <a href="{{ route('admin.studentedit', $item->id) }}"
-                        class="btn btn-sm btn-icon btn-outline-dark"
-                        data-bs-toggle="tooltip"
-                        title="Edit">
-                          <i class="ri-pencil-line"></i>
-                      </a>
-                    @endif
+                    <a href="{{ route('admin.studentedit', $item->id) }}"
+                      class="btn btn-sm btn-icon btn-dark"
+                      data-bs-toggle="tooltip"
+                      title="Edit">
+                        <i class="ri-pencil-line"></i>
+                    </a>
 
                     {{-- Delete --}}
-                    @if (hasPermissionByChild('delete_student'))
-                      <a href="javascript:void(0);"
-                        class="btn btn-sm btn-icon btn-outline-danger"
-                        onclick="deleteStudent({{ $item->id }})"
-                        data-bs-toggle="tooltip"
-                        title="Delete">
-                          <i class="ri-delete-bin-6-line"></i>
-                      </a>
-                    @endif
+                    <a href="javascript:void(0);"
+                      class="btn btn-sm btn-icon btn-danger"
+                      onclick="deleteStudent({{ $item->id }})"
+                      data-bs-toggle="tooltip"
+                      title="Delete">
+                        <i class="ri-delete-bin-6-line"></i>
+                    </a>
 
                     {{-- Admission History --}}
                     {{-- <a href="{{ route('admin.student.admissionhistory', $item->id) }}"
@@ -174,14 +213,12 @@
                     </a> --}}
 
                     {{-- Classwise Comparison --}}
-                    @if (hasPermissionByChild('student_class_wise_comparison'))
-                      <a href="{{ route('admin.student.classcompare', $item->id) }}"
-                        class="btn btn-sm btn-icon btn-outline-primary"
-                        data-bs-toggle="tooltip"
-                        title="Class Wise Comparison">
-                          <i class="ri-bar-chart-grouped-line"></i>
-                      </a>
-                    @endif
+                    <a href="{{ route('admin.student.classcompare', $item->id) }}"
+                      class="btn btn-sm btn-icon btn-primary"
+                      data-bs-toggle="tooltip"
+                      title="Class Wise Comparison">
+                        <i class="ri-bar-chart-grouped-line"></i>
+                    </a>
                 </div>
               </td>
             </tr>

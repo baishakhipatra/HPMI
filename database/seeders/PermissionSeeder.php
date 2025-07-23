@@ -28,12 +28,12 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'master_management', 'name' => 'class_wise_subject_assign', 'route' => 'admin.class.subjects.assign'],
             ['parent_name' => 'master_management', 'name' => 'class_wise_subject_delete', 'route' => 'admin.class.subjects.delete'],
 
-            ['parent_name' => 'master_management', 'name' => 'progress_marking_list', 'route' => 'admin.student.progresslist'],
-            ['parent_name' => 'master_management', 'name' => 'create_progress_marking', 'route' => 'admin.student.progressstore'],
-            ['parent_name' => 'master_management', 'name' => 'edit_progress_marking', 'route' => 'admin.student.progressupdate'],
-            ['parent_name' => 'master_management', 'name' => 'delete_progress_marking', 'route' => 'admin.student.progressdelete'],
+            ['parent_name' => 'master_management', 'name' => 'category_marking_list', 'route' => 'admin.student.progresslist'],
+            ['parent_name' => 'master_management', 'name' => 'create_category_marking', 'route' => 'admin.student.progressstore'],
+            ['parent_name' => 'master_management', 'name' => 'edit_category_marking', 'route' => 'admin.student.progressupdate'],
+            ['parent_name' => 'master_management', 'name' => 'delete_category_marking', 'route' => 'admin.student.progressdelete'],
 
-            ['parent_name' => 'master_management', 'name' => 'progress_chart', 'route' => 'admin.progresschart'],
+            // ['parent_name' => 'master_management', 'name' => 'progress_chart', 'route' => 'admin.progresschart'],
 
             ['parent_name' => 'master_management', 'name' => 'designations', 'route' => 'admin.designation.list'],
 
@@ -70,6 +70,8 @@ class PermissionSeeder extends Seeder
             ['parent_name' => 'student_management', 'name' => 'edit_student_mark', 'route' => 'admin.student-marks.update'],
             ['parent_name' => 'student_management', 'name' => 'delete_student_mark', 'route' => 'admin.student-marks.delete'],
             ['parent_name' => 'student_management', 'name' => 'export_student_mark_list', 'route' => 'admin.student-marks.export'],
+
+            ['parent_name' => 'student_management', 'name' => 'progress_chart', 'route' => 'admin.progresschart'],
 
             ['parent_name' => 'report_management', 'name' => 'report_list', 'route' => 'admin.report.index'],
             ['parent_name' => 'report_management', 'name' => 'export_report_list', 'route' => 'admin.report.export'],
