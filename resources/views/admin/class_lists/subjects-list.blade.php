@@ -72,10 +72,12 @@
                 <td>
                   <div class="btn-group" role="group" aria-label="Subject Actions">
                     {{-- Delete Button --}}
+                    @if (hasPermissionByChild('class_wise_subject_delete'))
                     <button type="button" class="btn btn-sm btn-icon btn-outline-danger"
                       onclick="deleteClassToSub({{ $subject->id }})" data-bs-toggle="tooltip" title="Delete">
                       <i class="ri-delete-bin-6-line"></i>
                     </button>
+                    @endif
                   </div>
                 </td>
               </tr>
@@ -105,9 +107,9 @@
           <input type="hidden" name="classId" value="{{$classData->id}}" />
           <div class="mb-3">
             <div class="form-floating form-floating-outline">
-              <select class="form-control js-example-basic-multiple" id="subjectDropdown" name="subjectId[]" multiple="multiple">
+              <select class="form-control js-example-basic-multiple" name="subjectId[]" multiple="multiple">
                 @foreach($allSubjects as $subject)
-                <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
+                  <option value="{{ $subject->id }}">{{ $subject->sub_name }}</option>
                 @endforeach
               </select>
               @error('subjectId')
@@ -116,7 +118,9 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary d-block" >Add</button>
+          @if (hasPermissionByChild('class_wise_subject_assign'))
+            <button type="submit" class="btn btn-primary d-block" onClick="addSubject({{$classData->id}})">Add</button>
+          @endif
         </form>
       </div>
     </div>
@@ -125,10 +129,34 @@
 
 @endsection
 @section('scripts')
-<!-- Select2 -->
-{{-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> --}}
 <script>
- var $con = jQuery.noConflict();
+ var $jq = jQuery.noConflict();
+
+  $jq(document).ready(function () {
+    $jq('.js-example-basic-multiple').select2();
+
+    // Bind your custom function here if needed
+  });
+
+  function addSubject(classId) {
+    $jq.ajax({
+      url: "{{ route('admin.subjectlist.delete') }}",
+      type: 'POST',
+      data: {
+        "id": classId,
+        "_token": '{{ csrf_token() }}',
+      },
+      success: function (data) {
+        if (data.status != 200) {
+          toastFire('error', data.message);
+        } else {
+          toastFire('success', data.message);
+          location.reload();
+        }
+      }
+    });
+  }
+
   function deleteClassToSub(userId) {
     //toastFire('success', 'test message');
     Swal.fire({
@@ -162,13 +190,8 @@
     });
   }
 
- 
-
-  $con(document).ready(function () {
-    $con('#subjectDropdown').select2({
-      placeholder: "Select Subjects",
-      width: '100%'
-    });
+  $(document).ready(function () {
+    $('.js-example-basic-multiple').select2();
   });
 </script>
 @endsection

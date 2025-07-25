@@ -1,3 +1,19 @@
+body {
+    background: linear-gradient(180deg, #FAFBFF 0%, #E9EFFB 100%);
+}
+
+.bg-primary {
+    background-color: #FF7556 !important;
+}
+
+.bg-success {
+    background-color: #39A1EA !important;
+}
+
+.bg-purple {
+    background-color: #29AB91 !important;
+}
+
 .login-frame {
     display: block;
     overflow: hidden;
@@ -51,11 +67,11 @@ a:hover {
 
 .btn-primary {
     color: #fff;
-    background-color: #133C73;
-    border-color: #133C73;
+    background-color: #405189;
+    border-color: #405189;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-primary:focus {
     background-color: #1D314B !important;
     border-color: #1D314B !important;
 }
@@ -68,7 +84,7 @@ a:hover {
 
 .menu .app-brand.demo, .dark-style .menu .app-brand.demo {
     height: 85px;
-    border-bottom: 1px solid #e7e7e7;
+    border-bottom: 1px solid #ffffff33;
 }
 
 .menu-inner {
@@ -80,23 +96,29 @@ a:hover {
 }
 
 .light-style .menu-vertical .menu-item .menu-link:hover {
-    background-color: rgb(243 156 18 / 34%);
+    background-color: #5B6AA1;
+    color:#fff;
+}
+
+.light-style .menu-vertical .menu-item .menu-link:focus {
+    color:#fff;
 }
 
 .menu-vertical .menu-item .menu-link, .menu-vertical .menu-header, .menu-vertical .menu-block {
     padding: 12px 1.45rem;
     margin-block: 0;
-    margin-inline: 1.125rem;
+    margin-inline: 0.45rem;
     border-radius: 0 50rem 50rem 0;
     margin-left: 0;
 }
 
 .light-style .menu-vertical .menu-item.active>.menu-toggle, .light-style .menu-vertical .menu-item.open>.menu-toggle {
-     background-color: rgb(243 156 18);
+     background-color: #5B6AA1;
 }
 
 .menu-vertical .menu-item .menu-toggle:after {
     right: 9px;
+    color: #ffffff;
 }
 
 .text-primary {
@@ -110,8 +132,13 @@ a:hover {
 
 .btn-danger {
     color: #fff;
-    background-color: #FA8E29;
-    border-color: #FA8E29;
+    background-color: #FF7556;
+    border-color: #FF7556;
+}
+
+.btn-danger:hover, .btn-danger:focus {
+    background-color: #F16646 !important;
+    border-color: #F16646 !important;
 }
 
 .menu-vertical .menu-item .menu-link {
@@ -144,4 +171,108 @@ a:hover {
 
 .label-color {
     color: #133C73;
-}
+}
+
+.nav-tabs .nav-link.active, .nav-tabs .nav-link.active:hover, .nav-tabs .nav-link.active:focus {
+    color: #fa8e29;
+}
+
+.nav-tabs .tab-slider {
+    background-color: #fa8e29;
+}
+
+.common-list {
+    display: block;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.common-list li {
+    margin-bottom: 9px;
+}
+
+.grid-list {
+    column-count: 2;
+}
+
+.select2-container--default .select2-selection--multiple {
+    min-height: 3.0000625rem;
+    padding-top: 8px;
+}
+
+.btn-outline-primary {
+    color: #133C73;
+    border-color: #133C73;
+    background: transparent;
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    color: #133C73 !important;
+    background-color: #f6f2ff !important;
+    border-color: #133C73 !important;
+}
+
+.form-check-input:checked {
+    background-color: #fa8e29;
+    border-color: #fa8e29;
+}
+
+.bg-menu-theme {
+    background-color: #4F5F9B !important;
+    color: #ffffff;
+}
+
+.bg-menu-theme .menu-link, .bg-menu-theme .menu-horizontal-prev, .bg-menu-theme .menu-horizontal-next {
+    color: #ffffff;
+}
+
+.menu-vertical .menu-item .menu-link i {
+    color: #ffffff;
+}
+
+.layout-wrapper:not(.layout-horizontal) .menu-vertical .menu-sub>.menu-item>.menu-link:before {
+    border: 1.5px solid #ffffff;
+    background: #ffffff;
+}
+
+.bg-menu-theme .menu-text {
+    color: #ffffff;
+}
+
+.layout-navbar.navbar-detached.container-xxl {
+    background: #4f5f9b;
+}
+
+.card {
+    background-clip: padding-box;
+    box-shadow: 0 .25rem .625rem #e0e8fb;
+    border-radius: 16px;
+}
+
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th, .table thead tr th {
+    background-color: #EFF3FC;
+}
+
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th:first-child {
+    border-top-left-radius:8px;
+}
+
+.table:not(.table-dark):not(.table-light) thead:not(.table-dark):not(.table-light) tr th:last-child {
+    border-top-right-radius:8px;
+}
+
+.btn-group .btn-success {
+    border-right: 1px solid #29AB91;
+    border-left: 1px solid #29AB91;
+}
+
+.btn-success {
+        background-color: #29AB91;
+    border-color: #29AB91;
+}
+
+.btn-sm i {
+    font-size:0.8125rem;
+}
+

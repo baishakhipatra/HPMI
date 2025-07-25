@@ -82,7 +82,7 @@
          {{-- Aadhaar No --}}
           <div class="form-floating form-floating-outline col-md-12">
             <input type="text" class="form-control" id="aadhar_no" name="aadhar_no" placeholder="Enter your Aadhaar No." value="{{ old('aadhar_no') }}">
-            <label for="aadhar_no">Aadhaar No.<span class="text-danger">*</span></label>
+            <label for="aadhar_no">Aadhaar No.</label>
             @error('aadhar_no')<small class="text-danger">{{ $message }}</small>@enderror
           </div>
 
@@ -191,7 +191,7 @@
             <select name="class_id" class="form-select" id="class_id" value="{{ old('class_id') }}">
               <option value="">Select Class</option>
               @foreach ($classrooms as $classroom)
-                <option value="{{ $classroom->id }}">{{ $classroom->class }}</option>
+                <option value="{{ $classroom->id }}">{{ strtoupper($classroom->class) }}</option>
               @endforeach
             </select>
             <label for="class_id">Class<span class="text-danger">*</span></label>

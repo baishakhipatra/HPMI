@@ -27,7 +27,7 @@ class StudentAdmission extends Model
     }
     public function section()
     {
-        return $this->belongsTo(SectionList::class);
+        return $this->belongsTo(SectionList::class, 'section_id');
     }
 
     public function academicsession()

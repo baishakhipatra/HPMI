@@ -1,7 +1,3 @@
-<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
-
-
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Student - List')
@@ -17,15 +13,15 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Student List</h3>
+    <h4 class="fw-bold mb-0">Student List</h4>
     <a href="{{ route('admin.studentcreate') }}" class="btn btn-primary btn-sm">+ Add Student</a>
   </div>
 
   {{-- <div class="px-3 py-2">
     <form action="" method="get">
       <div class="row">
-        <div class="col-md-6"></div>
-          <div class="col-md-6">  
+        <div class="col-md-3"></div>
+          <div class="col-md-9">  
             <div class="d-flex justify-content-end">
               <div class="form-group me-2 mb-0">
                 <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
@@ -74,32 +70,36 @@
       </div>
     </form>
   </div> --}}
-  <div class="px-3 py-2">
+
+
+  <div class="card-header pt-0 pb-0">
     <form action="" method="get">
         <div class="row">
-            <div class="col-md-6"></div>
-            <div class="col-md-6">
+            <div class="col-md-3"></div>
+            <div class="col-md-9">
                 <div class="d-flex justify-content-end align-items-center"> {{-- Added align-items-center for vertical alignment --}}
                     <div class="form-group me-2 mb-0">
                         <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
                     </div>
                     <div class="form-group mb-0">
                         <div class="btn-group">
-                            <button type="submit" class="btn btn-sm btn-primary">
+                            <button type="submit" class="btn btn-sm btn-primary" data-toggle="tooltip" title="Reset">
                                 <i class="tf-icons ri-filter-3-line"></i>
                             </button>
-                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                            <a href="{{ url()->current() }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Clear Filter">
                                 <i class="tf-icons ri-close-line"></i>
                             </a>
                             {{-- Export Button (already present) --}}
-                            <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
+                            
                                 <a href="{{ route('admin.student.export', ['keyword' => request()->input('keyword')]) }}"
-                                    class="btn buttons-collection btn-outline-secondary waves-effect"
+                                    class="btn btn-success waves-effect btn-sm"
                                     data-toggle="tooltip" title="Export Data">
-                                    Export Student <i class="tf-icons ri-download-line"></i>
+                                    <i class="tf-icons ri-download-line"></i>
                                 </a>
-                            </div>
-
+                            
+                            <button type="button" class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#importStudentModal">
+                                <i class="tf-icons ri-upload-line"></i>
+                            </button>
                             {{-- Removed the extra <hr> and CSV form placement here --}}
 
                         </div>
@@ -107,9 +107,7 @@
 
                     {{-- NEW: CSV Import Button and Hidden Form --}}
                     {{-- This section replaces the original separate CSV form block --}}
-                  <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#importStudentModal">
-                      <i class="tf-icons ri-upload-line"></i> Import Student
-                  </button>
+                  
                 </div>
             </div>
         </div>
@@ -177,13 +175,13 @@
                 </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
                     {{-- Edit --}}
-                    <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
+                    <a href="{{ route('admin.student.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
                       data-bs-toggle="tooltip" title="View">                  
                       <i class="ri-eye-line"></i>
                     </a>
 
                     <a href="{{ route('admin.studentedit', $item->id) }}"
-                      class="btn btn-sm btn-icon btn-outline-dark"
+                      class="btn btn-sm btn-icon btn-dark"
                       data-bs-toggle="tooltip"
                       title="Edit">
                         <i class="ri-pencil-line"></i>
@@ -191,7 +189,7 @@
 
                     {{-- Delete --}}
                     <a href="javascript:void(0);"
-                      class="btn btn-sm btn-icon btn-outline-danger"
+                      class="btn btn-sm btn-icon btn-danger"
                       onclick="deleteStudent({{ $item->id }})"
                       data-bs-toggle="tooltip"
                       title="Delete">
@@ -216,7 +214,7 @@
 
                     {{-- Classwise Comparison --}}
                     <a href="{{ route('admin.student.classcompare', $item->id) }}"
-                      class="btn btn-sm btn-icon btn-outline-primary"
+                      class="btn btn-sm btn-icon btn-primary"
                       data-bs-toggle="tooltip"
                       title="Class Wise Comparison">
                         <i class="ri-bar-chart-grouped-line"></i>
@@ -301,12 +299,51 @@
     });
   }
 
-  $(document).ready(function() {
-    $('#importStudentForm').on('submit', function(e) {
+  // $(document).ready(function() {
+  //   $('#importStudentForm').on('submit', function(e) {
+  //       e.preventDefault();
+
+  //       var formData = new FormData(this);
+  //       $('#importMessage').html('<div class="alert alert-info">Importing...</div>');
+
+  //       $.ajax({
+  //           url: "{{ route('admin.student.import') }}",
+  //           type: "POST",
+  //           data: formData,
+  //           contentType: false,
+  //           processData: false,
+  //           success: function(response) {
+  //             // console.log(response);
+  //             return false;
+  //               $('#importMessage').html('<div class="alert alert-success">Students imported successfully!</div>');
+  //               $('#excel_file').val('');
+  //               // Optionally close modal after short delay
+  //               setTimeout(function() {
+  //                   $('#importStudentModal').modal('hide');
+  //                   location.reload(); // Reload to reflect changes
+  //               }, 1500);
+  //           },
+  //           error: function(xhr) {
+  //               let errors = xhr.responseJSON?.errors || { error: ['Something went wrong.'] };
+  //               let errorHtml = '<div class="alert alert-danger"><ul>';
+  //               $.each(errors, function(key, messages) {
+  //                   messages.forEach(msg => {
+  //                       errorHtml += '<li>' + msg + '</li>';
+  //                   });
+  //               });
+  //               errorHtml += '</ul></div>';
+  //               $('#importMessage').html(errorHtml);
+  //           }
+  //       });
+  //   });
+  // });
+  $(document).ready(function () {
+    $('#importStudentForm').on('submit', function (e) {
         e.preventDefault();
 
         var formData = new FormData(this);
-        $('#importMessage').html('<div class="alert alert-info">Importing...</div>');
+        let $box = $('#importMessage');
+        $box.html('<div class="alert alert-info">Importing...</div>');
 
         $.ajax({
             url: "{{ route('admin.student.import') }}",
@@ -314,31 +351,33 @@
             data: formData,
             contentType: false,
             processData: false,
-            success: function(response) {
-              console.log(response);
-              return false;
-                $('#importMessage').html('<div class="alert alert-success">Students imported successfully!</div>');
-                $('#excel_file').val('');
-                // Optionally close modal after short delay
-                setTimeout(function() {
-                    $('#importStudentModal').modal('hide');
-                    location.reload(); // Reload to reflect changes
-                }, 1500);
-            },
-            error: function(xhr) {
-                let errors = xhr.responseJSON?.errors || { error: ['Something went wrong.'] };
-                let errorHtml = '<div class="alert alert-danger"><ul>';
-                $.each(errors, function(key, messages) {
-                    messages.forEach(msg => {
-                        errorHtml += '<li>' + msg + '</li>';
+            success: function (response) {
+                if (response.errors && response.errors.length > 0) {
+                    let html = `<div class="alert alert-danger"><strong>${response.message}</strong><ul>`;
+                    response.errors.forEach(function (err) {
+                        html += `<li>${err}</li>`;
                     });
-                });
-                errorHtml += '</ul></div>';
-                $('#importMessage').html(errorHtml);
+                    html += '</ul></div>';
+                    $box.html(html);
+                } else {
+                    $box.html('<div class="alert alert-success">CSV imported successfully!</div>');
+                    $('#importStudentForm')[0].reset();
+
+                    setTimeout(function () {
+                        $('#importStudentModal').modal('hide');
+                        window.location.href = "{{ route('admin.studentlist') }}";
+                    }, 2000);
+                }
+            },
+            error: function (xhr) {
+                let response = xhr.responseJSON;
+                let msg = response?.errors?.[0] || 'Something went wrong.';
+                $box.html(`<div class="alert alert-danger">${msg}</div>`);
             }
         });
     });
-  });
+});
+
 
 </script>
 

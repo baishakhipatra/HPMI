@@ -6,9 +6,9 @@
 @section('content')
 
 <div class="card p-4">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Create Teacher</h3>
-    <a href="{{ route('admin.teacher.index') }}" class="btn btn-danger">
+  <div class="card-header d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Create Teacher</h4>
+    <a href="{{ route('admin.teacher.index') }}" class="btn btn-danger btn-sm">
       <i class="ri-arrow-left-line"></i> Back
     </a>
   </div>
@@ -48,21 +48,34 @@
 
         {{-- Row 2: Email, Phone, DOB --}}
         <div class="row mb-3">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-floating form-floating-outline">
                     <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">
                     <label>Email<span class="text-danger">*</span></label>
                     @error('email') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="form-password-toggle">
+                    <div class="input-group input-group-merge">
+                        <div class="form-floating form-floating-outline flex-grow-1">
+                            <input type="password" id="password" class="form-control" name="password" placeholder="********" />
+                            <label for="password">Password<span class="text-danger">*</span></label>
+                            
+                        </div>
+                        <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
+                    </div>
+                    @error('password') <p class="small text-danger">{{ $message }}</p> @enderror
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="form-floating form-floating-outline">
                     <input type="text" name="mobile" class="form-control" placeholder="Mobile" value="{{ old('mobile') }}">
                     <label>Phone<span class="text-danger">*</span></label>
                     @error('mobile') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-floating form-floating-outline">
                     <input type="date" name="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}">
                     <label>Date of Birth</label>
@@ -89,7 +102,7 @@
             </div>
             <div class="col-md-4">
                 <div class="form-floating form-floating-outline">
-                    <textarea name="address" class="form-control" placeholder="Address" style="height: 70px;">{{ old('address') }}</textarea>
+                    <textarea name="address" class="form-control" placeholder="Address" >{{ old('address') }}</textarea>
                     <label>Address</label>
                     @error('address') <p class="text-danger small">{{ $message }}</p> @enderror
                 </div>
@@ -121,26 +134,9 @@
             </div>
         </div>
 
-        {{-- Password Field --}}
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <div class="form-password-toggle">
-                    <div class="input-group input-group-merge">
-                        <div class="form-floating form-floating-outline flex-grow-1">
-                            <input type="password" id="password" class="form-control" name="password" placeholder="********" />
-                            <label for="password">Password<span class="text-danger">*</span></label>
-                            
-                        </div>
-                        <span class="input-group-text cursor-pointer"><i class="ri-eye-off-line ri-20px"></i></span>
-                    </div>
-                    @error('password') <p class="small text-danger">{{ $message }}</p> @enderror
-                </div>
-            </div>
-        </div>
-
         {{-- Submit --}}
-        <div class="text-end">
-            <button type="submit" class="btn btn-primary px-4 py-2">Create</button>
+        <div class="text-start">
+            <button type="submit" class="btn btn-primary btn-sm">Create</button>
         </div>
          
     </form>

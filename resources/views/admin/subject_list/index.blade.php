@@ -1,5 +1,5 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Add your toastFire function if it's custom -->
 
@@ -21,34 +21,34 @@
         {{-- Subjects List --}}
         <div class="col-md-8">
             <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
+            <!-- <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 text-primary">Subject List</h5>
-            </div>
-            <div class="px-3 py-2">
-                <form method="GET" action="">
-                <div class="row">
-                    <div class="col-md-6"></div>
-                    <div class="col-md-6">
-                    <div class="d-flex justify-content-end">
-                        <div class="form-group me-2 mb-0">
-                        <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" 
-                            value="{{ request()->input('keyword') }}" placeholder="Search something...">
+            </div> -->
+                <form method="GET" action="" class="mb-0">
+                    <div class="row card-header">
+                        <div class="col-md-6">
+                            <h4 class="fw-bold mb-0">Subject List</h5>
                         </div>
-                        <div class="form-group mb-0">
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-sm btn-primary">
-                            <i class="ri-filter-3-line"></i>
-                            </button>
-                            <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
-                            <i class="ri-close-line"></i>
-                            </a>
+                        <div class="col-md-6">
+                        <div class="d-flex justify-content-end align-items-center">
+                            <div class="form-group me-2 mb-0">
+                            <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" 
+                                value="{{ request()->input('keyword') }}" placeholder="Search something...">
+                            </div>
+                            <div class="form-group mb-0">
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="ri-filter-3-line"></i>
+                                </button>
+                                <a href="{{ url()->current() }}" class="btn btn-sm btn-light" title="Clear filter">
+                                <i class="ri-close-line"></i>
+                                </a>
+                            </div>
+                            </div>
                         </div>
                         </div>
                     </div>
-                    </div>
-                </div>
                 </form>
-            </div>
 
             <div class="card-body">
                 <div class="table-responsive text-nowrap">
@@ -86,17 +86,21 @@
                                             @endphp
 
                                             {{-- Edit Button --}}
-                                            <a href="{{ $edit_link }}" class="btn btn-sm btn-icon btn-outline-dark"                                            
-                                            data-bs-toggle="tooltip"  title="Edit">                                           
-                                            <i class="ri-pencil-line"></i>
-                                            </a>
+                                            @if (hasPermissionByChild('update_subject'))
+                                                <a href="{{ $edit_link }}" class="btn btn-sm btn-icon btn-outline-dark"                                            
+                                                data-bs-toggle="tooltip"  title="Edit">                                           
+                                                <i class="ri-pencil-line"></i>
+                                                </a>
+                                            @endif
 
                                             {{-- Delete Button --}}
-                                            <button type="button"
-                                                class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteSubject({{ $subject->id }})"                        
-                                                data-bs-toggle="tooltip" title="Delete">                       
-                                                <i class="ri-delete-bin-6-line"></i>
-                                            </button>
+                                            @if (hasPermissionByChild('delete_subject'))
+                                                <button type="button"
+                                                    class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteSubject({{ $subject->id }})"                        
+                                                    data-bs-toggle="tooltip" title="Delete">                       
+                                                    <i class="ri-delete-bin-6-line"></i>
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
@@ -149,9 +153,11 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary d-block ">
-                        Create
-                    </button>
+                    @if (hasPermissionByChild('create_subject'))
+                        <button type="submit" class="btn btn-primary d-block ">
+                            Create
+                        </button>
+                    @endif
                     </form>
                 </div>
             </div>

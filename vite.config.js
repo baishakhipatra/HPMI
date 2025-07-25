@@ -40,6 +40,8 @@ export default defineConfig({
   plugins: [
     laravel({
       input: [
+        // 'resources/css/style.css',
+        'resources/assets/js/main.js',
         'resources/css/app.css',
         'resources/assets/css/demo.css',
         'resources/js/app.js',

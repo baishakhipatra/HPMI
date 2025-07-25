@@ -69,7 +69,7 @@ class DesignationController extends Controller
 
     public function permissions(Request $request, $id) {
         $designation = Designation::findOrFail($id);
-        $permissions = Permission::orderBy('parent_name')->get();
+        $permissions = Permission::orderBy('parent_name')->whereNotNull('route')->get();
         $assignedPermissions = $designation->permissions->pluck('id')->toArray();
 
         return view('admin.designations.permissions', compact('designation', 'permissions', 'assignedPermissions'));

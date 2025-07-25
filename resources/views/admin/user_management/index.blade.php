@@ -14,32 +14,38 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Employee List</h3>
-    <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
+    <h4 class="fw-bold mb-0">Employee List</h4>
+    @if (hasPermissionByChild('create_employee'))
+      <a href="{{ route('admin.employee.create') }}" class="btn btn-primary btn-sm">+ Add Employee</a>
+    @endif
   </div>
 
-  <div class="px-3 py-2">
+  <div class="card-header pt-0 pb-0">
     <form action="" method="get">
       <div class="row">
         <div class="col-md-6"></div>
           <div class="col-md-6">  
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
               <div class="form-group me-2 mb-0">
                 <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
               </div>
               <div class="form-group mb-0">
                 <div class="btn-group">
                   <button type="submit" class="btn btn-sm btn-primary">
-                    <i class="menu-icon tf-icons ri-filter-3-line"></i>
+                    <i class=" tf-icons ri-filter-3-line"></i>
                   </button>
-                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
-                    <i class="menu-icon tf-icons ri-close-line"></i>
+                  <a href="{{ url()->current() }}" class="btn btn-sm btn-danger" data-toggle="tooltip" title="Clear filter">
+                    <i class=" tf-icons ri-close-line"></i>
                   </a>
-                  <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
-                    class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                    data-toggle="tooltip" title="Export Data">
-                    Export
-                  </a>
+                  @if (hasPermissionByChild('export_employee_list'))
+                    
+                      <a href="{{ route('admin.employee.export', ['keyword' => request()->input('keyword')]) }}" 
+                        class="btn btn-sm btn-success" 
+                        data-toggle="tooltip" title="Export Data">
+                        <i class="tf-icons ri-download-line"></i>
+                      </a>
+                    
+                  @endif
                 </div>
               </div>
             </div>
@@ -79,36 +85,33 @@
               </td>
               {{-- Edit and delete --}}
               <td>
-                {{-- <div class="dropdown">
-                  <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
-                      <i class="ri-more-2-line"></i>
-                  </button>
-                  <div class="dropdown-menu">
-                   
-                    <a class="dropdown-item" href="{{ route('admin.employee.show', $item->id) }}" title="View" data-bs-toggle="tooltip">
-                      <i class="ri-eye-line me-1"></i> View
-                    </a>
-                    <a class="dropdown-item" href="{{ route('admin.employee.edit', $item->id) }}" title="Edit" data-bs-toggle="tooltip">
-                        <i class="ri-pencil-line me-1"></i> Edit
-                    </a>
-                    <a class="dropdown-item" href="javascript:void(0);" data-bs-toggle="tooltip" title="Delete" onclick="deleteUser({{$item->id}})">
-                        <i class="ri-delete-bin-6-line me-1"></i> Delete
-                    </a>
-                  </div>
-                </div> --}}
                 <div class="btn-group" role="group" aria-label="Action Buttons">
-                  <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
-                    data-bs-toggle="tooltip" title="View">                  
-                    <i class="ri-eye-line"></i>
-                  </a>
-                  <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
-                    data-bs-toggle="tooltip"  title="Edit">
-                    <i class="ri-pencil-line"></i>
-                  </a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteUser({{ $item->id }})"     
-                    data-bs-toggle="tooltip" title="Delete">
-                    <i class="ri-delete-bin-6-line"></i>
-                  </a>
+                  @if (hasPermissionByChild('employee_details'))
+                    
+                      <a href="{{ route('admin.employee.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
+                        data-bs-toggle="tooltip" title="View">                  
+                        <i class="ri-eye-line"></i>
+                      </a>
+                    
+                  @endif
+                  
+                  @if (hasPermissionByChild('edit_employee'))
+                    
+                      <a href="{{ route('admin.employee.edit', $item->id) }}" class="btn btn-sm btn-icon btn-dark"                     
+                        data-bs-toggle="tooltip"  title="Edit">
+                        <i class="ri-pencil-line"></i>
+                      </a>
+                    
+                  @endif
+                  
+                  @if (hasPermissionByChild('delete_employee'))
+                    
+                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-danger" onclick="deleteUser({{ $item->id }})"     
+                        data-bs-toggle="tooltip" title="Delete">
+                        <i class="ri-delete-bin-6-line"></i>
+                      </a>
+                       
+                  @endif           
                 </div>
               </td>
  

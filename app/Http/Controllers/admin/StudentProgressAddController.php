@@ -22,11 +22,18 @@ class StudentProgressAddController extends Controller
 
     public function getClassesBySession(Request $request)
     {
+        $admin = auth()->guard('admin')->user();
+
         // pull class_ids out of admissions for that session
-        $classIds = StudentAdmission::where('session_id', $request->session_id)
-                    ->pluck('class_id')
-                    ->unique()
-                    ->toArray();
+        $query = StudentAdmission::where('session_id', $request->session_id);
+
+        // If teacher, restrict to their assigned classes
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            $query->whereIn('class_id', $assignedClassIds);
+        }
+
+        $classIds = $query->pluck('class_id')->unique()->toArray();
 
         $classes = ClassList::whereIn('id', $classIds)->get();
 
@@ -38,6 +45,20 @@ class StudentProgressAddController extends Controller
 
     public function getStudentsByClass(Request $request)
     {
+
+        $admin = auth()->guard('admin')->user();
+
+        // Check if teacher and restrict class access
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+
+            if (!in_array($request->class_id, $assignedClassIds)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You are not assigned to this class.'
+                ], 403);
+            }
+        }
         // filter admissions by both session & class
         $studentIds = StudentAdmission::where('session_id', $request->session_id)
                     ->where('class_id', $request->class_id)

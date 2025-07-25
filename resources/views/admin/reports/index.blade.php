@@ -1,289 +1,237 @@
-
-
 @extends('layouts/contentNavbarLayout')
-
-
 
 @section('title', 'Class - List')
 
-
-
 @section('content')
 
-
-
-<div class="container-xxl">
-
-    <h4 class="fw-bold">Academic Reports</h4>
-
-    <p>Comprehensive academic and performance reports</p>
-
-
-
-    <div class="row mb-4">
-
-        @php
-
-          $widgets = [
-
-            ['icon' => 'ri-user-3-fill', 'count' => $studentsCount, 'label' => 'Total Students'],
-
-            ['icon' => 'ri-book-open-fill', 'count' => $classesCount, 'label' => 'Total Classes'],
-
-            ['icon' => 'ri-bar-chart-fill', 'count' => $subjectsCount, 'label' => 'Total Subjects'],
-
-            ['icon' => 'ri-file-list-3-fill', 'count' => $marksCount, 'label' => 'Total Marks Recorded'],
-
-          ];
-
-        @endphp
-
-
-
-        @foreach ($widgets as $widget)
-
-        <div class="col-md-3">
-
-            <div class="card text-center p-3">
-
-                <i class="ri {{ $widget['icon'] }} fs-2 mb-2"></i>
-
-                <h4>{{ $widget['count'] }}</h4>
-
-                <p>{{ $widget['label'] }}</p>
-
-            </div>
-
-        </div>
-
-        @endforeach
-
+<div class="card">
+    <div class="card-header">
+        <h4 class="fw-bold mb-0">Academic Reports</h4>
+        <p>Comprehensive academic and performance reports</p>
     </div>
 
+    <div class="card-body">
+        <div class="row mb-5">
+            @php
 
+            $widgets = [
 
-    {{-- Filters for both tabs --}}
+                ['icon' => 'ri-user-3-fill', 'count' => $studentsCount, 'label' => 'Total Students'],
 
-    <div class="row mb-3">
+                ['icon' => 'ri-book-open-fill', 'count' => $classesCount, 'label' => 'Total Classes'],
 
-        <div class="col-md-3">
+                ['icon' => 'ri-bar-chart-fill', 'count' => $subjectsCount, 'label' => 'Total Subjects'],
 
-            <label for="filterSession" class="form-label">Session</label>
+                ['icon' => 'ri-file-list-3-fill', 'count' => $marksCount, 'label' => 'Total Marks Recorded'],
 
-            <select id="filterSession" class="form-select">
+            ];
 
-                <option value="">All Sessions</option>
+            @endphp
 
-                @foreach($sessions as $id => $name)
+            @foreach ($widgets as $widget)
 
-                    <option value="{{ $id }}">{{ $name }}</option>
-
-                @endforeach
-
-            </select>
-
+            <div class="col-md-3">
+                <div class="card text-center p-3">
+                    <i class="ri {{ $widget['icon'] }} fs-2 mb-2"></i>
+                    <h4>{{ $widget['count'] }}</h4>
+                    <p>{{ $widget['label'] }}</p>
+                </div>
+            </div>
+            @endforeach
         </div>
+    
+            <hr class="">
+        {{-- Filters for both tabs --}}
 
-        <div class="col-md-3">
-
-            <label for="filterClass" class="form-label">Class</label>
-
-            <select id="filterClass" class="form-select">
-
-                <option value="">All Classes</option>
-
-            </select>
-
-        </div>
-
-        <div class="col-md-3">
-
-            <label for="filterSubject" class="form-label">Subject</label>
-
-            <select id="filterSubject" class="form-select">
-
-                <option value="">All Subjects</option>
-
-            </select>
-
-        </div>
-
-        {{-- Student Filter for Report Card Tab --}}
-
-        <div class="col-md-3">
-
-            <label for="filterStudent" class="form-label">Student</label>
-
-            <select id="filterStudent" class="form-select">
-
-                <option value="">Select Student</option>
-
-            </select>
-
-        </div>
-
-    </div>
-
-
-
-    {{-- Tabs --}}
-
-    <ul class="nav nav-tabs mb-3">
-
-        <li class="nav-item">
-
-            <a class="nav-link active" id="classComparisonTab" data-bs-toggle="tab" href="#classComparison">Class-Wise Comparison</a>
-
-        </li>
-
-        <li class="nav-item">
-
-            <a class="nav-link" id="studentReportTab" data-bs-toggle="tab" href="#studentReports">Student Report Cards</a>
-
-        </li>
-
-    </ul>
-
-
-
-    <div class="tab-content">
-
-        {{-- Class-Wise Comparison Tab Content (existing) --}}
-
-        <div class="tab-pane fade show active" id="classComparison">
-
-            <div class="d-flex justify-content-between align-items-center mb-2">
-
-                <h5>Class Performance Comparison</h5>
-
-                <button class="btn btn-outline-primary"><i class="ri-download-2-line"></i> Export Report</button>
-
+        <div class="row mb-5">
+            <div class="col-md-3">
+                <label for="filterSession" class="form-label">Session</label>
+                <select id="filterSession" class="form-select">
+                    <option value="">All Sessions</option>
+                    @foreach($sessions as $id => $name)
+                        <option value="{{ $id }}">{{ $name }}</option>
+                    @endforeach
+                </select>
             </div>
 
-            <canvas id="performanceChart" height="100"></canvas>
+            <div class="col-md-3">
+                <label for="filterClass" class="form-label">Class</label>
+                <select id="filterClass" class="form-select">
+                    <option value="">All Classes</option>
+                </select>
+            </div>
 
-            <p id="noDataMessage" class="text-center mt-3 alert alert-info" style="display: none;"></p>
+            <div class="col-md-3">
+                <label for="filterSubject" class="form-label">Subject</label>
+                <select id="filterSubject" class="form-select">
+                    <option value="">All Subjects</option>
+                </select>
+            </div>
 
+            {{-- Student Filter for Report Card Tab --}}
+
+            <div class="col-md-3">
+                <label for="filterStudent" class="form-label">Student</label>
+                <select id="filterStudent" class="form-select">
+                    <option value="">Select Student</option>
+                </select>
+            </div>
         </div>
 
 
 
-        {{-- Student Report Cards Tab Content (NEW) --}}
+        {{-- Tabs --}}
 
-        <div class="tab-pane fade" id="studentReports">
+        <ul class="nav nav-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" id="classComparisonTab" data-bs-toggle="tab" href="#classComparison">Class-Wise Comparison</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="studentReportTab" data-bs-toggle="tab" href="#studentReports">Student Report Cards</a>
+            </li>
+        </ul>
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
 
-                <h5>Individual Student Reports</h5>
+        <div class="tab-content">
 
-                <a href=""
+            {{-- Class-Wise Comparison Tab Content (existing) --}}
 
-                    id="exportReportBtn"
+            <div class="tab-pane fade show active" id="classComparison">
 
-                    class="btn btn-outline-primary">
+                <div class="d-flex justify-content-between align-items-center mb-2">
 
-                    <i class="ri-download-2-line"></i> Export Report Card
+                    <h5>Class Performance Comparison</h5>
 
-                </a>
+                    <!-- <button class="btn btn-outline-primary"><i class="ri-download-2-line me-2"></i> Export Report</button> -->
+
+                </div>
+
+                <canvas id="performanceChart" height="100"></canvas>
+
+                <p id="noDataMessage" class="text-center mt-3 alert alert-info" style="display: none;"></p>
 
             </div>
 
 
 
-            <div id="studentReportCardContainer" style="display: none;">
+            {{-- Student Report Cards Tab Content (NEW) --}}
 
-                <h4 id="reportStudentName" class="mb-3"></h4>
+            <div class="tab-pane fade" id="studentReports">
 
-                <div class="row">
+                <div class="d-flex justify-content-between align-items-center mb-2">
 
-                    <div class="col-md-6">
+                    <h5>Individual Student Reports</h5>
+                    @if (hasPermissionByChild('export_report_list'))
+                    <a href=""
 
-                        <p><strong>Session:</strong> <span id="reportSessionName"></span></p>
+                        id="exportReportBtn"
 
-                        <p><strong>Class:</strong> <span id="reportClassName"></span></p>
+                        class="btn btn-outline-primary">
 
-                    </div>
+                        <i class="ri-download-2-line me-2"></i> Export Report Card
 
-                    {{-- <div class="col-md-6">
-
-                        <p><strong>Roll Number:</strong> <span id="reportRollNumber"></span></p>
-
-                    </div> --}}
+                    </a>
+                    @endif
 
                 </div>
 
 
 
-                <h6>Subject-Wise Performance</h6>
+                <div id="studentReportCardContainer" style="display: none;">
 
-                <div class="table-responsive">
+                    <h4 id="reportStudentName" class="mb-3"></h4>
 
-                    <table class="table table-bordered table-striped">
+                    <div class="row">
 
-                        <thead>
+                        <div class="col-md-6">
 
-                            <tr>
+                            <p><strong>Session:</strong> <span id="reportSessionName"></span></p>
 
-                                <th>Subject</th>
+                            <p><strong>Class:</strong> <span id="reportClassName"></span></p>
 
-                                <th>Mid-Term (Marks/Out Of)</th>
+                        </div>
 
-                                <th>Final Exam (Marks/Out Of)</th>
+                        {{-- <div class="col-md-6">
 
-                                <th>Status</th>
+                            <p><strong>Roll Number:</strong> <span id="reportRollNumber"></span></p>
 
-                            </tr>
+                        </div> --}}
 
-                        </thead>
+                    </div>
 
-                        <tbody id="studentMarksTableBody">
 
-                            
 
-                        </tbody>
+                    <h6>Subject-Wise Performance</h6>
 
-                    </table>
+                    <div class="table-responsive">
+
+                        <table class="table table-bordered table-striped">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Subject</th>
+
+                                    <th>Mid-Term (Marks/Out Of)</th>
+
+                                    <th>Final Exam (Marks/Out Of)</th>
+
+                                    <th>Status</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="studentMarksTableBody">
+
+                                
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+
+                    <h6 class="mt-4">Overall Summary</h6>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+
+                            <p><strong>Total Marks Obtained (Final):</strong> <span id="reportTotalMarks"></span></p>
+
+                            <p><strong>Overall Percentage:</strong> <span id="reportAveragePercentage"></span>%</p>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p><strong>Overall Status:</strong> <span id="reportOverallStatus"></span></p>
+
+                        </div>
+
+                    </div>
 
                 </div>
 
 
 
-                <h6 class="mt-4">Overall Summary</h6>
+                <div id="selectStudentMessage" class="text-center mt-5">
 
-                <div class="row">
+                    <h5 class="mt-3">Select a Student</h5>
 
-                    <div class="col-md-6">
-
-                        <p><strong>Total Marks Obtained (Final):</strong> <span id="reportTotalMarks"></span></p>
-
-                        <p><strong>Overall Percentage:</strong> <span id="reportAveragePercentage"></span>%</p>
-
-                    </div>
-
-                    <div class="col-md-6">
-
-                        <p><strong>Overall Status:</strong> <span id="reportOverallStatus"></span></p>
-
-                    </div>
+                    <p>Choose a student from the filter above to view their detailed report card.</p>
 
                 </div>
 
-            </div>
-
-
-
-            <div id="selectStudentMessage" class="text-center mt-5">
-
-                <h5 class="mt-3">Select a Student</h5>
-
-                <p>Choose a student from the filter above to view their detailed report card.</p>
+                <p id="studentReportErrorMessage" class="text-center mt-3 alert alert-danger" style="display: none;"></p>
 
             </div>
-
-             <p id="studentReportErrorMessage" class="text-center mt-3 alert alert-danger" style="display: none;"></p>
 
         </div>
-
     </div>
 
 </div>
@@ -577,7 +525,9 @@
 
         }
 
-
+        function toUcwords(str) {
+            return str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+        }
 
         function populateStudents() {
 
@@ -612,8 +562,8 @@
                         let options = '<option value="">Select Student</option>';
 
                         $.each(res.students, function (i, s) {
-
-                            options += `<option value="${s.id}">${s.name}</option>`;
+                            const studentName = toUcwords(s.name);
+                            options += `<option value="${s.id}">${studentName}</option>`;
 
                         });
 
@@ -636,7 +586,7 @@
         }
 
 
-
+       
         function fetchStudentReportCard() {
             const sessionId = $('#filterSession').val();
             const classId = $('#filterClass').val();
@@ -667,7 +617,7 @@
                     console.log("Student Report Card Response:", res);
                     if (res.success && res.data) {
                         const data = res.data;
-                        $('#reportStudentName').text(data.student_name);
+                        $('#reportStudentName').text(toUcwords(data.student_name));
                         $('#reportSessionName').text(data.session_name);
                         $('#reportClassName').text(data.class_name);
                         $('#reportRollNumber').text(data.roll_number || 'N/A');

@@ -15,9 +15,11 @@ class TeacherListController extends Controller
     public function index(Request $request) 
     {
         $keyword = $request->input('keyword');
-        $query = Admin::where('user_type', 'Teacher')->orWhere('designation_id', '1')
-                ->with(['teacherSubjects']);
-
+            $query = Admin::where(function ($q) {
+                $q->where('user_type', 'Teacher')
+                ->orWhere('designation_id', '1');
+        })->with(['teacherSubjects']);
+        
         $query->when($keyword, function ($q) use ($keyword) {
             $q->where(function($subQuery) use ($keyword) {
                 $subQuery->where('name', 'like', '%'. $keyword . '%')

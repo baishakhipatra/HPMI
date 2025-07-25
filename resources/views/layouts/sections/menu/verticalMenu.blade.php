@@ -2,7 +2,7 @@
 
   <!-- ! Hide app brand if navbar-full -->
   <div class="app-brand demo">
-    <a href="{{url('/')}}" class="app-brand-link">
+    {{-- <a href="{{url('/')}}" class="app-brand-link"> --}}
       {{--<span class="app-brand-logo demo me-1">
             @include('_partials.macros',["height"=>20])
             </span> --}}
@@ -106,11 +106,21 @@
                   Progress Marking
               </a>
           </li> --}}
+          @if (hasPermissionByChild('student_progress_marking'))
           <li class="menu-item {{ request()->is('admin/student-progress-marking') ? 'active' : '' }}">
             <a href="{{ route('admin.student.progressmarking.select') }}" class="menu-link">
                 <div>Progress Marking</div>
             </a>
           </li>
+          @endif
+
+          @if (hasPermissionByChild('progress_chart'))
+          <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
+            <a href="{{route('admin.progresschart')}}" class="menu-link">
+              <div>Progress Chart</div>
+            </a>
+          </li>
+          @endif
           {{-- @endif --}}
         </ul>
       </li>
@@ -140,26 +150,26 @@
           </li>
           @endif
 
-          @if (hasPermissionByChild('progress_marking_list'))
+          @if (hasPermissionByChild('category_marking_list'))
           <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
             <a href="{{route('admin.student.progresslist')}}" class="menu-link">
-              <div>Progress Marking Category</div>
+              <div>Progress Category</div>
             </a>
           </li>
           @endif
 
-          @if (hasPermissionByChild('progress_chart'))
+          {{-- @if (hasPermissionByChild('progress_chart'))
           <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
             <a href="{{route('admin.progresschart')}}" class="menu-link">
               <div>Progress Chart</div>
             </a>
           </li>
-          @endif
+          @endif --}}
 
           @if (hasPermissionByChild('designations'))
           <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
             <a href="{{route('admin.designation.list')}}" class="menu-link">
-              <div>Designations</div>
+              <div>Role Management</div>
             </a>
           </li>
           @endif
@@ -167,15 +177,18 @@
       </li>
       @endif
 
-      <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
-        <a href="{{route('admin.report.index')}}" class="menu-link">
-          <i class="menu-icon fa-solid fa-chart-pie"></i>
-          <div>Report</div>
-        </a>
-      </li>
+      {{-- Report Management --}}
+      @if (hasPermissionByParent('report_management'))
+        <li class="menu-item {{ (request()->is('admin/report*')) ? 'open' : '' }}">
+          <a href="{{route('admin.report.index')}}" class="menu-link">
+            <i class="menu-icon fa-solid fa-chart-pie"></i>
+            <div>Report</div>
+          </a>
+        </li>
+      @endif
       
       <li class="menu-item">
-        <a class="btn btn-danger d-flex" href="{{ route('admin.logout') }}"
+        <a class="btn btn-danger d-flex rounded-0" href="{{ route('admin.logout') }}"
             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
               <small class="align-middle">Logout</small>
               <i class="ri-logout-box-r-line ms-2 ri-16px"></i>

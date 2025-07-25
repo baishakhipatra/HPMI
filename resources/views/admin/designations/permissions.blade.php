@@ -19,23 +19,31 @@
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4>Manage Permissions for: {{ $designation->name }}</h4>
+            <h4 class="fw-bold mb-0">Manage Permissions for: {{ ucwords($designation->name)}}</h4>
             <a href="{{ route('admin.designation.list') }}" class="btn btn-sm btn-danger">
-                <i class="menu-icon tf-icons ri-arrow-left-line"></i>Back</a>
+                <i class="menu-icon tf-icons ri-arrow-left-line"></i>
+                Back
+            </a>
         </div>
         <form method="POST" action="{{ route('admin.designation.permissions.update') }}">
             @csrf
             <input type="hidden" name="designation_id" value="{{ $designation->id }}">
     
             @foreach($permissions->groupBy('parent_name') as $group => $groupPermissions)
-                <div class="card-header" style="background: #f4f0ff;">
+                @php
+                   $parentPermissionId = App\Models\Permission::where('parent_name', $group)->where('name',$group)->first();
+                @endphp 
+                <div class="card-header" style="background: #cedaff;">
+                    @if($parentPermissionId)
+                        <input type="checkbox" class="form-check-input" value="{{ $parentPermissionId->id }}" id="perm_{{ $parentPermissionId->id }}" {{ in_array($parentPermissionId->id, $assignedPermissions) ? 'checked' : '' }} onchange="updatePermissionAjax(this, {{ $designation->id }})">
+                    @endif
                     <h5 class="text-primary mb-0">{{ ucwords(str_replace('_', ' ', $group)) }}</h5>
                 </div>
 
                 <div class="card-body mt-2">
                     <div class="row">
-                        @php $chunked = $groupPermissions->chunk(8); @endphp
-
+                        @php $chunked = $groupPermissions->chunk(8); 
+                        @endphp
                         @foreach($chunked as $chunk)
                             <div class="col-md-6">
                                 @foreach($chunk as $permission)

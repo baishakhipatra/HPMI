@@ -1,5 +1,4 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 @extends('layouts/contentNavbarLayout')
 
 @section('title', 'Student - Readmission')
@@ -125,6 +124,7 @@
 </div>
 
 @endsection
+@section('scripts')
 <script>
   $(document).ready(function() {
     $('#class_id').on('change', function() {
@@ -158,3 +158,4 @@
     });
   });
 </script>
+@endsection

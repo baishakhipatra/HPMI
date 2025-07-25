@@ -15,8 +15,10 @@
 <!-- Basic Bootstrap Table -->
 <div class="card">
   <div class="card-header d-flex justify-content-between align-items-center">
-    <h3 class="mb-0 text-primary">Teacher List</h3>
-    <a href="{{ route('admin.teacher.create') }}" class="btn btn-primary btn-sm">+ Add Teacher</a>
+    <h4 class="fw-bold mb-0">Teacher List</h4>
+    @if (hasPermissionByChild('create_teacher'))
+      <a href="{{ route('admin.teacher.create') }}" class="btn btn-primary btn-sm">+ Add Teacher</a>
+    @endif
   </div>
 
   <div class="px-3 py-2">
@@ -24,25 +26,27 @@
       <div class="row">
         <div class="col-md-6"></div>
           <div class="col-md-6">  
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end align-items-center">
               <div class="form-group me-2 mb-0">
                 <input type="search" class="form-control form-control-sm" name="keyword" id="keyword" value="{{ request()->input('keyword') }}" placeholder="Search something...">
               </div>
               <div class="form-group mb-0">
                 <div class="btn-group">
-                  <button type="submit" class="btn btn-sm btn-primary">
+                  <button type="submit" class="btn btn-sm btn-primary waves-effect waves-light">
                     <i class="tf-icons ri-filter-3-line"></i>
                   </button>
-                  <a href="{{ url()->current() }}" class="btn btn-sm btn-light" data-toggle="tooltip" title="Clear filter">
+                  <a href="{{ url()->current() }}" class="btn btn-sm btn-danger waves-effect waves-light" data-toggle="tooltip" title="Clear filter">
                     <i class="tf-icons ri-close-line"></i>
                   </a>
-                  <div class="d-md-flex justify-content-between align-items-center dt-layout-start">
-                    <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 
-                      class="btn buttons-collection btn-outline-secondary dropdown-toggle waves-effect" 
-                      data-toggle="tooltip" title="Export Data">
-                      Export
-                    </a>
-                  </div>
+                  @if (hasPermissionByChild('export_teacher_list'))
+                    
+                      <a href="{{ route('admin.teacher.export', ['keyword' => request()->input('keyword')]) }}" 
+                        class="btn btn-sm btn-success waves-effect waves-light" 
+                        data-toggle="tooltip" title="Export Data">
+                        <i class="tf-icons ri-download-line"></i>
+                      </a>
+                    
+                  @endif
                 </div>
               </div>
             </div>
@@ -74,14 +78,15 @@
               $subjects = [];
               foreach ($item->teacherSubjects as $teacherSubject) {
                 $clasName = $teacherSubject->classList->class;
-                $subjectName = $teacherSubject->subjectList->sub_name;
+                // $subjectName = $teacherSubject->subjectList->sub_name;
+                $subjectName = $teacherSubject->subjectList->sub_name ?? 'N/A';
 
                 if (!in_array($clasName, $classes)) {
                   $classes[] = $clasName;
                 }
                 $subjects[] = 'Class ' . $clasName . ' - ' . ucfirst($subjectName);
               }
-              // dd($subjects);
+             
             @endphp
             <tr>
               <td>{{ $item->user_id}}</td>
@@ -89,32 +94,6 @@
               <td>{{ $item->email }}</td>
               <td>{{ $item->mobile }}</td>
               <td>{{ $item->date_of_joining}}</td>
-              {{-- <td>
-                @if(count($classes) > 0)
-                  <ul class="mb-0">
-                      @foreach($classes as $eachClassItem)
-                        <li>{{ $eachClassItem ?? '-' }}</li>
-                      @endforeach
-                  </ul>
-                @else
-                    -
-                @endif
-              </td>
-             
-              <td>
-                @if(count($subjects) > 0)
-                    <ul class="mb-0">
-                        @foreach($subjects as $eachSubjectItem)
-                            <li>
-                                {{ $eachSubjectItem }}
-                            </li>
-                        @endforeach
-                    </ul>
-                @else
-                    -
-                @endif
-              </td> --}}
-
               <td>
                  <div class="form-check form-switch" data-bs-toggle="tooltip" title="Toggle status">
                     <input class="form-check-input ms-auto" type="checkbox" id="customSwitch{{$item->id}}"
@@ -122,21 +101,35 @@
                     <label class="form-check-label" for="customSwitch{{$item->id}}"></label>
                   </div>
               </td>
-              {{-- Edit and delete --}}
-              <td>
+              {{-- View, Edit and delete --}}
+              <td>               
                 <div class="btn-group" role="group" aria-label="Action Buttons">
-                  <a href="{{ route('admin.teacher.show', $item->id) }}"  class="btn btn-sm btn-icon btn-outline-success"         
-                    data-bs-toggle="tooltip" title="View">                  
-                    <i class="ri-eye-line"></i>
-                  </a>
-                  <a href="{{ route('admin.teacher.edit', $item->id) }}" class="btn btn-sm btn-icon btn-outline-dark"                     
-                    data-bs-toggle="tooltip"  title="Edit">
-                    <i class="ri-pencil-line"></i>
-                  </a>
-                  <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-outline-danger" onclick="deleteTeacher({{ $item->id }})"     
-                    data-bs-toggle="tooltip" title="Delete">
-                    <i class="ri-delete-bin-6-line"></i>
-                  </a>
+                  @if (hasPermissionByChild('details_teacher'))
+                    
+                      <a href="{{ route('admin.teacher.show', $item->id) }}"  class="btn btn-sm btn-icon btn-success"         
+                        data-bs-toggle="tooltip" title="View">                  
+                        <i class="ri-eye-line"></i>
+                      </a>
+                    
+                  @endif
+                 
+                  @if (hasPermissionByChild('edit_teacher'))
+                    
+                      <a href="{{ route('admin.teacher.edit', $item->id) }}" class="btn btn-sm btn-icon btn-dark"                     
+                        data-bs-toggle="tooltip"  title="Edit">
+                        <i class="ri-pencil-line"></i>
+                      </a>
+                    
+                  @endif
+                  
+                  @if (hasPermissionByChild('delete_teacher'))
+                    
+                      <a href="javascript:void(0);" class="btn btn-sm btn-icon btn-danger" onclick="deleteTeacher({{ $item->id }})"     
+                        data-bs-toggle="tooltip" title="Delete">
+                        <i class="ri-delete-bin-6-line"></i>
+                      </a>
+                     
+                  @endif               
                 </div>
               </td> 
             </tr>
@@ -145,8 +138,7 @@
       </table>
       {{ $admins->links() }}
     </div>
-  </div>
-  
+  </div>  
 </div>
 @endsection
 @section('scripts')
