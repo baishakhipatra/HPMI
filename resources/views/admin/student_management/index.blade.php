@@ -214,7 +214,11 @@
                                 <select name="students[{{ $stu->id }}][to_class_id]" class="form-control">
                                     <option value="">Select</option>
                                     @foreach($stu->available_classes as $cls)
-                                        <option value="{{ $cls->id }}">{{ strtoupper($cls->class) }}</option>
+                                        {{-- <option value="{{ $cls->id }}">{{ strtoupper($cls->class) }}</option> --}}
+                                        <option value="{{ $cls->id }}"
+                                            {{ old("students.{$stu->id}.to_class_id") == $cls->id ? 'selected' : '' }}>
+                                            {{ strtoupper($cls->class) }}
+                                        </option>
                                     @endforeach
                                 </select>
                                 <input type="hidden" name="students[{{ $stu->id }}][student_id]" value="{{ $stu->id }}">
@@ -224,15 +228,17 @@
                                 <select name="students[{{ $stu->id }}][section]" class="form-control">
                                     <option value="">Select</option>
                                     @foreach($stu->to_sections as $sec)
-                                        <option value="{{ $sec->section }}">
-                                             {{ strtoupper(optional($sec->class)->class . '-' . $sec->section) }}
+                                        <option value="{{ $sec->section }}"
+                                            {{ old("students.{$stu->id}.section") == $sec->section ? 'selected' : '' }}>
+                                            {{ strtoupper(optional($sec->class)->class . '-' . $sec->section) }}
                                         </option>
                                     @endforeach
                                 </select>
                             </td>
 
                             <td>
-                                <input type="number" name="students[{{ $stu->id }}][roll_number]" class="form-control">
+                                <input type="number" name="students[{{ $stu->id }}][roll_number]" class="form-control"
+                                    value="{{old("students.{$stu->id}.roll_number")}}">
                             </td>
                         </tr>
                         @if($errors->has($stu->id))

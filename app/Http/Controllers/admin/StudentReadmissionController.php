@@ -114,8 +114,8 @@ class StudentReadmissionController extends Controller
                 $stu->to_session = $nextSession;
 
                 // From and next classes
-                $fromClass = ClassList::find($fromClassId);
-                $nextClass = ClassList::where('id', '>', $fromClassId)->orderBy('id')->first();
+                $fromClass = ClassList::select(['id', 'class'])->where('id', $fromClassId)->first();
+                $nextClass = ClassList::select(['id', 'class'])->where('id', '>', $fromClassId)->orderBy('id')->first();
 
                 $stu->to_class = $fromClass; // <-- This fixes the view display
                 $stu->available_classes = collect([$fromClass, $nextClass])->filter();

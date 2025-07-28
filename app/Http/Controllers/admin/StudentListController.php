@@ -714,10 +714,15 @@ class StudentListController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Import error: ' . $e->getMessage());
+            // \Log::error('Import error: ' . $e->getMessage());
+            // return response()->json([
+            //     'errors' => ['Unexpected error during import. Please check the file.']
+            // ], 500);
+            \Log::error('Import error at line '.$e->getLine().' in '.$e->getFile().': '.$e->getMessage());
             return response()->json([
-                'errors' => ['Unexpected error during import. Please check the file.']
+                'errors' => ['Unexpected error: ' . $e->getMessage()]
             ], 500);
+
         }
     }
 

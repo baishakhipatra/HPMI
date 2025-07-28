@@ -8,7 +8,7 @@ use App\Models\StudentProgressCategory;
 
 class StudentProgressMarkingController extends Controller
 {
-   public function studentProgress(Request $request)
+    public function studentProgress(Request $request)
     {
       // $student = Student::findOrFail($id);
        $progressList = StudentProgressCategory::all();

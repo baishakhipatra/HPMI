@@ -180,9 +180,9 @@
                         </div>
 
                         <div class="d-flex">
-                            @if (hasPermissionByChild('create_category_marking'))
+                            {{-- @if (hasPermissionByChild('create_category_marking')) --}}
                                 <button type="submit" class="btn btn-primary btn-sm">Submit</button>
-                            @endif
+                            {{-- @endif --}}
                         </div>
                     </form>
                 </div>

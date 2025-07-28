@@ -59,7 +59,7 @@
                   @endif
 
                   {{-- Edit Button --}}
-                  {{-- @if (hasPermissionByChild('update_class')) --}}
+                  @if (hasPermissionByChild('update_class'))
                     <div>
                       <a href="{{ route('admin.classlist', ['update_id' => $class->id]) }}"
                         class="btn btn-sm btn-icon btn-outline-dark"
@@ -68,7 +68,7 @@
                           <i class="ri-pencil-line"></i>
                       </a>
                     </div>                  
-                  {{-- @endif --}}
+                  @endif
 
                   {{-- Delete Button --}}
                   @if (hasPermissionByChild('delete_class'))
@@ -186,9 +186,9 @@
                 </div>
 
                 <div class="d-flex">
-                  {{-- @if (hasPermissionByChild('create_class')) --}}
+                  @if (hasPermissionByChild('create_class'))
                     <button type="submit" class="btn btn-primary">Submit</button>
-                  {{-- @endif --}}
+                  @endif
                 </div>
             </form>
           </div>

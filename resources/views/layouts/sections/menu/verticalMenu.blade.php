@@ -67,30 +67,30 @@
 
 
       {{-- Student Management --}}
-      @if (hasPermissionByParent('student_management'))
+      {{-- @if (hasPermissionByParent('student_management')) --}}
       <li class="menu-item {{ (request()->is('admin/student-management*')) ? 'open' : '' }}" style="">
         <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
           <i class="menu-icon fa-solid fa-graduation-cap"></i>
           <div>Student Management</div>
         </a>
         <ul class="menu-sub">
-          @if (hasPermissionByChild('student_list'))
+          {{-- @if (hasPermissionByChild('student_list')) --}}
             <li class="menu-item {{ (request()->is('admin/student-management/student-list*')) ? 'open' : '' }}">
               <a href="{{route('admin.studentlist')}}" class="menu-link">
                 <div>Student List</div>
               </a>
             </li>
-          @endif
+          {{-- @endif --}}
 
-          @if (hasPermissionByChild('student_readmision_list'))
+          {{-- @if (hasPermissionByChild('student_readmision_list')) --}}
             <li class="menu-item {{ (request()->is('admin/student-management/student-readmission*')) ? 'open' : '' }}">
               <a href="{{route('admin.student.readmission.index')}}" class="menu-link">
                 <div>Re-admission</div>
               </a>
             </li>
-          @endif
+          {{-- @endif --}}
 
-          @if (hasPermissionByChild('student_mark_list'))
+          {{-- @if (hasPermissionByChild('student_mark_list')) --}}
             @if($exist_student)
               <li class="menu-item {{ (request()->is('admin/student-management/studentmark-list*')) ? 'open' : '' }}">
                 <a href="{{route('admin.studentmarklist')}}" class="menu-link">
@@ -98,7 +98,7 @@
                 </a>
               </li>
             @endif
-          @endif
+          {{-- @endif --}}
 
           {{-- @if (hasPermissionByChild('student_progress_marking_list')) --}}
           {{-- <li class="menu-item {{ request()->is('admin/student-progress-marking*') ? 'active' : '' }}">
@@ -106,13 +106,13 @@
                   Progress Marking
               </a>
           </li> --}}
-          @if (hasPermissionByChild('student_progress_marking'))
+          {{-- @if (hasPermissionByChild('student_progress_marking')) --}}
           <li class="menu-item {{ request()->is('admin/student-progress-marking') ? 'active' : '' }}">
             <a href="{{ route('admin.student.progressmarking.select') }}" class="menu-link">
                 <div>Progress Marking</div>
             </a>
           </li>
-          @endif
+          {{-- @endif --}}
 
           @if (hasPermissionByChild('progress_chart'))
           <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
@@ -124,10 +124,10 @@
           {{-- @endif --}}
         </ul>
       </li>
-      @endif
+      {{-- @endif --}}
 
       {{-- Master Management --}}
-      @if (hasPermissionByParent('master_management'))
+      {{-- @if (hasPermissionByParent('master_management')) --}}
       <li class="menu-item {{ (request()->is('admin/master-module*')) ? 'open' : '' }}" style="">
         <a href="#" class="menu-link menu-toggle waves-effect" target="_blank">
           <i class="menu-icon fa-solid fa-address-book"></i>
@@ -150,13 +150,13 @@
           </li>
           @endif
 
-          @if (hasPermissionByChild('category_marking_list'))
+          {{-- @if (hasPermissionByChild('category_marking_list')) --}}
           <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">
             <a href="{{route('admin.student.progresslist')}}" class="menu-link">
               <div>Progress Category</div>
             </a>
           </li>
-          @endif
+          {{-- @endif --}}
 
           {{-- @if (hasPermissionByChild('progress_chart'))
           <li class="menu-item {{ (request()->is('admin/master-module/progress-chart*')) ? 'open' : '' }}">
@@ -166,16 +166,16 @@
           </li>
           @endif --}}
 
-          @if (hasPermissionByChild('designations'))
+          {{-- @if (hasPermissionByChild('designations')) --}}
           <li class="menu-item {{ (request()->is('admin/master-module/designations*')) ? 'open' : '' }}">
             <a href="{{route('admin.designation.list')}}" class="menu-link">
               <div>Role Management</div>
             </a>
-          </li>
-          @endif
+          {{-- </li> --}}
+          {{-- @endif --}}
         </ul>
       </li>
-      @endif
+      {{-- @endif --}}
 
       {{-- Report Management --}}
       @if (hasPermissionByParent('report_management'))

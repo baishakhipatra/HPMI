@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf; 
 use App\Models\{Student, AcademicSession, StudentProgressMarking, StudentAdmission, ClassList, StudentProgressCategory};
 
 class StudentProgressAddController extends Controller
@@ -252,4 +253,44 @@ class StudentProgressAddController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+
+public function exportProgressPdf($student_id, $session)
+{
+    $student = Student::with(['admissions.session', 'admissions.class'])->findOrFail($student_id);
+    $academicSession = AcademicSession::where('session_name', $session)->firstOrFail();
+
+    $academic_session_id = $academicSession->id;
+
+    $currentAdmission = $student->admissions->where('session_id', $academic_session_id)->first();
+    if (!$currentAdmission) {
+        abort(404, 'Admission record not found.');
+    }
+
+    $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()->groupBy('field');
+
+    $getDetails = StudentProgressMarking::where('student_id', $student_id)
+        ->where('admission_session_id', $academic_session_id)
+        ->get();
+
+    $savedScores = $getDetails->groupBy('progress_category')
+        ->map(function ($items) {
+            return $items->pluck('formative_first_phase', 'progress_value')->toArray();
+        })
+        ->toArray();
+        
+
+    $pdf = Pdf::loadView('admin/student_management/export_progress_marking', [
+        'student' => $student,
+        'current_session' => $session,
+        'getDetails' => $getDetails,
+        'academic_session_id' => $academic_session_id,
+        'student_progress_category' => $student_progress_category,
+        'savedScores' => $savedScores,
+    ]);
+
+    return $pdf->download("Progress_Report_{$student->student_name}_{$session}.pdf");
+}
+
+
 }

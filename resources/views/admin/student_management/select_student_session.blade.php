@@ -65,7 +65,9 @@
 
       </div>
 
-      <button type="submit" class="btn btn-primary mt-3">Add Progress</button>
+      <button type="submit" class="btn btn-primary mt-3">Student Progress Marking</button>
+
+      <button type="button" id="exportPDFBtn" class="btn btn-danger mt-3">Export to PDF</button>
 
     </form>
 
@@ -157,6 +159,36 @@
 
 
     });
+
+
+$(document).ready(function() {
+    $('#exportPDFBtn').on('click', function(e) {
+        e.preventDefault();
+
+        let session_id = $('#session_id').val(); // This gets the ID (e.g., 11)
+        let classId = $('#class_id').val();
+        let studentId = $('#student_id').val();
+
+        if (!session_id || !classId || !studentId) {
+            alert('Please select session, class and student');
+            return;
+        }
+
+        // Get the text content (session_name) of the selected option
+        let sessionName = $('#session_id option:selected').text();
+
+        if (!sessionName) {
+            alert('Session name not found. Please select a valid session.');
+            return;
+        }
+
+        // The Laravel route expects the session name, so pass sessionName
+        let url = "{{ route('admin.student.progress.export.pdf', ['student_id' => '__STUDENT__', 'session' => '__SESSION_NAME__']) }}";
+        url = url.replace('__STUDENT__', studentId).replace('__SESSION_NAME__', sessionName);
+
+        window.open(url, '_blank');
+    });
+});
 
 
 
