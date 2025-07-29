@@ -31,7 +31,7 @@
       <div class="card-header">
         <div class="row w-100 align-items-center">
           <div class="col-md-6">
-            <h5 class="mb-0">Class: {{ $classData->class }}</h5>
+            <h5 class="mb-0">Class: {{ strtoupper($classData->class) }}</h5>
           </div>
           <div class="col-md-6">
             <form method="GET" action="">
@@ -118,9 +118,9 @@
             </div>
           </div>
 
-          @if (hasPermissionByChild('class_wise_subject_assign'))
+          {{-- @if (hasPermissionByChild('class_wise_subject_assign')) --}}
             <button type="submit" class="btn btn-primary d-block" onClick="addSubject({{$classData->id}})">Add</button>
-          @endif
+          {{-- @endif --}}
         </form>
       </div>
     </div>

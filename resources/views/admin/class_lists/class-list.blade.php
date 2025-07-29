@@ -48,7 +48,7 @@
               <td>
                 <div class="btn-group" role="group" aria-label="Class Actions">
                   {{-- Subject Button --}}
-                  @if (hasPermissionByChild('class_wise_subject'))
+                  {{-- @if (hasPermissionByChild('class_wise_subject')) --}}
                     <div>
                       <a href="{{ route('admin.class.subjects', ['id' => $class->id]) }}"
                         class="btn btn-sm btn-icon btn-outline-info"
@@ -56,7 +56,7 @@
                           <i class="ri-book-2-line"></i>
                       </a>
                     </div>                   
-                  @endif
+                  {{-- @endif --}}
 
                   {{-- Edit Button --}}
                   @if (hasPermissionByChild('update_class'))

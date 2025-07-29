@@ -597,6 +597,151 @@ class StudentMarkListController extends Controller
     }
 
 
+    // public function exportFormat(Request $request)
+    // {
+    //     // dd($request->all());
+    //     $request->validate([
+    //         'session_id' => 'required|exists:academic_sessions,id',
+    //         'class_ids' => 'required|array',
+    //         'class_ids.*' => 'exists:class_lists,id',
+    //     ]);
+
+    //     $headers = ['student_id', 'student_name', 'class', 'subject', 'mid_term_out_off', 'mid_term_stu_marks', 'final_exam_out_off', 'final_exam_stu_marks'];
+
+    //     $data = [];
+
+    //     // Get students for selected classes and session
+    //     $students = StudentAdmission::with('student', 'class', 'session')
+    //         ->where('session_id', $request->session_id)
+    //         ->whereIn('class_id', $request->class_ids)
+    //         ->get();
+
+    //     foreach ($students as $admission) {
+    //         $subjects = ClassWiseSubject::where('class_id', $admission->class_id)->with('subject')->get();
+    //         foreach ($subjects as $sub) {
+    //             $data[] = [
+    //                 $admission->student_id,
+    //                 $admission->student->full_name,
+    //                 $admission->class->name,
+    //                 $sub->subject->name,
+    //                 '', '', '', ''
+    //             ];
+    //         }
+    //     }
+
+    //     // $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+    //     // return response()->streamDownload(function () use ($headers, $data) {
+    //     //     $handle = fopen('php://output', 'w');
+    //     //     fputcsv($handle, $headers);
+    //     //     foreach ($data as $row) {
+    //     //         fputcsv($handle, $row);
+    //     //     }
+    //     //     fclose($handle);
+    //     // }, $filename);
+
+    //     if (count($data) > 0) {
+    //         $delimiter = ",";
+    //         $filename = "student_marks_export_" . date('Y-m-d_H-i-s') . ".csv";
+
+    //         $f = fopen('php://memory', 'w');
+
+    //         // CSV headers
+    //         fputcsv($f, $headers, $delimiter);
+
+    //         // CSV rows
+    //         foreach ($data as $row) {
+    //             fputcsv($f, $row, $delimiter);
+    //         }
+
+    //         // Rewind pointer and send file
+    //         fseek($f, 0);
+    //         header('Content-Type: text/csv');
+    //         header('Content-Disposition: attachment; filename="' . $filename . '";');
+    //         fpassthru($f);
+    //         exit;
+    //     } else {
+    //         return redirect()->back()->with('error', 'No student data found to export.');
+    //     }
+    // }
+
+    public function exportFormat(Request $request)
+    {
+        $request->validate([
+            'session_id' => 'required|exists:academic_sessions,id',
+            'class_ids' => 'required|array',
+            'class_ids.*' => 'exists:class_lists,id',
+        ]);
+
+        $headers = [
+            'student_name',
+            'student_id',
+            'class_name',
+            'session_name',
+            'subject_name',
+            'mid_term_stu_marks',
+            'final_exam_stu_marks'
+        ];
+
+        $data = [];
+
+        $students = StudentAdmission::with(['student', 'class', 'session'])
+            ->distinct('student_id')
+            ->where('session_id', $request->session_id)
+            ->whereIn('class_id', $request->class_ids)
+            ->get();
+
+        foreach ($students as $student) {
+            $subjects = ClassWiseSubject::with('subject')->select(['id', 'subject_id'])->where('class_id', $student->class_id)->get();
+            $subjectNames = '';
+            foreach ($subjects as $sub) {
+                if (!isset($sub->subject->sub_name)) {
+                    // print_r($sub);
+                    dd($sub);
+                }
+                $subjectNames .= $sub->subject->sub_name . ',';
+            }
+            $subjectNames = trim($subjectNames, ',');
+            $data[] = [
+                    $student->student->student_name,
+                    $student->student->student_id,
+                    $student->class->class,
+                    $student->session->session_name,
+                    $subjectNames,
+                    0,
+                    0
+                ];
+      
+        }
+
+        if (count($data) > 0) {
+            $delimiter = ",";
+            $filename = "student_marks_export_" . date('Y-m-d_H-i-s') . ".csv";
+
+            $f = fopen('php://memory', 'w');
+
+            // Add BOM for Excel compatibility with UTF-8, especially for special characters
+            fprintf($f, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+
+            // CSV headers
+            fputcsv($f, $headers, $delimiter);
+
+            // CSV rows
+            foreach ($data as $row) {
+                fputcsv($f, $row, $delimiter);
+            }
+
+            // Rewind pointer and send file
+            fseek($f, 0);
+            header('Content-Type: text/csv; charset=utf-8'); // Added charset
+            header("Content-Disposition: attachment; filename=$filename");
+            fpassthru($f);
+            exit;
+        } else {
+            return redirect()->back()->with('error', 'No student data found for the selected session and classes to export.');
+        }
+    }
+
 
 
 

@@ -142,13 +142,13 @@
           </li>
           @endif
 
-          @if (hasPermissionByChild('class_list'))
+          {{-- @if (hasPermissionByChild('class_list')) --}}
           <li class="menu-item {{ (request()->is('admin/master-module/class-list*')) ? 'open' : '' }}">
             <a href="{{route('admin.classlist')}}" class="menu-link">
               <div>Class List</div>
             </a>
           </li>
-          @endif
+          {{-- @endif --}}
 
           {{-- @if (hasPermissionByChild('category_marking_list')) --}}
           <li class="menu-item {{ (request()->is('admin/master-module/student-progress-marking*')) ? 'open' : '' }}">

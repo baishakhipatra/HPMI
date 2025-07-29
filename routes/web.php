@@ -183,7 +183,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/status/{id}', [StudentListController::class, 'status'])->name('admin.studentstatus');
                 Route::get('/get-sections', [StudentListController::class, 'getSections'])->name('admin.student.get-sections');
                 Route::post('/delete', [StudentListController::class, 'delete'])->name('admin.studentdelete');
-                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export')->middleware('check.permission');
+                Route::get('/export', [StudentListController::class, 'export'])->name('admin.student.export');
                 Route::post('/import', [StudentListController::class, 'import'])->name('admin.student.import');
 
             });
@@ -227,10 +227,12 @@ Route::prefix('admin')->group(function () {
                 Route::get('/get-students-by-session', [StudentMarkListController::class, 'getStudentsBySession'])->name('admin.get-students-by-session');
                 Route::get('/get-class-by-session-and-student', [StudentMarkListController::class, 'getClassBySessionAndStudent'])->name('admin.get-class-by-session-and-student');
                 Route::get('/student-marks/edit-data/{id}', [StudentMarkListController::class, 'getEditData'])->name('admin.student-marks.getData');
-                Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store')->middleware('check.permission');
-                Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update')->middleware('check.permission');
+                Route::post('/store', [StudentMarkListController::class, 'storeStudentMarks'])->name('admin.student-marks.store');
+                Route::post('/update', [StudentMarkListController::class, 'update'])->name('admin.student-marks.update');
                 Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete')->middleware('check.permission');
-                Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export')->middleware('check.permission');
+                Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
+                Route::post('/export-format', [StudentMarkListController::class, 'exportFormat'])->name('admin.student-marks.exportFormat');
+                Route::post('/import', [StudentMarkListController::class, 'import'])->name('admin.student-marks.import');
             });
 
 
@@ -247,7 +249,7 @@ Route::prefix('admin')->group(function () {
         //Master module
         Route::prefix('master-module')->group(function(){
             Route::prefix('class-list')->group(function(){
-                Route::get('/', [ClassListController::class, 'index'])->name('admin.classlist')->middleware('check.permission');
+                Route::get('/', [ClassListController::class, 'index'])->name('admin.classlist');
                 Route::get('/create', [ClassListController::class, 'create'])->name('admin.classcreate')->middleware('check.permission');
                 Route::post('/store', [ClassListController::class, 'store'])->name('admin.classstore');
                 Route::get('/edit/{id}', [ClassListController::class, 'edit'])->name('admin.classedit')->middleware('check.permission');
@@ -256,8 +258,8 @@ Route::prefix('admin')->group(function () {
                 Route::post('/delete', [ClassListController::class, 'delete'])->name('admin.classdelete')->middleware('check.permission');
 
                 //classwise subject
-                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects')->middleware('check.permission');
-                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign')->middleware('check.permission');
+                Route::get('/subjects/{id}', [ClassListController::class, 'subjectsList'])->name('admin.class.subjects');
+                Route::post('/subjects/add-subject', [ClassListController::class, 'addSubjectToclass'])->name('admin.class.subjects.assign');
                 Route::post('/subjects/delete', [ClassListController::class, 'deleteSubjectToclass'])->name('admin.class.subjects.delete')->middleware('check.permission');
             });
         

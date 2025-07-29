@@ -165,20 +165,30 @@ $(document).ready(function() {
     $('#exportPDFBtn').on('click', function(e) {
         e.preventDefault();
 
-        let session_id = $('#session_id').val(); // This gets the ID (e.g., 11)
+        let sessionId  = $('#session_id').val(); // This gets the ID (e.g., 11)
         let classId = $('#class_id').val();
         let studentId = $('#student_id').val();
 
-        if (!session_id || !classId || !studentId) {
-            alert('Please select session, class and student');
-            return;
+        if (!sessionId ) {
+          toastFire('error', 'Please select session');
+          return;
+        }
+
+        if (!classId) {
+          toastFire('error', 'Please select a class');
+          return;
+        }
+
+        if (!studentId) {
+          toastFire('error', 'Please select student');
+          return;
         }
 
         // Get the text content (session_name) of the selected option
         let sessionName = $('#session_id option:selected').text();
 
         if (!sessionName) {
-            alert('Session name not found. Please select a valid session.');
+            toastFire('error', 'Session name not found. Please select a valid session.');
             return;
         }
 
@@ -187,9 +197,9 @@ $(document).ready(function() {
         url = url.replace('__STUDENT__', studentId).replace('__SESSION_NAME__', sessionName);
 
         window.open(url, '_blank');
+        
     });
 });
-
 
 
 </script>

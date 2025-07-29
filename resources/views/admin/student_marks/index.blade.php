@@ -78,14 +78,14 @@
         </div>
     @endif
 
-    <div class="container py-4">
+    <div class="py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div class="card-header">
                 <h4 class="fw-bold mb-0">Marks Management</h4>
                 <small class="text-muted">Manage student marks</small>
             </div>
             <div>
-                @if (hasPermissionByChild('export_student_mark_list'))
+                {{-- @if (hasPermissionByChild('export_student_mark_list')) --}}
                     <a href="{{ route('admin.student-marks.export', [
                                 'student_name' => request('student_name'),
                                 'class_filter' => request('class_filter'),
@@ -96,13 +96,18 @@
                         data-toggle="tooltip" title="Export Student Mark">
                             Export <i class="tf-icons ri-download-line"></i>
                     </a>
-                @endif
+                {{-- @endif --}}
 
-                @if (hasPermissionByChild('create_student_mark'))
+                {{-- for import csv --}}
+                <button type="button" class="btn buttons-collection btn-outline-secondary waves-effect btn-sm" data-bs-toggle="modal" data-bs-target="#importStudentModal">
+                    Import <i class="tf-icons ri-upload-line"></i></i>
+                </button>
+
+                {{-- @if (hasPermissionByChild('create_student_mark')) --}}
                     <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addMarksModal">
                     + Add Marks
                     </button>
-                @endif
+                {{-- @endif --}}
             </div>
         </div>
         <form action="{{ route('admin.studentmarklist')}}" method="GET">
@@ -201,7 +206,7 @@
                             {{-- Edit Button --}}
                             @if (hasPermissionByChild('edit_student_mark'))
                                 <button type="button"
-                                class="btn btn-sm btn-icon btn-outline-dark editMarksBtn"
+                                class="btn btn-sm btn-icon btn-dark editMarksBtn"
                                 data-url="{{ route('admin.student-marks.getData', $mark->id) }}"
                                 data-bs-toggle="tooltip"  title="Edit">                                 
                                 <i class="ri-pencil-line"></i>
@@ -211,7 +216,7 @@
                             {{-- Delete Button --}}
                             @if (hasPermissionByChild('delete_student_mark'))
                                 <button type="button"
-                                class="btn btn-sm btn-icon btn-outline-danger"
+                                class="btn btn-sm btn-icon btn-danger"
                                 onclick="deleteMark({{ $mark->id }})" data-bs-toggle="tooltip" title="Delete">
                                 <i class="ri-delete-bin-6-line"></i>
                                 </button>
@@ -450,6 +455,63 @@
               </div>
             </div>
           </div>
+
+            <!-- Import Student Mark Modal -->
+        <div class="modal fade" id="importStudentModal" tabindex="-1" aria-labelledby="importStudentModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form id="importStudentForm" enctype="multipart/form-data" method="POST">
+                    @csrf
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importStudentModalLabel">Import Student Marks</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            {{-- Session Dropdown --}}
+                            <select id="session_id_for_import" name="session_ids" class="form-control">
+                                <option value="">Select Session</option>
+                                @foreach($sessions as $item)
+                                    <option value="{{ $item->session_id }}">{{ $item->session->session_name }}</option>
+                                @endforeach
+                            </select>
+
+
+                            {{-- Class Multi-Select --}}
+                            <div class="mb-3">
+                                <label for="class_ids" class="form-label">Select Classes</label>
+                                <select class="form-control" name="class_ids[]" id="class_ids" multiple data-placeholder="Choose classes...">
+                                    @foreach($classes as $class)
+                                        <option value="{{ $class->id }}">{{ strtoupper($class->class) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Export/Import Buttons --}}
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-outline-primary" id="exportMarksFormatBtn">
+                                    <i class="ri-download-line"></i> Export Format
+                                </button>
+                            </div>
+
+                            {{-- File Upload --}}
+                            <div class="mb-3">
+                                <label for="excel_file" class="form-label">Upload Filled CSV File</label>
+                                <input type="file" class="form-control" id="excel_file" name="excel_file" accept=".csv,.xls,.xlsx">
+                            </div>
+
+                            <div id="importMessage" class="text-danger"></div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Import</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
     
 @endsection
@@ -1034,6 +1096,59 @@
 
         });
 
+        // $con(document).ready(function () {
+        //     $con(".mySelect").select2({
+        //         placeholder: "Choose classes...",
+        //         allowClear: false,
+        //         minimumResultsForSearch: 5
+        //     });
+        // });
+
+
+        $con('#exportMarksFormatBtn').on('click', function (e) {
+            e.preventDefault();
+
+            const session_id = $('#session_id_for_import').val();
+            const class_ids = $('#class_ids').val();
+
+            console.log("session_id:", session_id);
+            console.log("class_ids:", class_ids);
+
+            if (!session_id || !class_ids || class_ids.length === 0) {
+                alert("Please select session and at least one class.");
+                return;
+            }
+
+            $.ajax({
+                url: '{{ route("admin.student-marks.exportFormat") }}',
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    session_id: session_id,
+                    class_ids: class_ids
+                },
+                xhrFields: {
+                    responseType: 'blob' // for binary content
+                },
+                success: function (response, status, xhr) {
+                    let filename = "student_marks_export.csv";
+                    const disposition = xhr.getResponseHeader('Content-Disposition');
+                    if (disposition && disposition.indexOf('filename=') !== -1) {
+                        filename = disposition.split('filename=')[1].replace(/"/g, '');
+                    }
+
+                    const blob = new Blob([response], { type: 'text/csv' });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    link.click();
+                },
+                error: function (xhr) {
+                    alert('Failed to export file. Please try again.');
+                    console.log(xhr.responseText);
+                }
+            });
+        });
 
     </script>
 @endsection
