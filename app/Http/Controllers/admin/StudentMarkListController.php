@@ -8,9 +8,11 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark, AcademicSession, TeacherClass};
+use App\Models\{ClassList, Subject, Student, StudentAdmission,ClassWiseSubject, StudentsMark, AcademicSession, 
+    TeacherClass, StudentMarkLog};
 
 class StudentMarkListController extends Controller
 {
@@ -597,91 +599,37 @@ class StudentMarkListController extends Controller
     }
 
 
-    // public function exportFormat(Request $request)
-    // {
-    //     // dd($request->all());
-    //     $request->validate([
-    //         'session_id' => 'required|exists:academic_sessions,id',
-    //         'class_ids' => 'required|array',
-    //         'class_ids.*' => 'exists:class_lists,id',
-    //     ]);
-
-    //     $headers = ['student_id', 'student_name', 'class', 'subject', 'mid_term_out_off', 'mid_term_stu_marks', 'final_exam_out_off', 'final_exam_stu_marks'];
-
-    //     $data = [];
-
-    //     // Get students for selected classes and session
-    //     $students = StudentAdmission::with('student', 'class', 'session')
-    //         ->where('session_id', $request->session_id)
-    //         ->whereIn('class_id', $request->class_ids)
-    //         ->get();
-
-    //     foreach ($students as $admission) {
-    //         $subjects = ClassWiseSubject::where('class_id', $admission->class_id)->with('subject')->get();
-    //         foreach ($subjects as $sub) {
-    //             $data[] = [
-    //                 $admission->student_id,
-    //                 $admission->student->full_name,
-    //                 $admission->class->name,
-    //                 $sub->subject->name,
-    //                 '', '', '', ''
-    //             ];
-    //         }
-    //     }
-
-    //     // $filename = 'student_marks_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
-
-    //     // return response()->streamDownload(function () use ($headers, $data) {
-    //     //     $handle = fopen('php://output', 'w');
-    //     //     fputcsv($handle, $headers);
-    //     //     foreach ($data as $row) {
-    //     //         fputcsv($handle, $row);
-    //     //     }
-    //     //     fclose($handle);
-    //     // }, $filename);
-
-    //     if (count($data) > 0) {
-    //         $delimiter = ",";
-    //         $filename = "student_marks_export_" . date('Y-m-d_H-i-s') . ".csv";
-
-    //         $f = fopen('php://memory', 'w');
-
-    //         // CSV headers
-    //         fputcsv($f, $headers, $delimiter);
-
-    //         // CSV rows
-    //         foreach ($data as $row) {
-    //             fputcsv($f, $row, $delimiter);
-    //         }
-
-    //         // Rewind pointer and send file
-    //         fseek($f, 0);
-    //         header('Content-Type: text/csv');
-    //         header('Content-Disposition: attachment; filename="' . $filename . '";');
-    //         fpassthru($f);
-    //         exit;
-    //     } else {
-    //         return redirect()->back()->with('error', 'No student data found to export.');
-    //     }
-    // }
-
     public function exportFormat(Request $request)
     {
         $request->validate([
-            'session_id' => 'required|exists:academic_sessions,id',
-            'class_ids' => 'required|array',
-            'class_ids.*' => 'exists:class_lists,id',
+            'session_id'    => 'required|exists:academic_sessions,id',
+            'class_ids'     => 'required|array',
+            'class_ids.*'   => 'exists:class_lists,id',
         ]);
 
-        $headers = [
-            'student_name',
-            'student_id',
-            'class_name',
-            'session_name',
-            'subject_name',
-            'mid_term_stu_marks',
-            'final_exam_stu_marks'
-        ];
+        // Base headers
+        $baseHeaders = ['student_name', 'phone_number', 'class_name', 'session_name'];
+        $subjectHeaders = [];
+
+        // Collect all unique subject names across selected classes
+        $subjects = ClassWiseSubject::with('subject')
+            ->whereIn('class_id', $request->class_ids)
+            ->get();
+
+        $subjectNames = [];
+        foreach ($subjects as $subject) {
+            if ($subject->subject && $subject->subject->sub_name) {
+                $subjectNames[$subject->subject->sub_name] = true;
+            }
+        }
+
+        // For each subject, we need two columns: mid term and final exam
+        foreach (array_keys($subjectNames) as $subject) {
+            $subjectHeaders[] = $subject . '_mid_term';
+            $subjectHeaders[] = $subject . '_final_exam';
+        }
+
+        $headers = array_merge($baseHeaders, $subjectHeaders);
 
         $data = [];
 
@@ -692,26 +640,21 @@ class StudentMarkListController extends Controller
             ->get();
 
         foreach ($students as $student) {
-            $subjects = ClassWiseSubject::with('subject')->select(['id', 'subject_id'])->where('class_id', $student->class_id)->get();
-            $subjectNames = '';
-            foreach ($subjects as $sub) {
-                if (!isset($sub->subject->sub_name)) {
-                    // print_r($sub);
-                    dd($sub);
-                }
-                $subjectNames .= $sub->subject->sub_name . ',';
+            $row = [
+                $student->student->student_name,
+                // $student->student->student_id,
+                $student->student->phone_number,
+                $student->class->class,
+                $student->session->session_name,
+            ];
+
+            // Initialize subject marks with empty or zero values
+            foreach ($subjectNames as $subject => $_) {
+                $row[] = ''; // mid term
+                $row[] = ''; // final exam
             }
-            $subjectNames = trim($subjectNames, ',');
-            $data[] = [
-                    $student->student->student_name,
-                    $student->student->student_id,
-                    $student->class->class,
-                    $student->session->session_name,
-                    $subjectNames,
-                    0,
-                    0
-                ];
-      
+
+            $data[] = $row;
         }
 
         if (count($data) > 0) {
@@ -720,20 +663,19 @@ class StudentMarkListController extends Controller
 
             $f = fopen('php://memory', 'w');
 
-            // Add BOM for Excel compatibility with UTF-8, especially for special characters
-            fprintf($f, chr(0xEF).chr(0xBB).chr(0xBF)); // UTF-8 BOM
+            // Add BOM for Excel compatibility with UTF-8
+            fprintf($f, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            // CSV headers
+            // Write headers
             fputcsv($f, $headers, $delimiter);
 
-            // CSV rows
+            // Write rows
             foreach ($data as $row) {
                 fputcsv($f, $row, $delimiter);
             }
 
-            // Rewind pointer and send file
             fseek($f, 0);
-            header('Content-Type: text/csv; charset=utf-8'); // Added charset
+            header('Content-Type: text/csv; charset=utf-8');
             header("Content-Disposition: attachment; filename=$filename");
             fpassthru($f);
             exit;
@@ -741,6 +683,155 @@ class StudentMarkListController extends Controller
             return redirect()->back()->with('error', 'No student data found for the selected session and classes to export.');
         }
     }
+
+    public function importMarks(Request $request)
+    {
+        $request->validate([
+            'excel_file'    => 'required|file|mimes:xlsx,csv,xls|max:10240',
+            'session_ids'   => 'required|exists:academic_sessions,id',
+            'class_ids'     => 'required|array',
+            'class_ids.*'   => 'exists:class_lists,id',
+        ]);
+
+        $sessionId = $request->input('session_ids');
+        $classIds = $request->input('class_ids', []);
+        $file = $request->file('excel_file');
+        $path = $file->getRealPath();
+        $data = array_map('str_getcsv', file($path));
+        
+        if (empty($data) || count($data) < 2) {
+            return back()->with('error', 'Uploaded file is empty or invalid.');
+        }
+
+        $headers = array_map('trim', $data[0]);
+        unset($data[0]); // Remove header row
+
+        $subjectMapping = []; // ['English_mid_term' => [subject_id, term], ...]
+
+        // Dynamically determine subjects from headers
+        foreach ($headers as $header) {
+            if (preg_match('/(.+)_mid_term$/', $header, $matches)) {
+                $subjectName = $matches[1];
+                $subject = Subject::where('sub_name', $subjectName)->first();
+                if ($subject) {
+                    $subjectMapping[$header] = [$subject->id, 'mid'];
+                }
+            }
+
+            if (preg_match('/(.+)_final_exam$/', $header, $matches)) {
+                $subjectName = $matches[1];
+                $subject = Subject::where('sub_name', $subjectName)->first();
+                if ($subject) {
+                    $subjectMapping[$header] = [$subject->id, 'final'];
+                }
+            }
+        }
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($data as $row) {
+                // Ensure the row has the same number of elements as headers
+                if (count($row) !== count($headers)) {
+                    // Log or handle the error for malformed rows if necessary
+                    continue; 
+                }
+                
+                $row = array_combine($headers, $row);
+                
+                // Use phone_number to find the student
+                $student = Student::where('phone_number', trim($row['phone_number']))->first();
+                if (!$student) {
+                    continue; // Skip if student not found by phone number
+                }
+                $student_id = $student->id;
+
+                $session_name = trim($row['session_name']);
+                $class_name = trim($row['class_name']);
+
+                $session_id = DB::table('academic_sessions')->where('session_name', $session_name)->value('id');
+                $class_id = DB::table('class_lists')->where('class', $class_name)->value('id');
+
+                // Skip if session or class not found
+                if (!$session_id || !$class_id) {
+                    continue;
+                }
+
+                $admission = StudentAdmission::where('student_id', $student_id)
+                    ->where('session_id', $session_id)
+                    ->where('class_id', $class_id)
+                    ->first();
+
+                if (!$admission) {
+                    continue; // Skip if no admission record found
+                }
+
+                // Get subjects available for this class
+                $classWiseSubjects = ClassWiseSubject::where('class_id', $class_id)
+                                                    ->pluck('subject_id')
+                                                    ->toArray();
+
+                $marksToInsert = [];
+
+                foreach ($subjectMapping as $column => [$subjectId, $term]) {
+                    // Check if the subject is offered in the student's class
+                    if (!in_array($subjectId, $classWiseSubjects)) {
+                        continue; // Skip if subject is not offered in this class
+                    }
+
+                    $markValue = trim($row[$column]);
+
+                    if ($markValue === '' || !is_numeric($markValue)) {
+                        continue; // Skip if mark is empty or not numeric
+                    }
+
+                    $existing = StudentsMark::where('student_admission_id', $admission->id)
+                        ->where('subject_id', $subjectId)
+                        ->first();
+
+                    if ($existing) {
+                        continue; // Skip if marks already exist for this subject and student
+                    }
+
+                    if (!isset($marksToInsert[$subjectId])) {
+                        $marksToInsert[$subjectId] = [
+                            'student_admission_id' => $admission->id,
+                            'session_id' => $session_id,
+                            'class_id' => $class_id,
+                            'student_id' => $student_id,
+                            'subject_id' => $subjectId,
+                            'mid_term_out_off' => 0,
+                            'mid_term_stu_marks' => null,
+                            'final_exam_out_off' => 0,
+                            'final_exam_stu_marks' => null,
+                        ];
+                    }
+
+                    if ($term === 'mid') {
+                        $marksToInsert[$subjectId]['mid_term_stu_marks'] = $markValue;
+                        $marksToInsert[$subjectId]['mid_term_out_off'] = 100;
+                    } else {
+                        $marksToInsert[$subjectId]['final_exam_stu_marks'] = $markValue;
+                        $marksToInsert[$subjectId]['final_exam_out_off'] = 100;
+                    }
+                }
+
+                foreach ($marksToInsert as $markData) {
+                    StudentsMark::create($markData);
+                }
+            }
+
+            DB::commit();
+            return back()->with('success', 'Student marks imported successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error importing marks: ' . $e->getMessage());
+        }
+    }
+   
+
+
 
 
 

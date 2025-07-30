@@ -232,7 +232,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/delete', [StudentMarkListController::class, 'delete'])->name('admin.student-marks.delete')->middleware('check.permission');
                 Route::get('/export', [StudentMarkListController::class, 'export'])->name('admin.student-marks.export');
                 Route::post('/export-format', [StudentMarkListController::class, 'exportFormat'])->name('admin.student-marks.exportFormat');
-                Route::post('/import', [StudentMarkListController::class, 'import'])->name('admin.student-marks.import');
+                Route::post('/import', [StudentMarkListController::class, 'importMarks'])->name('admin.student-marks.importMarks');
             });
 
 
