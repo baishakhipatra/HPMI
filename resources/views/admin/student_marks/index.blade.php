@@ -1115,7 +1115,7 @@
             console.log("class_ids:", class_ids);
 
             if (!session_id || !class_ids || class_ids.length === 0) {
-                alert("Please select session and at least one class.");
+                toastFire('error','Please select session and at least one class.');
                 return;
             }
 
@@ -1144,72 +1144,11 @@
                     link.click();
                 },
                 error: function (xhr) {
-                    alert('Failed to export file. Please try again.');
+                    toastFire('error','Failed to export file. Please try again.');
                     console.log(xhr.responseText);
                 }
             });
         });
-
-
-        // $con(document).ready(function () {
-        //     // Prevent submission if session or classes not selected
-        //     $con('#importStudentForm').on('submit', function (e) {
-        //         e.preventDefault();
-
-        //         const sessionId = $con('#session_id_for_import').val();
-        //         const classIds = $con('#class_ids').val();
-        //         const $messageBox = $con('#importMessage');
-
-        //         if (!sessionId || !classIds || classIds.length === 0) {
-        //             $messageBox.html('<div class="alert alert-danger">Please select a session and at least one class.</div>');
-        //             return;
-        //         }
-
-        //         const formData = new FormData(this);
-        //         $messageBox.html('<div class="alert alert-info">Importing...</div>');
-
-        //         $con.ajax({
-        //             url: "{{ route('admin.student-marks.importMarks') }}",
-        //             type: "POST",
-        //             data: formData,
-        //             contentType: false,
-        //             processData: false,
-        //             success: function (response) {
-        //                 if (response.success) {
-        //                     $messageBox.html('<div class="alert alert-success">Marks imported successfully!</div>');
-        //                     $con('#importStudentForm')[0].reset();
-        //                     setTimeout(function () {
-        //                         $con('#importStudentModal').modal('hide');
-        //                         location.reload();
-        //                     }, 2000);
-        //                 } else if (response.error || response.errors) {
-        //                     let html = `<div class="alert alert-danger"><strong>Error:</strong><ul>`;
-        //                     const errors = response.errors || [response.error];
-        //                     errors.forEach(err => html += `<li>${err}</li>`);
-        //                     html += '</ul></div>';
-        //                     $messageBox.html(html);
-        //                 } else {
-        //                     $messageBox.html('<div class="alert alert-warning">Unexpected response from server.</div>');
-        //                 }
-        //             },
-        //             error: function (xhr) {
-        //                 const response = xhr.responseJSON;
-        //                 let msg = "Something went wrong.";
-        //                 if (response?.message) msg = response.message;
-
-        //                 if (response?.errors) {
-        //                     msg = '<ul>';
-        //                     for (const key in response.errors) {
-        //                         msg += `<li>${response.errors[key][0]}</li>`;
-        //                     }
-        //                     msg += '</ul>';
-        //                 }
-
-        //                 $messageBox.html(`<div class="alert alert-danger">${msg}</div>`);
-        //             }
-        //         });
-        //     });
-        // });
 
 
 

@@ -15,7 +15,7 @@ use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Carbon\Carbon;
 
 
-use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, progressList,StudentProgressCategory,StudentProgressMarking};
+use App\Models\{Student, AcademicSession, ClassList, SectionList, StudentAdmission, StudentsMark, StudentMarkLog, progressList,StudentProgressCategory,StudentProgressMarking};
 
 class StudentListController extends Controller
 {
@@ -355,27 +355,43 @@ class StudentListController extends Controller
 
     public function delete(Request $request)
     {
-        $student = Student::find($request->id); 
+        try{
+            $student = Student::find($request->id); 
     
-        if (!$student) {
+            if (!$student) {
+                return response()->json([
+                    'status'    => 404,
+                    'message'   => 'student not found.',
+                ]);
+            }
+            
+
+            $imagePath = $student->image;
+
+            DB::beginTransaction();
+
+            // Delete all dependent records (manually or via relationships)
+            StudentAdmission::where('student_id', $student->id)->delete();
+            StudentsMark::where('student_id', $student->id)->delete();
+            StudentMarkLog::where('student_id', $student->id)->delete();
+        
+            $student->delete(); 
+
+            DB::commit();
+            // Delete image from public directory if it exists
+            if (!empty($imagePath) && file_exists(public_path($imagePath))) {
+                unlink(public_path($imagePath));
+            }
             return response()->json([
-                'status'    => 404,
-                'message'   => 'user not found.',
+                'status'    => 200,
+                'message'   => 'Studentlist deleted successfully.',
             ]);
+        }catch (\Exception $e) {
+            // Rollback transaction
+            DB::rollback();
+            return back()->withErrors([$e->getMessage()]);
         }
-
-        $imagePath = $student->image;
-    
-        $student->delete(); 
-
-        // Delete image from public directory if it exists
-        if (!empty($imagePath) && file_exists(public_path($imagePath))) {
-            unlink(public_path($imagePath));
-        }
-        return response()->json([
-            'status'    => 200,
-            'message'   => 'Studentlist deleted successfully.',
-        ]);
+        
     }
 
     

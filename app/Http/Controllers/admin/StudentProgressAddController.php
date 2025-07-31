@@ -91,51 +91,7 @@ class StudentProgressAddController extends Controller
         );
     }
 
-    // public function studentProgressList($student_id, $current_session)
-    // {
-    //     $student = Student::with('admissions.session')->find($student_id);
-    //     $AcademicSession = AcademicSession::where('session_name', $current_session)->first();
-    //     if (!$student || !$AcademicSession) {
-    //         abort(404, 'Student not found');
-    //     }
-    //     $academic_session_id = $AcademicSession->id;
-    //     // $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-    //     //     ->groupBy('value')
-    //     //     ->map(function ($items) {
-    //     //         return $items->pluck('value')->toArray(); // get only values per field
-    //     //     })
-    //     //     ->toArray();
-    //     $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()
-    //         ->groupBy('field'); 
-
-    //         foreach($student_progress_category as $key=>$item){
-    //             StudentProgressMarking::updateOrCreate([
-    //                 'student_id' =>$student_id,
-    //                 'admission_session_id' =>$AcademicSession->id,
-    //                 'progress_category' => ucwords($key)
-    //             ],[
-
-    //             ]);
-    //         }
-    //     $getDetails = StudentProgressMarking::where('student_id',$student_id)->where('admission_session_id',$AcademicSession->id)->get();
-
-    //     $savedScores = StudentProgressMarking::where('student_id', $student_id)
-    //         ->where('admission_session_id', $academic_session_id)
-    //         ->get()
-    //         ->groupBy('progress_category')
-    //         ->map(function ($items) {
-    //             return $items->pluck('formative_first_phase', 'progress_value')->toArray();
-    //         })
-    //         ->toArray();
-
-
-    //    // dd($savedScores);
-    //     $sessionMap = $student->admissions->mapWithKeys(function ($admission) {
-    //         return [$admission->session->session_name ?? 'Unknown' => $admission->id];
-    //     })->toArray();
-
-    //     return view('admin.student_management.student_progress_marking', compact('sessionMap','student','current_session','getDetails','academic_session_id','student_progress_category','savedScores'));
-    // }
+    
     public function studentProgressList($student_id, $current_session)
     {
         $admin = auth()->guard('admin')->user();
@@ -197,6 +153,7 @@ class StudentProgressAddController extends Controller
             return [$admission->session->session_name ?? 'Unknown' => $admission->id];
         })->toArray();
 
+        $progressOptions = getProgressScoreOptions();
         return view('admin.student_management.student_progress_marking', compact(
             'sessionMap',
             'student',
@@ -204,7 +161,7 @@ class StudentProgressAddController extends Controller
             'getDetails',
             'academic_session_id',
             'student_progress_category',
-            'savedScores'
+            'savedScores', 'progressOptions'
         ));
     }
 
@@ -255,42 +212,42 @@ class StudentProgressAddController extends Controller
     }
 
 
-public function exportProgressPdf($student_id, $session)
-{
-    $student = Student::with(['admissions.session', 'admissions.class'])->findOrFail($student_id);
-    $academicSession = AcademicSession::where('session_name', $session)->firstOrFail();
+    public function exportProgressPdf($student_id, $session)
+    {
+        $student = Student::with(['admissions.session', 'admissions.class'])->findOrFail($student_id);
+        $academicSession = AcademicSession::where('session_name', $session)->firstOrFail();
 
-    $academic_session_id = $academicSession->id;
+        $academic_session_id = $academicSession->id;
 
-    $currentAdmission = $student->admissions->where('session_id', $academic_session_id)->first();
-    if (!$currentAdmission) {
-        abort(404, 'Admission record not found.');
+        $currentAdmission = $student->admissions->where('session_id', $academic_session_id)->first();
+        if (!$currentAdmission) {
+            abort(404, 'Admission record not found.');
+        }
+
+        $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()->groupBy('field');
+
+        $getDetails = StudentProgressMarking::where('student_id', $student_id)
+            ->where('admission_session_id', $academic_session_id)
+            ->get();
+
+        $savedScores = $getDetails->groupBy('progress_category')
+            ->map(function ($items) {
+                return $items->pluck('formative_first_phase', 'progress_value')->toArray();
+            })
+            ->toArray();
+            
+
+        $pdf = Pdf::loadView('admin/student_management/export_progress_marking', [
+            'student' => $student,
+            'current_session' => $session,
+            'getDetails' => $getDetails,
+            'academic_session_id' => $academic_session_id,
+            'student_progress_category' => $student_progress_category,
+            'savedScores' => $savedScores,
+        ]);
+
+        return $pdf->download("Progress_Report_{$student->student_name}_{$session}.pdf");
     }
-
-    $student_progress_category = StudentProgressCategory::orderBy('field', 'ASC')->get()->groupBy('field');
-
-    $getDetails = StudentProgressMarking::where('student_id', $student_id)
-        ->where('admission_session_id', $academic_session_id)
-        ->get();
-
-    $savedScores = $getDetails->groupBy('progress_category')
-        ->map(function ($items) {
-            return $items->pluck('formative_first_phase', 'progress_value')->toArray();
-        })
-        ->toArray();
-        
-
-    $pdf = Pdf::loadView('admin/student_management/export_progress_marking', [
-        'student' => $student,
-        'current_session' => $session,
-        'getDetails' => $getDetails,
-        'academic_session_id' => $academic_session_id,
-        'student_progress_category' => $student_progress_category,
-        'savedScores' => $savedScores,
-    ]);
-
-    return $pdf->download("Progress_Report_{$student->student_name}_{$session}.pdf");
-}
 
 
 }

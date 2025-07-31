@@ -6,7 +6,8 @@ use App\Models\Admin;
 use App\Models\Permission;
 use App\Models\AcademicSession;
 use Carbon\Carbon;
-use App\Models\{DesignationPermission, StudentsMark};
+use Illuminate\Support\Facades\Auth;
+use App\Models\{DesignationPermission, StudentsMark, StudentMarkLog};
 
 // if(!function_exists('generateEmployeeId')) {
 //     function generateEmployeeId() {
@@ -269,6 +270,45 @@ if (!function_exists('createNewExistingSession')) {
 
         return $session;
     }
+}
+
+
+//studentmarklog
+if (!function_exists('logMarkUpdate')) {
+    function logMarkUpdate($studentId, $markId){
+        $mark = StudentsMark::find($markId);
+        if(!$mark) return;
+
+        $message = "Marks updated: Subject ID : {$mark->subject_id}, class ID: {$mark->class_id}";
+
+        if(!is_null($mark->mid_term_stu_marks)) {
+            $message .= ", Mid Term: {$mark->mid_term_stu_marks}/{$mark->mid_term_out_off}"; 
+        }
+
+        if(!is_null($mark->final_exam_stu_marks)) {
+            $message .= ", Final Exam: {$mark->final_exam_stu_marks}/{$mark->final_exam_out_off}"; 
+        }
+
+        StudentMarkLog::create([
+            'student_id' => $studentId,
+            'updated_by' => Auth::guard('admin')->user()->id,
+            'message'    => $message,
+        ]);
+    }
+
+    if (!function_exists('getProgressScoreOptions')) {
+        function getProgressScoreOptions()
+        {
+            return [
+                1 => 'Very Good',
+                2 => 'Good',
+                3 => 'Satisfactory',
+                4 => 'Requires more development',
+                5 => 'Delayed development',
+            ];
+        }
+    }
+
 }
 
 

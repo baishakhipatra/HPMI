@@ -607,6 +607,24 @@ class StudentMarkListController extends Controller
             'class_ids.*'   => 'exists:class_lists,id',
         ]);
 
+        $admin = auth()->user(); // Or auth('admin')->user() depending on your guard
+
+        // If the logged-in user is a teacher, restrict the class_ids
+        if ($admin && $admin->user_type === 'Teacher') {
+            $assignedClassIds = $admin->teacherClasses()->pluck('class_id')->toArray();
+            
+            // Intersect only assigned classes with requested class_ids
+            $allowedClassIds = array_intersect($assignedClassIds, $request->class_ids);
+
+            if (empty($allowedClassIds)) {
+                return redirect()->back()->with('error', 'You are not assigned to the selected classes.');
+            }
+
+            // Override the request class_ids with the filtered ones
+            $request->merge([
+                'class_ids' => $allowedClassIds
+            ]);
+        }
         // Base headers
         $baseHeaders = ['student_name', 'phone_number', 'class_name', 'session_name'];
         $subjectHeaders = [];
@@ -687,7 +705,7 @@ class StudentMarkListController extends Controller
     public function importMarks(Request $request)
     {
         $request->validate([
-            'excel_file'    => 'required|file|mimes:xlsx,csv,xls|max:10240',
+            'excel_file'    => 'required|file|mimes:xlsx,csv,xls|max:204800', // max size 20 MB
             'session_ids'   => 'required|exists:academic_sessions,id',
             'class_ids'     => 'required|array',
             'class_ids.*'   => 'exists:class_lists,id',
@@ -697,14 +715,14 @@ class StudentMarkListController extends Controller
         $classIds = $request->input('class_ids', []);
         $file = $request->file('excel_file');
         $path = $file->getRealPath();
-        $data = array_map('str_getcsv', file($path));
+        $rows = array_map('str_getcsv', file($path));
         
-        if (empty($data) || count($data) < 2) {
+        if (empty($rows) || count($rows) < 2) {
             return back()->with('error', 'Uploaded file is empty or invalid.');
         }
 
-        $headers = array_map('trim', $data[0]);
-        unset($data[0]); // Remove header row
+        // Extract and remove headers
+        $headers = array_map('trim', array_shift($rows));
 
         $subjectMapping = []; // ['English_mid_term' => [subject_id, term], ...]
 
@@ -712,15 +730,13 @@ class StudentMarkListController extends Controller
         foreach ($headers as $header) {
             if (preg_match('/(.+)_mid_term$/', $header, $matches)) {
                 $subjectName = $matches[1];
-                $subject = Subject::where('sub_name', $subjectName)->first();
+                $subject = Subject::select(['id'])->where('sub_name', $subjectName)->first();
                 if ($subject) {
                     $subjectMapping[$header] = [$subject->id, 'mid'];
                 }
-            }
-
-            if (preg_match('/(.+)_final_exam$/', $header, $matches)) {
+            } elseif (preg_match('/(.+)_final_exam$/', $header, $matches)) {
                 $subjectName = $matches[1];
-                $subject = Subject::where('sub_name', $subjectName)->first();
+                $subject = Subject::select(['id'])->where('sub_name', $subjectName)->first();
                 if ($subject) {
                     $subjectMapping[$header] = [$subject->id, 'final'];
                 }
@@ -729,104 +745,121 @@ class StudentMarkListController extends Controller
 
         DB::beginTransaction();
 
+        $updateCount = 0;
+
         try {
-            foreach ($data as $row) {
-                // Ensure the row has the same number of elements as headers
-                if (count($row) !== count($headers)) {
-                    // Log or handle the error for malformed rows if necessary
-                    continue; 
-                }
-                
-                $row = array_combine($headers, $row);
-                
-                // Use phone_number to find the student
-                $student = Student::where('phone_number', trim($row['phone_number']))->first();
-                if (!$student) {
-                    continue; // Skip if student not found by phone number
-                }
-                $student_id = $student->id;
-
-                $session_name = trim($row['session_name']);
-                $class_name = trim($row['class_name']);
-
-                $session_id = DB::table('academic_sessions')->where('session_name', $session_name)->value('id');
-                $class_id = DB::table('class_lists')->where('class', $class_name)->value('id');
-
-                // Skip if session or class not found
-                if (!$session_id || !$class_id) {
-                    continue;
-                }
-
-                $admission = StudentAdmission::where('student_id', $student_id)
-                    ->where('session_id', $session_id)
-                    ->where('class_id', $class_id)
-                    ->first();
-
-                if (!$admission) {
-                    continue; // Skip if no admission record found
-                }
-
-                // Get subjects available for this class
-                $classWiseSubjects = ClassWiseSubject::where('class_id', $class_id)
-                                                    ->pluck('subject_id')
-                                                    ->toArray();
-
-                $marksToInsert = [];
-
-                foreach ($subjectMapping as $column => [$subjectId, $term]) {
-                    // Check if the subject is offered in the student's class
-                    if (!in_array($subjectId, $classWiseSubjects)) {
-                        continue; // Skip if subject is not offered in this class
+            foreach (array_chunk($rows, 50) as $chunk) {
+                foreach ($chunk as $row) {
+                    $row = array_map('trim', $row);
+                    $data = array_combine($headers, $row);
+                                    
+                    // Use phone_number to find the student
+                    $student = Student::select(['id'])->where('phone_number', trim($data['phone_number']))->first();
+                    if (!$student) {
+                        continue; // Skip if student not found by phone number
                     }
+                    $student_id = $student->id;
 
-                    $markValue = trim($row[$column]);
+                    $session_name = trim($data['session_name']);
+                    $class_name = trim($data['class_name']);
 
-                    if ($markValue === '' || !is_numeric($markValue)) {
-                        continue; // Skip if mark is empty or not numeric
+                    $session_id = AcademicSession::where('session_name', $session_name)->value('id');
+                    $class_id = ClassList::where('class', $class_name)->whereIn('id', $classIds)->value('id');
+
+                    // Skip if session or class not found
+                    if (!$session_id || !$class_id) continue;
+
+                    $admission_id = StudentAdmission::where('student_id', $student_id)
+                        ->where('class_id', $class_id)
+                        ->where('session_id', $sessionId)
+                        ->value('id');
+
+                    if (!$admission_id) continue;
+
+                    // Get subjects available for this class
+                    $classWiseSubjects  = ClassWiseSubject::select(['id', 'subject_id'])
+                                            ->where('class_id', $class_id)
+                                            ->pluck('subject_id')
+                                            ->toArray();
+
+                    // echo '<pre>';
+                    // print_r($row);
+                    // print_r($data);
+                    // echo 'marks' . '\n';
+                    // print_r($subjectMapping);
+                    // echo '</pre>';
+                    // die;
+
+                    foreach ($subjectMapping as $column => [$subject_id, $term]) {
+                        $marksToInsert = [];
+
+                        // Check if the subject is offered in the student's class
+                        if (!in_array($subject_id, $classWiseSubjects)) {
+                            continue; // Skip if subject is not offered in this class
+                        }
+
+                        $markValue = trim($data[$column]);
+
+                        if ($markValue === '' || !is_numeric($markValue)) {
+                            continue; // Skip if mark is empty or not numeric
+                        }
+
+                        if ($term === 'mid') {
+                            $marksToInsert['mid_term_stu_marks'] = $markValue;
+                            $marksToInsert['mid_term_out_off'] = 100;
+                        } else {
+                            $marksToInsert['final_exam_stu_marks'] = $markValue;
+                            $marksToInsert['final_exam_out_off'] = 100;
+                        }
+
+                        $isStudentMarkExist = StudentsMark::select('id')->where([
+                                'student_admission_id' => $admission_id,
+                                'student_id' => $student_id,
+                                'subject_id' => $subject_id,
+                                'class_id' => $class_id,
+                            ])->first();
+
+                        if ($isStudentMarkExist) {
+                            //Log before update
+                            logMarkUpdate($student_id, $isStudentMarkExist->id);
+                            // Update marks if record is already exist for this subject and student
+                            StudentsMark::where([
+                                'id' => $isStudentMarkExist->id
+                            ])->update($marksToInsert);
+                        } else {
+                            // If record is not exists then insert student mark for current subject
+                            $marksToInsert['student_admission_id'] = $admission_id;
+                            $marksToInsert['student_id'] = $student_id;
+                            $marksToInsert['subject_id'] = $subject_id;
+                            $marksToInsert['class_id'] = $class_id;
+
+                            // Create student marks record
+                            StudentsMark::create($marksToInsert);
+                        }
                     }
-
-                    $existing = StudentsMark::where('student_admission_id', $admission->id)
-                        ->where('subject_id', $subjectId)
-                        ->first();
-
-                    if ($existing) {
-                        continue; // Skip if marks already exist for this subject and student
-                    }
-
-                    if (!isset($marksToInsert[$subjectId])) {
-                        $marksToInsert[$subjectId] = [
-                            'student_admission_id' => $admission->id,
-                            'session_id' => $session_id,
-                            'class_id' => $class_id,
-                            'student_id' => $student_id,
-                            'subject_id' => $subjectId,
-                            'mid_term_out_off' => 0,
-                            'mid_term_stu_marks' => null,
-                            'final_exam_out_off' => 0,
-                            'final_exam_stu_marks' => null,
-                        ];
-                    }
-
-                    if ($term === 'mid') {
-                        $marksToInsert[$subjectId]['mid_term_stu_marks'] = $markValue;
-                        $marksToInsert[$subjectId]['mid_term_out_off'] = 100;
-                    } else {
-                        $marksToInsert[$subjectId]['final_exam_stu_marks'] = $markValue;
-                        $marksToInsert[$subjectId]['final_exam_out_off'] = 100;
-                    }
-                }
-
-                foreach ($marksToInsert as $markData) {
-                    StudentsMark::create($markData);
+                    // Count of updated records
+                    $updateCount++;
                 }
             }
 
+            // Commit transaction
             DB::commit();
-            return back()->with('success', 'Student marks imported successfully.');
 
-        } catch (\Exception $e) {
+            $successMessage = 'Student marks imported successfully. ';
+            if ($updateCount > 0) {
+                $successMessage .= ' and ' .  $updateCount . ' records are updated';
+            }
+            $successMessage .= '.';
+            return back()->with('success', $successMessage);
+
+        }  catch (ValidationException $e) {
+            // Rollback transaction
             DB::rollback();
-            return back()->with('error', 'Error importing marks: ' . $e->getMessage());
+            return back()->withErrors($e->errors());
+        }catch (\Exception $e) {
+            // Rollback transaction
+            DB::rollback();
+            return back()->withErrors([$e->getMessage()]);
         }
     }
    

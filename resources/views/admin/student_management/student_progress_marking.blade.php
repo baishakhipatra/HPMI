@@ -7,12 +7,14 @@
 <div class="card">
   <div class="card-body">
     <div class="col-12">
-      <h6 class="text-body-secondary">Learning Perspective Of Conginitive Domain</h6>
+      <div class="card-header mb-4 d-flex justify-content-between align-items-center">
+        <h4 class="fw-bold mb-0">Learning Perspective of Conginitive Domain</h4>
         <div class="text-end">
             <a href="{{ route('admin.student.progressmarking.select') }}" class="btn btn-sm btn-danger">
-                <i class="menu-icon tf-icons ri-arrow-left-line"></i> Back
+                <i class="tf-icons ri-arrow-left-line"></i> Back
             </a>
         </div>
+      </div>
       <div class="nav-align-left nav-tabs-shadow">
         <ul class="nav nav-tabs" role="tablist">
             @foreach ($sessionMap as $index=>$session_item)
@@ -41,8 +43,8 @@
                       <div class="row">
                         @foreach ($values as $item)
                           <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ ucwords($item->value) }} (1-10)</label>
-                           <input type="number"
+                            <label class="form-label">{{ ucwords($item->value) }}</label>
+                           {{-- <input type="number"
                                   class="form-control progress-score-input"
                                   placeholder="Enter score"
                                   min="1" max="10"
@@ -50,7 +52,20 @@
                                   data-session="{{ $academic_session_id }}"
                                   data-category="{{ $fieldName }}"
                                   data-value="{{ $item->value }}"
-                                  value="{{ $savedScores[ucwords($fieldName)][ucwords($item->value)] ?? '' }}">
+                                  value="{{ $savedScores[ucwords($fieldName)][ucwords($item->value)] ?? '' }}"> --}}
+                                  @php $selected = $savedScores[ucwords($fieldName)][ucwords($item->value)] ?? ''; @endphp
+                                  <select class="form-select progress-score-input"
+                                      data-student="{{ $student->id }}"
+                                      data-session="{{ $academic_session_id }}"
+                                      data-category="{{ $fieldName }}"
+                                      data-value="{{ $item->value }}">
+                                      <option value="">Select</option>
+                                      @foreach (getProgressScoreOptions() as $score => $label)
+                                          <option value="{{ $score }}" {{ $selected == $score ? 'selected' : '' }}>
+                                              {{ $label }}
+                                          </option>
+                                      @endforeach
+                                  </select>
                           </div>
                         @endforeach
                       </div>
@@ -64,7 +79,7 @@
           <div class="mt-4">
             <label for="add_comments" class="form-label fw-bold">Add Comment</label>
             <textarea name="add_comments" id="add_comments" class="form-control" rows="3" placeholder="Enter comments...">{{ ucfirst($getDetails->first()->add_comments ?? '') }}</textarea>
-            <button type="button" id="save_comment_btn" class="btn btn-primary mt-2">Save Comment</button>
+            <button type="button" id="save_comment_btn" class="btn btn-primary mt-2 btn-sm">Save Comment</button>
           </div>
 
         </div>
